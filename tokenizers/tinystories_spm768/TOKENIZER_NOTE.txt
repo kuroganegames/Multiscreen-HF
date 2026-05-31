@@ -1,0 +1,1 @@
+HF-native ByteLevel BPE tokenizer trained with tokenizers. The model architecture can be Multiscreen or another CausalLM; it only consumes token ids.

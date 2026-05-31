@@ -1,0 +1,71 @@
+{
+  "expected_vocab_size": 768,
+  "cache": {
+    "cache_dir": null,
+    "hf_home": null,
+    "hub_cache_dir": null,
+    "datasets_cache_dir": null,
+    "model_cache_dir": null,
+    "tokenizer_cache_dir": null,
+    "modules_cache_dir": null,
+    "assets_cache_dir": null
+  },
+  "tokenizer": {
+    "path": "tokenizers/tinystories_spm768",
+    "use_fast": true,
+    "padding_side": "right"
+  },
+  "model": {
+    "config_path": "configs/tiny_llama_768/config.json",
+    "trust_remote_code": false,
+    "from_pretrained": false,
+    "pretrained_model_name_or_path": null,
+    "attn_implementation": "sdpa",
+    "tie_word_embeddings": true
+  },
+  "dataset": {
+    "name": "roneneldan/TinyStories",
+    "config_name": null,
+    "train_split": "train",
+    "eval_split": "validation[:10000]",
+    "text_column": "text",
+    "num_proc": 4,
+    "shuffle": true,
+    "seed": 42
+  },
+  "sft_config": {
+    "output_dir": "outputs/tiny_llama_768",
+    "max_steps": 5000,
+    "per_device_train_batch_size": 16,
+    "per_device_eval_batch_size": 16,
+    "gradient_accumulation_steps": 4,
+    "learning_rate": 0.001,
+    "lr_scheduler_type": "cosine",
+    "warmup_steps": 500,
+    "weight_decay": 0.1,
+    "max_grad_norm": 1.0,
+    "optim": "adamw_torch_fused",
+    "bf16": true,
+    "fp16": false,
+    "tf32": true,
+    "gradient_checkpointing": false,
+    "use_cache": false,
+    "dataset_text_field": "text",
+    "max_length": 512,
+    "packing": false,
+    "eval_packing": false,
+    "completion_only_loss": false,
+    "pad_token": "<pad>",
+    "eos_token": "</s>",
+    "eval_strategy": "steps",
+    "eval_steps": 1000,
+    "save_strategy": "steps",
+    "save_steps": 1000,
+    "save_total_limit": 3,
+    "logging_steps": 50,
+    "logging_first_step": true,
+    "report_to": "none",
+    "seed": 42,
+    "data_seed": 42
+  }
+}

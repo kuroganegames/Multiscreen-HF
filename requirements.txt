@@ -1,0 +1,9 @@
+torch>=2.4
+transformers>=4.57.0
+trl>=0.24.0
+datasets>=3.0.0
+accelerate>=1.0.0
+sentencepiece>=0.2.0
+safetensors>=0.4.5
+numpy>=1.26
+tokenizers>=0.20.0
