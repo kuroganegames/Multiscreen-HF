@@ -1,0 +1,40 @@
+{
+  "model_type": "multiscreen",
+  "architectures": [
+    "MultiscreenForCausalLM"
+  ],
+  "auto_map": {
+    "AutoConfig": "configuration_multiscreen.MultiscreenConfig",
+    "AutoModel": "modeling_multiscreen.MultiscreenModel",
+    "AutoModelForCausalLM": "modeling_multiscreen.MultiscreenForCausalLM"
+  },
+  "vocab_size": 50257,
+  "hidden_size": 256,
+  "hidden_dim": 256,
+  "num_hidden_layers": 16,
+  "num_layers": 16,
+  "num_attention_heads": 16,
+  "num_heads": 16,
+  "key_dim": 16,
+  "value_dim": 64,
+  "max_position_embeddings": 4096,
+  "max_seq_len": 4096,
+  "mipe_threshold": 256.0,
+  "gradient_checkpointing": false,
+  "use_cache": false,
+  "labels_are_shifted": false,
+  "mipe_compute_dtype": "fp32",
+  "softmask_compute_dtype": "fp32",
+  "strict_position_ids": true,
+  "strict_cache_positions": true,
+  "zero_pad_hidden_states": false,
+  "initializer_range": 0.1,
+  "bos_token_id": 50256,
+  "eos_token_id": 50256,
+  "pad_token_id": 50256,
+  "tie_word_embeddings": true,
+  "is_decoder": true,
+  "is_encoder_decoder": false,
+  "p0_gate": "P0-4 GPT-2 vocab + context 4096 smoke scaffold",
+  "p0_status": "configuration only; not a completed validation result"
+}
