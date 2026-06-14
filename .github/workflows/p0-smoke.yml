@@ -1,0 +1,79 @@
+name: P0 smoke tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  p0-smoke:
+    name: P0 CPU smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Upgrade pip
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+
+      - name: Install package and dependencies
+        run: |
+          python -m pip install -e .
+          python -m pip install -r requirements.txt
+
+      - name: Show environment
+        run: |
+          python - <<'PY'
+          import sys
+          import torch
+          import transformers
+          print("python:", sys.version)
+          print("torch:", torch.__version__)
+          print("transformers:", transformers.__version__)
+          print("cuda available:", torch.cuda.is_available())
+          PY
+
+      - name: Static syntax check
+        env:
+          PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/oracle:${{ github.workspace }}/third_party/multiscreen-pytorch
+        run: |
+          python -m py_compile \
+            multiscreen_transformers/*.py \
+            oracle/*.py \
+            scripts/*.py \
+            p0_2_three_way_minimal/*.py
+
+      - name: P0-1 oracle unit tests
+        env:
+          PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/oracle:${{ github.workspace }}/third_party/multiscreen-pytorch
+        run: |
+          python oracle/test_formula_units.py
+          python oracle/test_paper_math_oracle_selfcheck.py
+          python oracle/test_paper_math_oracle_smoke.py
+
+      - name: P0-1 HF vs oracle quick sweep
+        env:
+          PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/oracle:${{ github.workspace }}/third_party/multiscreen-pytorch
+        run: |
+          python oracle/test_against_hf_port.py --quick
+
+      - name: P0-2 three-way quick sweep
+        env:
+          PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/oracle:${{ github.workspace }}/third_party/multiscreen-pytorch
+        run: |
+          python p0_2_three_way_minimal/test_three_way_minimal.py \
+            --reference-root third_party/multiscreen-pytorch \
+            --hf-root . \
+            --oracle-root oracle \
+            --quick
