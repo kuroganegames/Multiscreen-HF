@@ -73,3 +73,50 @@ python scripts/train_tokenizer_spm.py \
   --output_dir tokenizers/tinystories_spm768 \
   --cache_dir /path/to/hf_cache
 ```
+
+## P0-4
+
+P0-4 is the GPT-2 vocabulary + context-4096 short smoke. See [P0_4_PLAN.md](P0_4_PLAN.md) and [P0_4_RESULTS_TEMPLATE.md](P0_4_RESULTS_TEMPLATE.md) before recording a pass.
+
+Run a cheap diagnostic first:
+
+```bash
+python scripts/p0_4_gpt2_context4096_smoke.py \
+  --psi-values 8 \
+  --steps-per-psi 8:3 \
+  --seq-len 1024 \
+  --microbatch-size 1 \
+  --grad-accum-steps 1 \
+  --amp-dtype bf16 \
+  --synthetic-text \
+  --output-dir outputs/p0_4_debug_psi8_ctx1024
+```
+
+Then run the actual Ψ=8 gate:
+
+```bash
+python scripts/p0_4_gpt2_context4096_smoke.py \
+  --psi-values 8 \
+  --steps-per-psi 8:50 \
+  --seq-len 4096 \
+  --microbatch-size 1 \
+  --grad-accum-steps 8 \
+  --amp-dtype bf16 \
+  --output-dir outputs/p0_4_gpt2_ctx4096_psi8
+```
+
+Only after Ψ=8 passes, run Ψ=16:
+
+```bash
+python scripts/p0_4_gpt2_context4096_smoke.py \
+  --psi-values 16 \
+  --steps-per-psi 16:25 \
+  --seq-len 4096 \
+  --microbatch-size 1 \
+  --grad-accum-steps 8 \
+  --amp-dtype bf16 \
+  --gradient-checkpointing \
+  --output-dir outputs/p0_4_gpt2_ctx4096_psi16
+```
+
+A P0-4 pass must generate `metrics.jsonl`, `p0_4_results.json`, and `P0-4_COMPLETE.md` under `outputs/`. Do not commit those output files or checkpoints.
