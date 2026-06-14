@@ -1,0 +1,115 @@
+# Python bytecode / caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Build / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+.conda/
+conda-meta/
+
+# Jupyter / notebooks
+.ipynb_checkpoints/
+
+# Editor / OS files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# Local caches
+.cache/
+hf_cache/
+huggingface_cache/
+datasets_cache/
+tokenizer_cache/
+.cache_huggingface/
+.cache_torch/
+.cache_datasets/
+
+# Training outputs / checkpoints
+outputs/
+checkpoints/
+runs/
+wandb/
+tensorboard/
+lightning_logs/
+
+# Model artifacts generated during experiments
+*.safetensors
+*.pt
+*.pth
+*.ckpt
+*.bin
+*.onnx
+*.gguf
+
+# Optimizer / scheduler / trainer states
+optimizer.pt
+scheduler.pt
+trainer_state.json
+training_args.bin
+rng_state*.pth
+
+# Local experiment metadata
+p0_*.log
+p0_*_pip_freeze.txt
+p0_*_conda_env.yml
+*_pip_freeze.txt
+*_conda_env.yml
+
+# Backup files created by patch scripts
+*.bak
+*.backup
+*.bak_dynamic_cache_patch
+
+# Local absolute-path reports
+local_*.json
+local_*.md
+
+# Keep source validation docs, but ignore generated validation outputs unless explicitly added
+validation_outputs/
+tmp_validation/
+tmp/
+temp/
+
+# Third-party vendored repo internals
+third_party/**/.git/
+third_party/**/__pycache__/
+third_party/**/*.pyc
+
+# CUDA / compile caches
+.triton/
+torch_compile_cache/
+inductor_cache/
+
+# Large generated datasets or token dumps
+*.arrow
+*.parquet
+*.jsonl.gz
+*.txt.gz
+
+# Do NOT ignore the committed smoke-test tokenizer:
+# tokenizers/tinystories_spm768/
