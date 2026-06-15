@@ -1,0 +1,56 @@
+{
+  "gate": "P0-2",
+  "name": "three-way comparison",
+  "status": "passed",
+  "runs": [
+    {
+      "name": "cpu_fp32_quick",
+      "device": "cpu",
+      "dtype": "float32",
+      "quick": true,
+      "counts": {
+        "prefill_three_way": 12,
+        "cache_split_three_way": 28
+      }
+    },
+    {
+      "name": "cpu_fp32_full",
+      "device": "cpu",
+      "dtype": "float32",
+      "quick": false,
+      "counts": {
+        "prefill_three_way": 45,
+        "cache_split_three_way": 237
+      }
+    },
+    {
+      "name": "cuda_bf16_quick",
+      "device": "cuda:0",
+      "dtype": "bfloat16",
+      "quick": true,
+      "counts": {
+        "prefill_three_way": 12,
+        "cache_split_three_way": 28
+      }
+    },
+    {
+      "name": "cuda_bf16_full",
+      "device": "cuda:0",
+      "dtype": "bfloat16",
+      "quick": false,
+      "counts": {
+        "prefill_three_way": 45,
+        "cache_split_three_way": 237
+      }
+    }
+  ],
+  "covered": [
+    "reference logits",
+    "HF logits",
+    "oracle logits",
+    "external CE loss",
+    "KV cache",
+    "layer hooks",
+    "prefix/suffix cache split"
+  ]
+}
