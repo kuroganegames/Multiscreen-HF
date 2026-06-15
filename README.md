@@ -10,6 +10,14 @@ For the detailed validation record, see [docs/VALIDATION_STATUS.md](docs/VALIDAT
 
 For development restart context, see [docs/HANDOFF.md](docs/HANDOFF.md).
 
+For compact validation run summaries, see [docs/validation_results/VALIDATION_LOG_INDEX.md](docs/validation_results/VALIDATION_LOG_INDEX.md).
+
+For future validation logging rules, see [docs/LOGGING_POLICY.md](docs/LOGGING_POLICY.md).
+
+For repository hygiene and release-readiness checks, see [docs/REPOSITORY_AUDIT.md](docs/REPOSITORY_AUDIT.md).
+
+
+
 ## What is included
 
 ```text

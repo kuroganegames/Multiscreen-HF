@@ -4,6 +4,8 @@ This is the primary handoff document for resuming development of this repository
 
 The short version: this repository contains a **P0-qualified research implementation** of Multiscreen for Hugging Face Transformers. It has passed formula-level, reference-equivalence, cache/generation, and short TinyStories training checks. It is suitable as a correctness-first research baseline, but it is not yet a paper-scale, optimized, or production-serving implementation.
 
+For final repository hygiene checks, see [REPOSITORY_AUDIT.md](REPOSITORY_AUDIT.md).
+
 ## Quick restart checklist
 
 Use this checklist after a fresh clone or after switching machines.

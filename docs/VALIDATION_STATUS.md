@@ -4,6 +4,10 @@ This document records the validation state of the current Multiscreen HF impleme
 
 For project-wide handoff information and recommended next steps, see [HANDOFF.md](HANDOFF.md).
 
+For compact validation run summaries, see [docs/validation_results/VALIDATION_LOG_INDEX.md](docs/validation_results/VALIDATION_LOG_INDEX.md).
+
+For future validation logging rules, see [docs/LOGGING_POLICY.md](docs/LOGGING_POLICY.md).
+
 ## Status summary
 
 ```text
