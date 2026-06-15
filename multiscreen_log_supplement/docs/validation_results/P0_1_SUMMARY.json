@@ -1,0 +1,107 @@
+{
+  "gate": "P0-1",
+  "name": "paper_math_oracle vs HF implementation",
+  "status": "passed",
+  "runs": [
+    {
+      "name": "cpu_fp32_quick",
+      "device": "cpu",
+      "dtype": "float32",
+      "quick": true,
+      "counts": {
+        "cache_split": 10,
+        "padding_cache": 24,
+        "padding_full": 8,
+        "position_contract_negative_cache": 1,
+        "position_contract_negative_no_cache": 1,
+        "position_ids_zero": 1,
+        "shape_forward_loss": 12,
+        "shape_logits_to_keep": 24,
+        "shape_shifted_loss": 12,
+        "zero_relevance": 1
+      }
+    },
+    {
+      "name": "cpu_fp32_full",
+      "device": "cpu",
+      "dtype": "float32",
+      "quick": false,
+      "counts": {
+        "cache_split": 144,
+        "padding_cache": 240,
+        "padding_full": 88,
+        "position_contract_negative_cache": 2,
+        "position_contract_negative_no_cache": 2,
+        "position_ids_zero": 2,
+        "shape_forward_loss": 60,
+        "shape_logits_to_keep": 144,
+        "shape_shifted_loss": 60,
+        "zero_relevance": 2
+      }
+    },
+    {
+      "name": "cuda_bf16_quick",
+      "device": "cuda:0",
+      "dtype": "bfloat16",
+      "quick": true,
+      "counts": {
+        "cache_split": 10,
+        "padding_cache": 24,
+        "padding_full": 8,
+        "position_contract_negative_cache": 1,
+        "position_contract_negative_no_cache": 1,
+        "position_ids_zero": 1,
+        "shape_forward_loss": 12,
+        "shape_logits_to_keep": 24,
+        "shape_shifted_loss": 12,
+        "zero_relevance": 1
+      }
+    },
+    {
+      "name": "cuda_bf16_full",
+      "device": "cuda:0",
+      "dtype": "bfloat16",
+      "quick": false,
+      "counts": {
+        "cache_split": 144,
+        "padding_cache": 240,
+        "padding_full": 88,
+        "position_contract_negative_cache": 2,
+        "position_contract_negative_no_cache": 2,
+        "position_ids_zero": 2,
+        "shape_forward_loss": 60,
+        "shape_logits_to_keep": 144,
+        "shape_shifted_loss": 60,
+        "zero_relevance": 2
+      }
+    },
+    {
+      "name": "cuda_fp16_quick",
+      "device": "cuda:0",
+      "dtype": "float16",
+      "quick": true,
+      "counts": {
+        "cache_split": 10,
+        "padding_cache": 24,
+        "padding_full": 8,
+        "position_contract_negative_cache": 1,
+        "position_contract_negative_no_cache": 1,
+        "position_ids_zero": 1,
+        "shape_forward_loss": 12,
+        "shape_logits_to_keep": 24,
+        "shape_shifted_loss": 12,
+        "zero_relevance": 1
+      }
+    }
+  ],
+  "covered": [
+    "logits",
+    "loss",
+    "shifted labels",
+    "logits_to_keep",
+    "cache split",
+    "padding masks",
+    "zero relevance",
+    "position contract"
+  ]
+}

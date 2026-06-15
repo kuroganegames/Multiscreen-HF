@@ -1,0 +1,38 @@
+{
+  "gate": "P0-3",
+  "name": "TinyStories smoke training",
+  "status": "passed",
+  "dataset": "roneneldan/TinyStories train[:20000]",
+  "tokenizer": "tokenizers/tinystories_spm768",
+  "packed_chunks": 2032,
+  "seq_len": 128,
+  "device": "cuda:0",
+  "amp_dtype": "bfloat16",
+  "batch_size": 4,
+  "runs": [
+    {
+      "psi": 8,
+      "params": 966850,
+      "steps": 40,
+      "initial_probe_loss": 8.2159,
+      "final_probe_loss": 4.3126,
+      "absolute_drop": 3.9032,
+      "relative_drop_percent": 47.5085,
+      "save_load": "passed",
+      "generate_use_cache": "passed",
+      "cache_split_after_training": "passed"
+    },
+    {
+      "psi": 16,
+      "params": 14877442,
+      "steps": 25,
+      "initial_probe_loss": 15.8997,
+      "final_probe_loss": 5.928,
+      "absolute_drop": 9.9716,
+      "relative_drop_percent": 62.716,
+      "save_load": "passed",
+      "generate_use_cache": "passed",
+      "cache_split_after_training": "passed"
+    }
+  ]
+}
