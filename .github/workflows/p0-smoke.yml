@@ -54,6 +54,17 @@ jobs:
             scripts/*.py \
             p0_2_three_way_minimal/*.py
 
+      - name: P0-4 static config preflight
+        env:
+          PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/oracle:${{ github.workspace }}/third_party/multiscreen-pytorch
+        run: |
+          python scripts/p0_4_gpt2_context4096_smoke.py \
+            --config-dir configs/p0_4_multiscreen_psi8_gpt2_ctx4096 \
+            --validate-config-only
+          python scripts/p0_4_gpt2_context4096_smoke.py \
+            --config-dir configs/p0_4_multiscreen_psi16_gpt2_ctx4096 \
+            --validate-config-only
+
       - name: P0-1 oracle unit tests
         env:
           PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/oracle:${{ github.workspace }}/third_party/multiscreen-pytorch
