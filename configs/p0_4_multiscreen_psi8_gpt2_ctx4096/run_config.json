@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "run_name": "p0_4_multiscreen_psi8_gpt2_ctx4096",
+  "notes": "Canonical first-stage P0-4 smoke. Run Psi=8 before attempting Psi=16.",
+  "model": {
+    "psi": 8,
+    "key_dim": 16,
+    "value_dim": 64,
+    "seq_len": 4096,
+    "mipe_threshold": 256.0,
+    "initializer_range": 0.1,
+    "model_compute_dtype": "fp32",
+    "gradient_checkpointing": true
+  },
+  "tokenizer": {
+    "tokenizer_name": "gpt2",
+    "tokenizer_revision": null,
+    "expected_vocab_size": 50257,
+    "use_fast_tokenizer": true,
+    "local_files_only": false,
+    "cache_dir": null
+  },
+  "data": {
+    "dataset_name": "roneneldan/TinyStories",
+    "dataset_config": null,
+    "train_split": "train[:20000]",
+    "text_column": "text",
+    "text_file": null,
+    "data_files": null,
+    "data_dir": null,
+    "dataset_revision": null,
+    "max_texts": 20000,
+    "max_train_tokens": 1048576,
+    "num_workers": 0
+  },
+  "training": {
+    "device": "cuda:0",
+    "amp_dtype": "bf16",
+    "micro_batch_size": 1,
+    "grad_accum_steps": 1,
+    "max_optimizer_steps": 50,
+    "learning_rate": 0.0003,
+    "weight_decay": 0.0,
+    "max_grad_norm": 1.0,
+    "fused_adamw": true,
+    "seed": 42,
+    "log_every": 1,
+    "probe_replay_every": 1
+  },
+  "validation": {
+    "min_loss_drop": 0.01,
+    "min_rel_loss_drop": 0.001,
+    "no_loss_drop_check": false,
+    "postcheck_seq_len": 32,
+    "reload_atol": 1e-5,
+    "reload_rtol": 1e-5,
+    "cache_atol": 0.03,
+    "cache_rtol": 0.03,
+    "prompt": "Once upon a time",
+    "max_new_tokens": 8
+  },
+  "output": {
+    "output_dir": "outputs/p0_4_multiscreen_psi8_gpt2_ctx4096"
+  }
+}
