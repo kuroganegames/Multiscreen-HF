@@ -73,3 +73,46 @@ python scripts/train_tokenizer_spm.py \
   --output_dir tokenizers/tinystories_spm768 \
   --cache_dir /path/to/hf_cache
 ```
+
+## P0-4
+
+P0-4 is implemented but its qualifying CUDA bf16 runs are not recorded yet. See [P0_4_PLAN.md](P0_4_PLAN.md) before execution.
+
+Static config preflight; this does not download the tokenizer or dataset:
+
+```bash
+python scripts/p0_4_gpt2_context4096_smoke.py \
+  --config-dir configs/p0_4_multiscreen_psi8_gpt2_ctx4096 \
+  --validate-config-only
+
+python scripts/p0_4_gpt2_context4096_smoke.py \
+  --config-dir configs/p0_4_multiscreen_psi16_gpt2_ctx4096 \
+  --validate-config-only
+```
+
+Optional non-qualifying 1024-token diagnostic:
+
+```bash
+python scripts/p0_4_gpt2_context4096_smoke.py \
+  --config-dir configs/p0_4_multiscreen_psi8_gpt2_ctx4096 \
+  --seq-len 1024 \
+  --steps 2 \
+  --gradient-accumulation-steps 1 \
+  --output-dir outputs/p0_4_psi8_ctx1024_diagnostic
+```
+
+Qualifying Psi=8 run:
+
+```bash
+python scripts/p0_4_gpt2_context4096_smoke.py \
+  --config-dir configs/p0_4_multiscreen_psi8_gpt2_ctx4096
+```
+
+Run Psi=16 only after the Psi=8 output is reviewed:
+
+```bash
+python scripts/p0_4_gpt2_context4096_smoke.py \
+  --config-dir configs/p0_4_multiscreen_psi16_gpt2_ctx4096
+```
+
+A qualifying run uses GPT-2 vocab 50,257, sequence length 4,096, CUDA bf16, and at least 50 optimizer steps. Reduced runs write `P0-4_DIAGNOSTIC_COMPLETE.md`, not `P0-4_COMPLETE.md`.
