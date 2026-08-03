@@ -1,6 +1,6 @@
 # Codex Goal Handoff: P0-4 Local Qualification
 
-This document is the local-Codex entry point for continuing development after the merge of PR #3.
+This document preserves the strict local-Codex P0-4 reproduction workflow created after PR #3. P0-4 has since completed; current status is recorded in [VALIDATION_STATUS.md](VALIDATION_STATUS.md) and [validation_results/P0_4_SUMMARY.md](validation_results/P0_4_SUMMARY.md).
 
 ## Current phase
 
@@ -12,11 +12,11 @@ P0-2: complete
 P0-3: complete
 P0-4 harness/config/docs: merged in PR #3
 P0-4 CPU static and tiny end-to-end CI diagnostic: passed
-P0-4 qualifying CUDA bf16 context-4096 runs: pending
+P0-4 qualifying CUDA bf16 context-4096 runs: passed for Psi=8 and Psi=16
 P1 ecosystem work: not yet validated
 ```
 
-The immediate goal is not to optimize Multiscreen or begin LoRA work. It is to execute P0-4 honestly on the local CUDA system, preserve evidence, and update the validation record without weakening the gate.
+The prompt below is retained for intentional P0-4 reproduction or requalification without weakening the gate. It is not the repository's pending next task. No P1 capability is validated yet; a new task should select one focused gate explicitly.
 
 ## Clone and enter the repository
 
@@ -50,7 +50,7 @@ Useful goal controls:
 /goal clear    remove it
 ```
 
-## Before starting the goal
+## Before intentionally reproducing the goal
 
 The local environment should provide:
 
@@ -64,9 +64,9 @@ The local environment should provide:
 
 Codex should discover the actual environment rather than assuming paths. The user may already be inside a Conda or virtual environment; do not replace it unnecessarily.
 
-## Ready-to-paste `/goal` prompt
+## Historical ready-to-paste P0-4 requalification prompt
 
-Paste the complete block below into Codex from the repository root.
+Paste the complete block below only when a fresh P0-4 reproduction or requalification is desired. Its embedded PROJECT STATE intentionally describes the pre-execution starting point and is not the current repository status.
 
 ```text
 /goal Complete the local P0-4 qualification and evidence handoff for this repository without stopping for ordinary setup, test, training, logging, or documentation errors. Stop only when one of the explicitly defined terminal states is reached.
@@ -80,7 +80,7 @@ PROJECT STATE
 - P0-2 is complete: dieOD/multiscreen-pytorch, the HF implementation, and paper_math_oracle agree in the recorded CPU fp32 and CUDA bf16 sweeps.
 - P0-3 is complete: Psi=8 and Psi=16 TinyStories bf16 smoke training passed, including finite losses/gradients, save/load, greedy generation with cache, and manual cache-split equality.
 - PR #3 merged the P0-4 harness, Psi=8/Psi=16 GPT-2-context-4096 configs, plans, result template, static preflight, and a tiny CPU end-to-end CI diagnostic.
-- The current development phase is P0-4 qualifying local execution. P0-4 is not complete yet.
+- For this intentional requalification goal, rerun P0-4 from the accepted complete baseline; keep the repository's accepted P0-4 status complete unless new contrary evidence is produced.
 - Do not begin P1 LoRA, QLoRA, Unsloth, broad generation, serving, Triton, or performance work during this goal.
 
 PRIMARY OBJECTIVE

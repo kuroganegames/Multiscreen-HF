@@ -34,6 +34,8 @@ P0_2_SUMMARY.md
 P0_2_SUMMARY.json
 P0_3_SUMMARY.md
 P0_3_SUMMARY.json
+P0_4_SUMMARY.md
+P0_4_SUMMARY.json
 VALIDATION_LOG_INDEX.md
 ```
 
@@ -70,6 +72,9 @@ absolute loss drop
 relative loss drop
 save/load status
 generation/cache status
+qualification conditions and verdict
+peak allocated/reserved CUDA memory when relevant
+SHA-256 hashes of retained raw summary and metrics files
 ```
 
 ## What not to commit
@@ -103,6 +108,7 @@ oracle/paper_math_oracle.py
 oracle/test_against_hf_port.py
 p0_2_three_way_minimal/test_three_way_minimal.py
 scripts/p0_3_tinystories_stability.py
+scripts/p0_4_gpt2_context4096_smoke.py
 ```
 
 Minimum rerun policy:
@@ -115,7 +121,7 @@ cache/generation change:
   rerun P0-1 quick and a P0-3 quick smoke
 
 training script change:
-  rerun P0-3 quick or full depending on the change
+  rerun the corresponding P0-3 or P0-4 diagnostic/qualification level depending on the change
 
 P0-qualified release/tag:
   rerun P0-1 CPU fp32 full, P0-2 CPU fp32 full, and at least CUDA bf16 quick/full if available

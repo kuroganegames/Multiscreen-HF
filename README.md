@@ -6,7 +6,7 @@ This repository is a research artifact. It is not an official implementation of 
 
 Current status:
 
-> **P0-qualified research implementation based on P0-1/P0-2/P0-3.** The P0-4 GPT-2-vocab, context-4096 harness is merged and CPU-diagnosed, while qualifying CUDA bf16 Psi=8/Psi=16 runs remain pending.
+> **P0-qualified research implementation through P0-4.** Reviewed local CUDA bf16 GPT-2-vocabulary, context-4096 qualifying runs passed for both Psi=8 and Psi=16. This remains a correctness/stability smoke result, not a paper-scale or efficiency result.
 
 ## Start here
 
@@ -119,63 +119,40 @@ manual cache split vs full-forward suffix
 
 Recorded metrics are in [docs/validation_results/p0_3_results.json](docs/validation_results/p0_3_results.json).
 
-### P0-4: harness merged; qualifying execution pending
+### P0-4: complete
 
-PR #3 added:
+Reviewed local runs passed the strict GPT-2-vocabulary, context-4096 CUDA bf16 gate for both intended model orders:
 
-```text
-scripts/p0_4_gpt2_context4096_smoke.py
-configs/p0_4_multiscreen_psi8_gpt2_ctx4096/
-configs/p0_4_multiscreen_psi16_gpt2_ctx4096/
-docs/P0_4_PLAN.md
-docs/P0_4_RESULTS_TEMPLATE.md
-CI static preflight and tiny CPU end-to-end diagnostic
-```
+| Metric | Psi=8 | Psi=16 |
+|---|---:|---:|
+| parameters | 4,134,146 | 27,546,626 |
+| optimizer steps | 50 | 50 |
+| probe loss | 11.140747 → 4.675382 | 15.799321 → 3.495601 |
+| peak CUDA allocated | 3,156,709,888 bytes | 6,622,802,944 bytes |
+| reload max abs | 0 | 0 |
+| cache max abs | 0 | 0.125, within configured atol/rtol |
+| `qualification.qualified` | `true` | `true` |
 
-A qualifying P0-4 run requires:
+Both runs recorded finite losses and gradients, configured probe-loss decrease, save/load, tokenizer reload, greedy generation with cache, and manual cache-split agreement within tolerance. The compact reviewed evidence and raw-artifact hashes are in [P0_4_SUMMARY.md](docs/validation_results/P0_4_SUMMARY.md) and [P0_4_SUMMARY.json](docs/validation_results/P0_4_SUMMARY.json).
 
-```text
-GPT-2 vocabulary = 50,257
-context = 4,096
-CUDA
-bf16
-at least 50 optimizer steps
-finite loss and gradients
-probe-loss decrease
-save/load comparison
-generation with cache
-manual cache-split comparison
-```
-
-A CPU, reduced-context, different-dtype, or shorter run remains diagnostic and must not be reported as a P0-4 pass.
-
-Static preflight:
-
-```bash
-python scripts/p0_4_gpt2_context4096_smoke.py \
-  --config-dir configs/p0_4_multiscreen_psi8_gpt2_ctx4096 \
-  --validate-config-only
-
-python scripts/p0_4_gpt2_context4096_smoke.py \
-  --config-dir configs/p0_4_multiscreen_psi16_gpt2_ctx4096 \
-  --validate-config-only
-```
-
-Qualifying Psi=8 command:
+The qualifying reproduction commands remain:
 
 ```bash
 python scripts/p0_4_gpt2_context4096_smoke.py \
   --config-dir configs/p0_4_multiscreen_psi8_gpt2_ctx4096
 ```
 
-Run Psi=16 only after reviewing a qualifying Psi=8 result:
+Review and accept the new Psi=8 artifacts and memory headroom before running
+Psi=16.
 
 ```bash
 python scripts/p0_4_gpt2_context4096_smoke.py \
   --config-dir configs/p0_4_multiscreen_psi16_gpt2_ctx4096
 ```
 
-## Local Codex continuation
+A CPU, reduced-context, different-dtype, or shorter run remains diagnostic and must not be reported as a P0-4 pass.
+
+## Local Codex reproduction guidance
 
 After cloning, start Codex from the repository root:
 
@@ -183,7 +160,7 @@ After cloning, start Codex from the repository root:
 codex
 ```
 
-Codex reads [AGENTS.md](AGENTS.md) before working. The ready-to-paste `/goal` prompt in [docs/CODEX_P0_4_HANDOFF.md](docs/CODEX_P0_4_HANDOFF.md) guides environment audit, baseline tests, Psi=8/Psi=16 qualification, evidence sanitization, documentation updates, and PR preparation.
+Codex reads [AGENTS.md](AGENTS.md) before working. The `/goal` prompt in [docs/CODEX_P0_4_HANDOFF.md](docs/CODEX_P0_4_HANDOFF.md) is retained as a strict P0-4 reproduction/requalification workflow; it is no longer the repository's pending next task.
 
 If `/goal` is unavailable:
 
@@ -196,7 +173,6 @@ codex
 
 Not yet validated:
 
-- qualifying P0-4 CUDA bf16 context-4096 execution
 - paper-scale pretraining or paper-quality reproduction
 - long-context retrieval at paper settings
 - long-context runtime or memory efficiency

@@ -17,16 +17,19 @@ P0-3: Psi=8/16 TinyStories bf16 smoke training
   complete
 
 P0-4: GPT-2 vocab 50,257 + context 4096 short pretraining smoke
-  harness/config/docs merged in PR #3
-  CPU static and tiny end-to-end diagnostic passed in GitHub Actions
-  qualifying local CUDA bf16 Psi=8/Psi=16 execution is pending
+  complete
+  qualifying local CUDA bf16 Psi=8/Psi=16 runs passed
+  reviewed compact evidence is recorded under docs/validation_results/
 ```
 
-The current development phase is **P0-4 execution and evidence collection**. Do not describe P0-4 as complete until qualifying CUDA bf16 runs have been reviewed and the repository documentation has been updated from actual artifacts.
+The P0 validation phase is complete through P0-4. No P1 ecosystem capability is validated yet; select and validate one focused P1 gate at a time.
 
 ## Read before changing anything
 
 Read these files in order:
+
+The P0-4 plan and Codex handoff below are retained reproduction/history
+documents; they do not mean that P0-4 is still pending.
 
 ```text
 README.md
@@ -35,6 +38,7 @@ docs/VALIDATION_STATUS.md
 docs/TESTING.md
 docs/KNOWN_LIMITATIONS.md
 docs/P0_4_PLAN.md
+docs/validation_results/P0_4_SUMMARY.md
 docs/CODEX_P0_4_HANDOFF.md
 docs/LOGGING_POLICY.md
 docs/REPOSITORY_AUDIT.md
@@ -139,7 +143,7 @@ position or mask behavior
 
 If cache/generation behavior changes, add or extend a focused generation/cache test and run a P0-3 or P0-4 diagnostic in addition to the P0 quick checks.
 
-## P0-4 execution rules
+## P0-4 qualification and reproduction rules
 
 P0-4 qualification is intentionally strict. A run is qualifying only when all of these are true:
 
@@ -153,10 +157,12 @@ finite train losses
 finite gradient norms
 probe loss decreases by configured threshold
 save_pretrained / from_pretrained passes
+the saved tokenizer is reloadable
 loaded logits pass configured tolerances
 generate(use_cache=True) appends tokens
 manual cache split matches full-forward suffix
 metrics.jsonl and summary.json are written
+P0-4_COMPLETE.md exists and failure artifacts are absent
 ```
 
 A CPU, shorter-context, different-dtype, or fewer-step run is diagnostic only, even when all diagnostic checks pass. It must not be used to mark P0-4 complete.
@@ -174,14 +180,14 @@ Execution order:
 
 Do not silently weaken the qualifying criteria to work around an OOM or environment limitation. Preserve failure artifacts and report the run as blocked or failed.
 
-## Change strategy during P0-4
+## Future validation and change strategy
 
-During the first P0-4 local pass:
+During any P0-4 reproduction or follow-up validation:
 
 - Prefer fixing environment, data, tokenizer, config, logging, or harness issues before touching the model core.
 - Do not change `modeling_multiscreen.py`, the paper oracle, cache semantics, or state-dict conversion merely to make a long-context run pass.
 - If evidence indicates a model-core defect, stop the qualifying sequence, create a focused diagnosis, explain which P0 contract is implicated, and rerun the required P0 comparison suite after any fix.
-- Do not start P1 LoRA/QLoRA/Unsloth work until the P0-4 outcome is explicitly recorded or the user changes priorities.
+- Do not describe any P1 capability as validated without a separate focused gate and recorded evidence.
 
 ## Validation records
 

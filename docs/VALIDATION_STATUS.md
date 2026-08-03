@@ -21,14 +21,14 @@ P0-3: Psi=8/16 TinyStories smoke training
   Status: complete
 
 P0-4: GPT-2 vocab + context 4096 short pretraining smoke
-  Status: harness/config/docs prepared; qualifying CUDA bf16 execution pending
+  Status: complete; reviewed qualifying CUDA bf16 Psi=8/Psi=16 execution passed
 ```
 
-The current implementation can be considered a **P0-qualified research implementation** based on completed P0-1/P0-2/P0-3 gates. P0-4 is an additional pending gate and must not be reported as complete from static config validation or a reduced diagnostic.
+The current implementation can be considered a **P0-qualified research implementation through P0-4**. P0-4 was accepted only from reviewed qualifying Psi=8/Psi=16 CUDA bf16 artifacts; static config validation and reduced diagnostics remain non-qualifying substitutes.
 
 ## Scope of “P0-qualified”
 
-P0-qualified means the implementation has passed small-shape math/caching tests and a short TinyStories training smoke test. It does **not** mean the implementation reproduces the paper at scale, is optimized, or is production-ready.
+P0-qualified means the implementation has passed small-shape math/caching tests, a short TinyStories training smoke test, and the recorded GPT-2-vocabulary context-4096 short-run qualification. It does **not** mean the implementation reproduces the paper at scale, is optimized, or is production-ready.
 
 Confirmed:
 
@@ -39,10 +39,10 @@ Confirmed:
 - DynamicCache-compatible greedy `generate()` smoke path
 - Psi=8/16 short TinyStories bf16 training stability
 - P0-4 script/config static validation for Psi=8 and Psi=16
+- P0-4 qualifying GPT-2-vocabulary, context-4096 CUDA bf16 Psi=8/Psi=16 training
 
 Not confirmed:
 
-- P0-4 qualifying GPT-2-vocab, context-4096 CUDA bf16 training
 - 28M/286M/1.3B paper-scale training
 - long-context retrieval benchmarks at paper settings
 - runtime efficiency relative to Transformer baselines
@@ -289,6 +289,7 @@ Validated paths:
 - P0-1 quick after DynamicCache patch
 - P0-3 `generate(use_cache=True)` after training
 - post-load manual cache split in P0-3
+- P0-4 qualifying Psi=8/Psi=16 greedy generation and manual cache split
 
 Still not validated:
 
@@ -303,11 +304,11 @@ Still not validated:
 ### Current status
 
 ```text
-Harness: prepared
-Psi=8 config: prepared and statically validated
-Psi=16 config: prepared and statically validated
-Qualifying CUDA bf16 run: pending
-Recorded result: none yet
+Harness: prepared and exercised
+Psi=8 config: statically validated and qualifying run passed
+Psi=16 config: statically validated and qualifying run passed
+Qualifying CUDA bf16 execution: complete
+Recorded result: passed
 ```
 
 Primary files:
@@ -317,52 +318,57 @@ scripts/p0_4_gpt2_context4096_smoke.py
 configs/p0_4_multiscreen_psi8_gpt2_ctx4096/
 configs/p0_4_multiscreen_psi16_gpt2_ctx4096/
 docs/P0_4_PLAN.md
-docs/P0_4_RESULTS_TEMPLATE.md
+docs/validation_results/P0_4_SUMMARY.md
+docs/validation_results/P0_4_SUMMARY.json
 ```
 
-### Intended coverage
+### Recorded results
 
-- model construction from checked-in `MultiscreenConfig`
-- GPT-2 tokenizer loading with exact vocabulary size 50,257
-- packed text dataset
-- sequence length 4,096 forward/backward
-- finite train loss
-- finite gradient norm
-- short-run probe-loss decrease
-- `save_pretrained` / `from_pretrained`
-- loaded-logit comparison
-- greedy `generate(use_cache=True)`
-- manual cache split vs full-forward suffix
-- stepwise `metrics.jsonl`
-- `summary.json`
-- generated `P0-4_COMPLETE.md` only for a qualifying run
+Both accepted runs used GPT-2 vocabulary 50,257, sequence length 4,096, CUDA bf16, microbatch 1, gradient accumulation 8, gradient checkpointing, and 50 optimizer steps.
+
+| Metric | Psi=8 | Psi=16 |
+|---|---:|---:|
+| parameters | 4,134,146 | 27,546,626 |
+| initial probe loss | 11.140747 | 15.799321 |
+| final probe loss | 4.675382 | 3.495601 |
+| relative loss drop | 58.0335% | 77.8750% |
+| max finite grad norm | 5.393857 | 23.194632 |
+| training elapsed seconds | 107.6805 | 425.8058 |
+| peak allocated bytes | 3,156,709,888 | 6,622,802,944 |
+| peak reserved bytes | 4,525,654,016 | 9,130,999,808 |
+| loaded-logits max abs | 0 | 0 |
+| cache-split max abs | 0 | 0.125, within configured atol/rtol |
+| prompt / generated length | 4 / 12 | 4 / 12 |
+| `qualification.qualified` | `true` | `true` |
+
+The environment used Python 3.12.11, PyTorch 2.7.1+cu128, Transformers 4.57.6, CUDA 12.8, and an NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition.
+
+Every event in both 57-event metrics streams was reviewed. All 50 train losses and gradient norms per run were finite, optimizer steps were contiguous, memory peaks stabilized after step 2, probe loss met the configured threshold, saved models and tokenizers reloaded, greedy generation appended tokens, and manual cache splits passed the configured tolerances. Both qualifying markers were present and failure artifacts absent. The Psi=16 cache value passed the combined `atol=0.03, rtol=0.03` predicate; it is not an absolute-only threshold.
+
+Full ignored artifacts remain local. Their SHA-256 hashes, exact sanitized commands, package versions, and detailed metrics are recorded in [P0_4_SUMMARY.md](validation_results/P0_4_SUMMARY.md) and [P0_4_SUMMARY.json](validation_results/P0_4_SUMMARY.json).
 
 ### Qualification rule
 
-The harness writes `P0-4_COMPLETE.md` only if the run uses:
+P0-4 still counts only when all strict conditions are met:
 
 ```text
 GPT-2 vocab size: 50,257
 context length: 4,096
 device: CUDA
 AMP dtype: bf16
+microbatch: 1
 optimizer steps: at least 50
+finite loss and gradient norms
+configured probe-loss decrease
+save/load and tokenizer reload
+loaded logits within tolerance
+greedy generate(use_cache=True)
+manual cache split within tolerance
+complete summary, metrics, and qualifying marker artifacts
 ```
 
-A reduced-context, CPU, other-dtype, or shorter run can pass diagnostic checks but writes `P0-4_DIAGNOSTIC_COMPLETE.md` and does not complete P0-4.
+A reduced-context, CPU, other-dtype, or shorter run can pass diagnostic checks but remains non-qualifying. The accepted runtime and memory values are feasibility diagnostics only, not evidence of long-context efficiency.
 
-See [P0_4_PLAN.md](P0_4_PLAN.md) for execution order and [P0_4_RESULTS_TEMPLATE.md](P0_4_RESULTS_TEMPLATE.md) for the review record.
+## Next validation boundary
 
-## Recommended next validation step
-
-Execute P0-4 on a suitable CUDA bf16 system in this order:
-
-```text
-1. rerun P0-1/P0-2 quick checks
-2. optional Psi=8 context-1024 diagnostic
-3. qualifying Psi=8 context-4096 run
-4. review memory, loss, reload, generation, and cache artifacts
-5. qualifying Psi=16 context-4096 run only after Psi=8 passes
-```
-
-P1 ecosystem work should not be described as validated merely because the P0-4 harness exists.
+P0-4 is complete. No P1 ecosystem capability is validated yet. A future task should select one focused gate—such as PEFT/LoRA, QLoRA, Unsloth, a broader generation matrix, or `torch.compile`—and record it independently without expanding P0-4's claims.

@@ -78,7 +78,7 @@ python scripts/train_tokenizer_spm.py \
 
 ## P0-4
 
-P0-4 is implemented and its CPU/static integration path passed in CI, but qualifying CUDA bf16 runs are not recorded yet. Read [P0_4_PLAN.md](P0_4_PLAN.md) before execution.
+P0-4 qualifying CUDA bf16 runs passed for Psi=8 and Psi=16. Reviewed results and raw-artifact hashes are recorded in [P0_4_SUMMARY.md](validation_results/P0_4_SUMMARY.md) and [P0_4_SUMMARY.json](validation_results/P0_4_SUMMARY.json); the commands below remain the strict reproduction procedure.
 
 Static config preflight; this does not download the tokenizer or dataset:
 
@@ -103,14 +103,14 @@ python scripts/p0_4_gpt2_context4096_smoke.py \
   --output-dir outputs/p0_4_psi8_ctx1024_diagnostic
 ```
 
-Qualifying Psi=8 run:
+Qualifying Psi=8 reproduction:
 
 ```bash
 python scripts/p0_4_gpt2_context4096_smoke.py \
   --config-dir configs/p0_4_multiscreen_psi8_gpt2_ctx4096
 ```
 
-Run Psi=16 only after the Psi=8 output is reviewed:
+Run the qualifying Psi=16 reproduction only after the new Psi=8 output is reviewed:
 
 ```bash
 python scripts/p0_4_gpt2_context4096_smoke.py \
@@ -119,4 +119,4 @@ python scripts/p0_4_gpt2_context4096_smoke.py \
 
 A qualifying run uses GPT-2 vocab 50,257, sequence length 4,096, CUDA bf16, and at least 50 optimizer steps. Reduced runs write `P0-4_DIAGNOSTIC_COMPLETE.md`, not `P0-4_COMPLETE.md`.
 
-After accepted runs, record compact sanitized summaries under `docs/validation_results/`, update the validation log index and status documents, and rerun the P0-1/P0-2 quick suite.
+For a future reproduction, retain its ignored raw artifacts under a distinct output directory, compare them with the accepted historical record, and add a new compact sanitized record rather than overwriting the existing evidence. Rerun the P0-1/P0-2 quick suite and both config preflights.

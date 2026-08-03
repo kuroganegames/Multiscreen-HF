@@ -1,5 +1,8 @@
 # Validation Logging Policy
 
+> Historical pre-P0-4 import bundle. Do not use this copy as the current policy.
+> See the canonical [logging policy](../../docs/LOGGING_POLICY.md).
+
 This document defines what validation logs should be kept in the repository and how new validation runs should be recorded.
 
 The repository is a research artifact. Raw terminal logs can be useful during debugging, but the repository should keep **compact, human-readable and machine-readable summaries** rather than large logs or checkpoints.
