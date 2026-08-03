@@ -8,14 +8,21 @@ Current status:
 
 > **P0-qualified research implementation through P0-4.** Reviewed local CUDA bf16 GPT-2-vocabulary, context-4096 qualifying runs passed for both Psi=8 and Psi=16. This remains a correctness/stability smoke result, not a paper-scale or efficiency result.
 
+Selected next gate:
+
+> **P1-preflight A: validation provenance and evidence retention v1.** This is evidence infrastructure only; no P1 model/ecosystem capability is validated by selecting or completing it.
+
 ## Start here
 
 - Development restart: [docs/HANDOFF.md](docs/HANDOFF.md)
-- Local Codex `/goal` continuation: [docs/CODEX_P0_4_HANDOFF.md](docs/CODEX_P0_4_HANDOFF.md)
+- Selected gate design: [docs/P1_PREFLIGHT_A_PLAN.md](docs/P1_PREFLIGHT_A_PLAN.md)
+- Local Codex `/goal` continuation: [docs/CODEX_P1_PREFLIGHT_A_HANDOFF.md](docs/CODEX_P1_PREFLIGHT_A_HANDOFF.md)
 - Repository instructions for Codex: [AGENTS.md](AGENTS.md)
 - Detailed validation boundary: [docs/VALIDATION_STATUS.md](docs/VALIDATION_STATUS.md)
 - Reproduction commands: [docs/TESTING.md](docs/TESTING.md)
-- P0-4 execution plan: [docs/P0_4_PLAN.md](docs/P0_4_PLAN.md)
+- Accepted P0-4 evidence: [docs/validation_results/P0_4_SUMMARY.md](docs/validation_results/P0_4_SUMMARY.md)
+- P0-4 reproduction plan: [docs/P0_4_PLAN.md](docs/P0_4_PLAN.md)
+- Historical P0-4 Codex handoff: [docs/CODEX_P0_4_HANDOFF.md](docs/CODEX_P0_4_HANDOFF.md)
 - Known limitations: [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md)
 - Validation log index: [docs/validation_results/VALIDATION_LOG_INDEX.md](docs/validation_results/VALIDATION_LOG_INDEX.md)
 - Logging policy: [docs/LOGGING_POLICY.md](docs/LOGGING_POLICY.md)
@@ -41,11 +48,15 @@ The vendored reference retains its Apache-2.0 license. See [THIRD_PARTY_NOTICES.
 
 ## Install
 
+The user's development environments are managed with Conda. Preserve an already suitable active environment; create an isolated environment when needed rather than broadly upgrading or replacing existing package state. `uv` may be used as a scoped installation helper against an explicit environment.
+
 ```bash
 python -m pip install -e .
 python -m pip install -r requirements.txt
 export PYTHONPATH=$PWD:$PWD/oracle
 ```
+
+Do not install globally, modify the Conda base environment, or run broad upgrades merely to start this repository.
 
 ## Minimal usage
 
@@ -142,8 +153,7 @@ python scripts/p0_4_gpt2_context4096_smoke.py \
   --config-dir configs/p0_4_multiscreen_psi8_gpt2_ctx4096
 ```
 
-Review and accept the new Psi=8 artifacts and memory headroom before running
-Psi=16.
+Review and accept the new Psi=8 artifacts and memory headroom before running Psi=16.
 
 ```bash
 python scripts/p0_4_gpt2_context4096_smoke.py \
@@ -152,7 +162,25 @@ python scripts/p0_4_gpt2_context4096_smoke.py \
 
 A CPU, reduced-context, different-dtype, or shorter run remains diagnostic and must not be reported as a P0-4 pass.
 
-## Local Codex reproduction guidance
+## P1-preflight A
+
+P1-preflight A will implement:
+
+```text
+explicit reviewer provenance
+clean/dirty worktree provenance
+truthful historical not-recorded fields
+deterministic exact/private evidence packaging
+separate sanitized/shareable packaging
+offline archive verification and tamper detection
+long-term off-repository evidence retention descriptors
+```
+
+It must not change model behavior or accepted P0 metrics. The exact raw archive remains private and outside Git; only a verified sanitized archive may be published when explicitly configured.
+
+See [docs/P1_PREFLIGHT_A_PLAN.md](docs/P1_PREFLIGHT_A_PLAN.md).
+
+## Local Codex continuation
 
 After cloning, start Codex from the repository root:
 
@@ -160,7 +188,20 @@ After cloning, start Codex from the repository root:
 codex
 ```
 
-Codex reads [AGENTS.md](AGENTS.md) before working. The `/goal` prompt in [docs/CODEX_P0_4_HANDOFF.md](docs/CODEX_P0_4_HANDOFF.md) is retained as a strict P0-4 reproduction/requalification workflow; it is no longer the repository's pending next task.
+Codex reads [AGENTS.md](AGENTS.md) before working. Use the ready-to-paste `/goal` prompt in [docs/CODEX_P1_PREFLIGHT_A_HANDOFF.md](docs/CODEX_P1_PREFLIGHT_A_HANDOFF.md).
+
+Before starting the Goal, provide an explicit reviewer and durable archive directory:
+
+```bash
+export MULTISCREEN_EVIDENCE_REVIEWERS=kuroganegames
+export MULTISCREEN_EVIDENCE_ARCHIVE_DIR=/absolute/path/outside/the/repository
+```
+
+If a fresh checkout does not contain the original ignored P0-4 outputs:
+
+```bash
+export MULTISCREEN_P0_4_RAW_ROOT=/absolute/path/to/the/original/P0-4/raw-output-root
+```
 
 If `/goal` is unavailable:
 
@@ -173,6 +214,11 @@ codex
 
 Not yet validated:
 
+- P1-preflight A evidence infrastructure
+- P1-preflight B gradient-checkpointing modernization
+- architecture/initialization/all-scale contract validation
+- long-position/MiPE semantics resolution
+- paper-training-contract smoke
 - paper-scale pretraining or paper-quality reproduction
 - long-context retrieval at paper settings
 - long-context runtime or memory efficiency
