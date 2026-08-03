@@ -54,6 +54,46 @@ jobs:
             scripts/*.py \
             p0_2_three_way_minimal/*.py
 
+      - name: P0-4 static config preflight
+        env:
+          PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/oracle:${{ github.workspace }}/third_party/multiscreen-pytorch
+        run: |
+          python scripts/p0_4_gpt2_context4096_smoke.py \
+            --config-dir configs/p0_4_multiscreen_psi8_gpt2_ctx4096 \
+            --validate-config-only
+          python scripts/p0_4_gpt2_context4096_smoke.py \
+            --config-dir configs/p0_4_multiscreen_psi16_gpt2_ctx4096 \
+            --validate-config-only
+
+      - name: P0-4 tiny CPU diagnostic
+        env:
+          PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/oracle:${{ github.workspace }}/third_party/multiscreen-pytorch
+          HF_HUB_DISABLE_XET: "1"
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          Path("/tmp/p0_4_smoke.txt").write_text(
+              ("Once upon a time, a small fox learned to share with a friend.\n\n" * 64),
+              encoding="utf-8",
+          )
+          PY
+          python scripts/p0_4_gpt2_context4096_smoke.py \
+            --config-dir configs/p0_4_multiscreen_psi8_gpt2_ctx4096 \
+            --device cpu \
+            --allow-cpu true \
+            --amp-dtype none \
+            --seq-len 16 \
+            --steps 8 \
+            --gradient-accumulation-steps 1 \
+            --microbatch-size 1 \
+            --gradient-checkpointing false \
+            --fused-adamw false \
+            --max-train-tokens 17 \
+            --text-file /tmp/p0_4_smoke.txt \
+            --output-dir /tmp/p0_4_cpu_diagnostic
+          test -f /tmp/p0_4_cpu_diagnostic/P0-4_DIAGNOSTIC_COMPLETE.md
+          test ! -f /tmp/p0_4_cpu_diagnostic/P0-4_COMPLETE.md
+
       - name: P0-1 oracle unit tests
         env:
           PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/oracle:${{ github.workspace }}/third_party/multiscreen-pytorch

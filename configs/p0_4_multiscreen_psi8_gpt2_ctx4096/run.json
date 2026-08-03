@@ -1,0 +1,63 @@
+{
+  "stage": "P0-4",
+  "description": "Multiscreen Psi=8, GPT-2 vocabulary, context 4096 short bf16 pretraining smoke",
+  "cache": {
+    "cache_dir": null
+  },
+  "tokenizer": {
+    "name_or_path": "gpt2",
+    "use_fast": true,
+    "expected_vocab_size": 50257
+  },
+  "dataset": {
+    "name": "roneneldan/TinyStories",
+    "config_name": null,
+    "train_split": "train[:20000]",
+    "text_column": "text",
+    "text_file": null,
+    "data_files": null,
+    "data_dir": null,
+    "revision": null,
+    "streaming": false,
+    "max_texts": 20000,
+    "max_train_tokens": 524416
+  },
+  "training": {
+    "seq_len": 4096,
+    "optimizer_steps": 50,
+    "microbatch_size": 1,
+    "gradient_accumulation_steps": 8,
+    "learning_rate": 0.0006,
+    "weight_decay": 0.0,
+    "betas": [
+      0.9,
+      0.95
+    ],
+    "eps": 1e-8,
+    "max_grad_norm": 1.0,
+    "amp_dtype": "bf16",
+    "gradient_checkpointing": true,
+    "fused_adamw": true,
+    "probe_replay_every": 4
+  },
+  "checks": {
+    "min_loss_drop": 0.01,
+    "min_rel_loss_drop": 0.001,
+    "reload_atol": 1e-5,
+    "reload_rtol": 1e-5,
+    "reload_check_tokens": 16,
+    "cache_atol": 0.03,
+    "cache_rtol": 0.03,
+    "cache_check_tokens": 24,
+    "prompt": "Once upon a time",
+    "max_new_tokens": 8
+  },
+  "runtime": {
+    "output_dir": "outputs/p0_4_multiscreen_psi8_gpt2_ctx4096",
+    "device": "cuda:0",
+    "allow_cpu": false,
+    "num_workers": 0,
+    "seed": 42,
+    "log_every": 1
+  }
+}

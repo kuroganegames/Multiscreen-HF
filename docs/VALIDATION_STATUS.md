@@ -4,9 +4,9 @@ This document records the validation state of the current Multiscreen HF impleme
 
 For project-wide handoff information and recommended next steps, see [HANDOFF.md](HANDOFF.md).
 
-For compact validation run summaries, see [docs/validation_results/VALIDATION_LOG_INDEX.md](docs/validation_results/VALIDATION_LOG_INDEX.md).
+For compact validation run summaries, see [validation_results/VALIDATION_LOG_INDEX.md](validation_results/VALIDATION_LOG_INDEX.md).
 
-For future validation logging rules, see [docs/LOGGING_POLICY.md](docs/LOGGING_POLICY.md).
+For future validation logging rules, see [LOGGING_POLICY.md](LOGGING_POLICY.md).
 
 ## Status summary
 
@@ -17,12 +17,14 @@ P0-1: paper_math_oracle vs HF implementation
 P0-2: unofficial PyTorch reference vs HF implementation vs paper_math_oracle
   Status: complete
 
-P0-3: Ψ=8/16 TinyStories smoke training
+P0-3: Psi=8/16 TinyStories smoke training
   Status: complete
+
+P0-4: GPT-2 vocab + context 4096 short pretraining smoke
+  Status: harness/config/docs prepared; qualifying CUDA bf16 execution pending
 ```
 
-The current implementation can be considered a **P0-qualified research implementation**.
-
+The current implementation can be considered a **P0-qualified research implementation** based on completed P0-1/P0-2/P0-3 gates. P0-4 is an additional pending gate and must not be reported as complete from static config validation or a reduced diagnostic.
 
 ## Scope of “P0-qualified”
 
@@ -35,10 +37,12 @@ Confirmed:
 - three-way comparison with the unofficial PyTorch reference
 - CPU fp32 and CUDA bf16 sweeps
 - DynamicCache-compatible greedy `generate()` smoke path
-- Ψ=8/16 short TinyStories bf16 training stability
+- Psi=8/16 short TinyStories bf16 training stability
+- P0-4 script/config static validation for Psi=8 and Psi=16
 
 Not confirmed:
 
+- P0-4 qualifying GPT-2-vocab, context-4096 CUDA bf16 training
 - 28M/286M/1.3B paper-scale training
 - long-context retrieval benchmarks at paper settings
 - runtime efficiency relative to Transformer baselines
@@ -211,11 +215,11 @@ cache_split_three_way: 237
 
 A CUDA bf16 full mismatch was initially observed in `cache[0].K` at a long-position MiPE modulo boundary. The cause was comparison-mode mismatch: the oracle was using stable fp32 auxiliary MiPE/Softmask math, while the reference implementation performed that scalar math in bf16. The oracle now supports `reference` compute mode, and P0-2 sets this mode for low-precision three-way comparisons. After this update, CUDA bf16 full passes.
 
-## P0-3: TinyStories Ψ=8/16 smoke training
+## P0-3: TinyStories Psi=8/16 smoke training
 
 ### Purpose
 
-Verify that the implementation can run short TinyStories training in bf16 for both Ψ=8 and Ψ=16, and that checkpoint/generation/cache paths remain functional after training.
+Verify that the implementation can run short TinyStories training in bf16 for both Psi=8 and Psi=16, and that checkpoint/generation/cache paths remain functional after training.
 
 ### Command shape
 
@@ -233,7 +237,7 @@ python scripts/p0_3_tinystories_stability.py \
 
 ### Recorded results
 
-Ψ=8:
+Psi=8:
 
 ```text
 params: 966,850
@@ -249,7 +253,7 @@ save_load_logits_max_abs: 0
 cache_split_logits_max_abs: 0
 ```
 
-Ψ=16:
+Psi=16:
 
 ```text
 params: 14,877,442
@@ -294,19 +298,71 @@ Still not validated:
 - assisted generation
 - distributed generation / `synced_gpus`
 
-## Recommended next validation step
+## P0-4: GPT-2 vocabulary + context 4096 smoke
 
-The next natural step is P0-4:
+### Current status
 
 ```text
-GPT-2 vocab + context 4096 short pretraining smoke test
+Harness: prepared
+Psi=8 config: prepared and statically validated
+Psi=16 config: prepared and statically validated
+Qualifying CUDA bf16 run: pending
+Recorded result: none yet
 ```
 
-Purpose:
+Primary files:
 
-- larger vocabulary
-- longer context
-- more realistic memory profile
-- short-run bf16 stability
+```text
+scripts/p0_4_gpt2_context4096_smoke.py
+configs/p0_4_multiscreen_psi8_gpt2_ctx4096/
+configs/p0_4_multiscreen_psi16_gpt2_ctx4096/
+docs/P0_4_PLAN.md
+docs/P0_4_RESULTS_TEMPLATE.md
+```
 
-This should be performed before claiming readiness for PEFT/LoRA/Unsloth or runtime-performance work.
+### Intended coverage
+
+- model construction from checked-in `MultiscreenConfig`
+- GPT-2 tokenizer loading with exact vocabulary size 50,257
+- packed text dataset
+- sequence length 4,096 forward/backward
+- finite train loss
+- finite gradient norm
+- short-run probe-loss decrease
+- `save_pretrained` / `from_pretrained`
+- loaded-logit comparison
+- greedy `generate(use_cache=True)`
+- manual cache split vs full-forward suffix
+- stepwise `metrics.jsonl`
+- `summary.json`
+- generated `P0-4_COMPLETE.md` only for a qualifying run
+
+### Qualification rule
+
+The harness writes `P0-4_COMPLETE.md` only if the run uses:
+
+```text
+GPT-2 vocab size: 50,257
+context length: 4,096
+device: CUDA
+AMP dtype: bf16
+optimizer steps: at least 50
+```
+
+A reduced-context, CPU, other-dtype, or shorter run can pass diagnostic checks but writes `P0-4_DIAGNOSTIC_COMPLETE.md` and does not complete P0-4.
+
+See [P0_4_PLAN.md](P0_4_PLAN.md) for execution order and [P0_4_RESULTS_TEMPLATE.md](P0_4_RESULTS_TEMPLATE.md) for the review record.
+
+## Recommended next validation step
+
+Execute P0-4 on a suitable CUDA bf16 system in this order:
+
+```text
+1. rerun P0-1/P0-2 quick checks
+2. optional Psi=8 context-1024 diagnostic
+3. qualifying Psi=8 context-4096 run
+4. review memory, loss, reload, generation, and cache artifacts
+5. qualifying Psi=16 context-4096 run only after Psi=8 passes
+```
+
+P1 ecosystem work should not be described as validated merely because the P0-4 harness exists.
