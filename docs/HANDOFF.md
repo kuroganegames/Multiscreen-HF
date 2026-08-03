@@ -2,59 +2,91 @@
 
 This is the primary development-restart document for `kuroganegames/Multiscreen-HF`.
 
-The repository contains a **P0-qualified research implementation** of Multiscreen for Hugging Face Transformers. P0-1, P0-2, P0-3, and P0-4 are complete. Reviewed local CUDA bf16 context-4096 evidence is recorded for both Psi=8 and Psi=16.
+The repository contains a **P0-qualified correctness-first research implementation** of Multiscreen for Hugging Face Transformers. P0-1, P0-2, P0-3, and P0-4 are complete. Reviewed CUDA bf16 GPT-2-vocabulary, context-4096 evidence is recorded for Psi=8 and Psi=16.
 
-The current phase is therefore:
+The selected next gate is:
 
 ```text
-selection of the next focused validation gate; no P1 gate has been selected or validated
+P1-preflight A: Validation provenance / evidence retention v1
 ```
 
-For ordinary continuation after a local clone, read the root [`AGENTS.md`](../AGENTS.md), [VALIDATION_STATUS.md](VALIDATION_STATUS.md), and the accepted [P0_4_SUMMARY.md](validation_results/P0_4_SUMMARY.md). Use [CODEX_P0_4_HANDOFF.md](CODEX_P0_4_HANDOFF.md) only for an intentional P0-4 reproduction or requalification.
+This is an infrastructure gate. It does not validate a new model capability and must not be combined with P1-preflight B, P0.5 core work, or PEFT/LoRA.
 
-For repository hygiene checks, see [REPOSITORY_AUDIT.md](REPOSITORY_AUDIT.md).
+Start with:
+
+- repository instructions: [`AGENTS.md`](../AGENTS.md)
+- gate design: [P1_PREFLIGHT_A_PLAN.md](P1_PREFLIGHT_A_PLAN.md)
+- Codex Goal handoff: [CODEX_P1_PREFLIGHT_A_HANDOFF.md](CODEX_P1_PREFLIGHT_A_HANDOFF.md)
+- canonical validation boundary: [VALIDATION_STATUS.md](VALIDATION_STATUS.md)
+- accepted P0-4 evidence: [P0_4_SUMMARY.md](validation_results/P0_4_SUMMARY.md) and [P0_4_SUMMARY.json](validation_results/P0_4_SUMMARY.json)
+- current logging policy: [LOGGING_POLICY.md](LOGGING_POLICY.md)
+- repository audit: [REPOSITORY_AUDIT.md](REPOSITORY_AUDIT.md)
+
+Use [CODEX_P0_4_HANDOFF.md](CODEX_P0_4_HANDOFF.md) only for an intentional P0-4 reproduction or requalification.
 
 ## 1. Current project state
 
-### Milestones
-
 | Milestone | Status | Meaning |
 |---|---:|---|
-| P0-1 | Complete | `paper_math_oracle` and the HF implementation agree on validated small-shape formula, loss, mask, position, and cache behavior. |
-| P0-2 | Complete | The vendored unofficial PyTorch reference, HF implementation, and oracle agree in recorded CPU fp32 and CUDA bf16 sweeps. |
+| P0-1 | Complete | Oracle and HF small-shape formula, loss, mask, position, and cache checks passed under the recorded conditions. |
+| P0-2 | Complete | Vendored unofficial reference, HF implementation, and oracle three-way comparisons passed under recorded CPU fp32 and CUDA bf16 conditions. |
 | P0-3 | Complete | Psi=8/16 TinyStories bf16 smoke training passed, including finite loss/gradients, save/load, cache split, and greedy generation. |
-| P0-4 harness | Merged | GPT-2 vocab/context-4096 harness, Psi=8/16 configs, plan, result template, static checks, and tiny CPU integration diagnostic were merged in PR #3. |
-| P0-4 qualifying execution | Complete | Reviewed CUDA bf16 context-4096, 50-step Psi=8 and Psi=16 runs passed; see [P0_4_SUMMARY.md](validation_results/P0_4_SUMMARY.md). |
-| P1 ecosystem work | Not started as validated work | PEFT/LoRA, QLoRA, Unsloth, generation matrix, compile, and serving remain future work. |
+| P0-4 | Complete | Psi=8/16 GPT-2-vocabulary, context-4096 CUDA bf16 qualification passed and compact reviewed evidence was committed. |
+| P1-preflight A | Selected | Reviewer/worktree provenance and exact/sanitized evidence retention v1 are to be implemented. |
+| P1-preflight B | Not started | Gradient-checkpointing API modernization remains separate. |
+| P0.5-C1/C2/C3 | Not started | Core-completion checks remain separate from evidence infrastructure. |
+| P1 ecosystem capabilities | None validated | PEFT/LoRA, QLoRA, Unsloth, generation matrix, compile, and serving remain future gates. |
 
 ### Baseline identity
 
 ```text
-Current status: P0-qualified research baseline through P0-4
+Current baseline: P0-qualified research implementation through P0-4
+Current main merge after P0-4 evidence: f538ed053292cba1834766a80d0b61167a42d4a2
 Primary implementation: multiscreen_transformers/modeling_multiscreen.py
 Primary config: multiscreen_transformers/configuration_multiscreen.py
 Primary equation oracle: oracle/paper_math_oracle.py
-Primary validation record: docs/VALIDATION_STATUS.md
-Current execution plan: docs/P0_4_PLAN.md
-Codex local handoff: docs/CODEX_P0_4_HANDOFF.md
-Repository instructions for Codex: AGENTS.md
+Canonical validation status: docs/VALIDATION_STATUS.md
+Accepted P0-4 summary: docs/validation_results/P0_4_SUMMARY.{md,json}
+Selected gate design: docs/P1_PREFLIGHT_A_PLAN.md
+Selected Codex Goal: docs/CODEX_P1_PREFLIGHT_A_HANDOFF.md
 ```
 
-P0-4 is complete from reviewed qualifying Psi=8/Psi=16 CUDA bf16 artifacts. Static config validation, CI CPU diagnostics, and reduced-context runs remain non-qualifying substitutes.
+P0-4 remains complete from its accepted evidence. P1-preflight A adds provenance and retention metadata; it must not rewrite the original metrics or imply a new model validation result.
 
 ## 2. First ten minutes after a fresh clone
-
-Clone and inspect the checkout:
 
 ```bash
 git clone https://github.com/kuroganegames/Multiscreen-HF.git
 cd Multiscreen-HF
 
 git status --short --branch
+git rev-parse HEAD
 git log -1 --oneline
+git remote -v
 ```
 
-Install the local package and declared dependencies:
+Confirm that `main` is current and the working tree is clean before creating a focused branch.
+
+### Development environment
+
+Python development environments are managed with Conda. `uv` is installed and may be used as a scoped installation helper.
+
+Do not replace or broadly mutate the current environment by default.
+
+```text
+- inspect `CONDA_DEFAULT_ENV`, `CONDA_PREFIX`, Python, pip, and package versions;
+- use the active Conda environment when suitable;
+- create a separate Conda or other isolated virtual environment when isolation is useful;
+- do not modify or delete Conda base;
+- do not install globally;
+- do not run broad upgrades such as `conda update --all` or unconstrained `pip install -U`;
+- when using uv, target an explicit environment and avoid rewriting unrelated lockfiles;
+- record before/after versions for any package change.
+```
+
+Creating an isolated environment is explicitly allowed for P1-preflight A.
+
+Install only what is needed:
 
 ```bash
 python -m pip install -e .
@@ -62,305 +94,155 @@ python -m pip install -r requirements.txt
 export PYTHONPATH=$PWD:$PWD/oracle
 ```
 
-Run the minimum P0 baseline checks:
-
-```bash
-python oracle/test_formula_units.py
-python oracle/test_paper_math_oracle_selfcheck.py
-python oracle/test_paper_math_oracle_smoke.py
-python oracle/test_against_hf_port.py --quick
-
-python p0_2_three_way_minimal/test_three_way_minimal.py \
-  --reference-root third_party/multiscreen-pytorch \
-  --hf-root . \
-  --oracle-root oracle \
-  --quick
-```
-
-Run the P0-4 static preflight:
-
-```bash
-python scripts/p0_4_gpt2_context4096_smoke.py \
-  --config-dir configs/p0_4_multiscreen_psi8_gpt2_ctx4096 \
-  --validate-config-only
-
-python scripts/p0_4_gpt2_context4096_smoke.py \
-  --config-dir configs/p0_4_multiscreen_psi16_gpt2_ctx4096 \
-  --validate-config-only
-```
-
-If these checks pass, the checkout matches the expected merged baseline at the CPU/static level. The accepted P0-4 GPU evidence is recorded separately; a fresh clone has not itself reproduced those CUDA runs.
+If the active environment already has the required dependencies, do not reinstall or upgrade them speculatively.
 
 ## 3. Codex continuation
 
-Start Codex from the repository root so it reads `AGENTS.md`:
+Start Codex from the Git root so it reads `AGENTS.md`:
 
 ```bash
 codex
 ```
 
-If the `/goal` command is not available:
+If `/goal` is unavailable:
 
 ```bash
 codex features enable goals
 codex
 ```
 
-[CODEX_P0_4_HANDOFF.md](CODEX_P0_4_HANDOFF.md) is retained as a strict P0-4 reproduction/requalification prompt. P0-4 is no longer the pending next task; select a new focused gate explicitly rather than rerunning it by default.
+Before running the P1-preflight A Goal, configure the reviewer and a user-controlled archive directory outside the repository:
 
-Do not start Codex from a parent directory and assume repository instructions were loaded. Confirm the working directory is the Git root.
+```bash
+export MULTISCREEN_EVIDENCE_REVIEWERS=kuroganegames
+export MULTISCREEN_EVIDENCE_ARCHIVE_DIR=/absolute/path/to/durable/evidence-storage
+```
 
-## 4. Repository map
+A fresh clone normally does not contain ignored P0-4 raw outputs. Point to the original retained files when needed:
+
+```bash
+export MULTISCREEN_P0_4_RAW_ROOT=/absolute/path/to/the/original/P0-4/raw-output-root
+```
+
+Optional sanitized public publication must be explicit:
+
+```bash
+export MULTISCREEN_EVIDENCE_PUBLIC_RELEASE_TAG=p0-4-qualified-v0
+```
+
+Never publish the exact raw archive to a public release.
+
+Use the complete prompt in [CODEX_P1_PREFLIGHT_A_HANDOFF.md](CODEX_P1_PREFLIGHT_A_HANDOFF.md).
+
+## 4. P1-preflight A purpose
+
+The gate addresses three evidence-review follow-ups:
 
 ```text
-AGENTS.md
-  Persistent repository-level instructions for Codex.
-
-multiscreen_transformers/
-  configuration_multiscreen.py   HF config, Psi scaling, validation options
-  modeling_multiscreen.py        P0-qualified HF CausalLM implementation
-  data.py                        Packed dataset helper
-  compile_utils.py               Compile environment helpers
-
-oracle/
-  paper_math_oracle.py           Dense equation-oriented reference
-  test_against_hf_port.py        P0-1 HF-vs-oracle sweep
-  test_formula_units.py          Formula-level tests
-  test_paper_math_oracle_*.py    Oracle self-check and smoke tests
-
-p0_2_three_way_minimal/
-  test_three_way_minimal.py      P0-2 reference-vs-HF-vs-oracle comparison
-
-third_party/multiscreen-pytorch/
-  Vendored dieOD/multiscreen-pytorch reference used by P0-2
-
-scripts/
-  p0_3_tinystories_stability.py          P0-3 training harness
-  p0_4_gpt2_context4096_smoke.py         P0-4 training/qualification harness
-  train_pretrain_sft.py                  Larger TRL/SFT-style entry point
-  train_tokenizer_spm.py                 TinyStories 768-vocab tokenizer creation
-  eval_smoke.py, count_params.py, cache_utils.py
-
-configs/
-  p0_4_multiscreen_psi8_gpt2_ctx4096/
-  p0_4_multiscreen_psi16_gpt2_ctx4096/
-  P0-3 and earlier debug/training configs
-
-tokenizers/tinystories_spm768/
-  Committed tokenizer used for P0-3 reproducibility
-
-docs/
-  HANDOFF.md                    Main development restart guide
-  CODEX_P0_4_HANDOFF.md         Clone-to-Codex goal workflow and full prompt
-  VALIDATION_STATUS.md          Canonical validation boundary
-  TESTING.md                    Reproduction commands
-  KNOWN_LIMITATIONS.md          Explicit unvalidated scope
-  P0_4_PLAN.md                  P0-4 execution and failure triage
-  P0_4_RESULTS_TEMPLATE.md      Human-readable result template
-  LOGGING_POLICY.md             Result logging and sanitization policy
-  REPOSITORY_AUDIT.md           Hygiene and handoff-readiness audit
-  RELEASE_CHECKLIST.md          Tag/release checklist
-  validation_results/           Accepted compact validation summaries
+1. reviewer and review-method provenance;
+2. clean/dirty worktree provenance;
+3. long-term raw evidence retention with separate exact/private and sanitized/shareable archives.
 ```
 
-## 5. Key design contracts
-
-### 5.1 HF implementation is the extension baseline
-
-`multiscreen_transformers/modeling_multiscreen.py` is the current development baseline. It is validated against:
+Expected implementation areas:
 
 ```text
-paper_math_oracle
-dieOD/multiscreen-pytorch
+scripts/collect_validation_provenance.py
+scripts/package_validation_evidence.py
+scripts/verify_validation_evidence.py
+schemas/validation_evidence_v1.schema.json
+focused evidence-tooling tests
+docs/EVIDENCE_ARCHIVE_POLICY.md
+docs/validation_results/P0_4_EVIDENCE_ARCHIVE.json
+policy, index, release-checklist, CI, ignore, agent, README, and handoff updates
 ```
 
-This validation is strong for the recorded small-shape and smoke conditions, not for paper-scale training or optimized serving.
+No model, oracle, cache, generation, position, state-dict, tokenizer, dataset, training-harness, or P0 config source should change.
 
-### 5.2 The oracle is dense and correctness-oriented
+## 5. Evidence truth rules
 
-`oracle/paper_math_oracle.py` deliberately follows the equations with dense tensors. It is intended for tiny correctness comparisons. It must not be used as a speed or long-context implementation reference.
-
-### 5.3 Trim parameterization
-
-Paper form:
-
-```python
-r = sigmoid(s_r)
-alpha = clamp(1 - (1 - sim) / r, min=0) ** 2
-```
-
-HF/reference inverse-width form:
-
-```python
-inv_r = exp(sr) + 1
-alpha = clamp(1 - inv_r * (1 - sim), min=0) ** 2
-```
-
-Required conversion:
+Keep these concepts separate:
 
 ```text
-s_r_paper = -s_r_hf
+original validation-run provenance
+evidence-packaging/handoff provenance
+acceptance review
 ```
 
-Do not alter this mapping without a focused mathematical and three-way validation update.
-
-### 5.4 Oracle compute modes
-
-Stable paper/oracle checks:
-
-```python
-mipe_compute_dtype="fp32"
-softmask_compute_dtype="fp32"
-```
-
-Low-precision reference compatibility:
-
-```python
-mipe_compute_dtype="reference"
-softmask_compute_dtype="reference"
-```
-
-P0-2 uses reference-compatible behavior when matching the vendored low-precision implementation. P0-1 normally emphasizes stable fp32 auxiliary math.
-
-### 5.5 Position handling
-
-Literal paper checks use:
-
-```python
-position_rule="paper"
-```
-
-HF/reference compatibility can use:
-
-```python
-position_rule="hf_mod_after_max_position"
-```
-
-The HF public API only supports the validated scalar contiguous position/cache contract. Arbitrary batch-specific offsets are not silently supported.
-
-### 5.6 DynamicCache boundary
-
-The HF implementation normalizes empty Transformers cache objects for prefill and converts compatible non-empty cache objects to the internal legacy tuple form.
-
-Validated:
+For the historical P0-4 run, a commit SHA does not prove a clean worktree. If clean state or original-run reviewer identity was not recorded at execution time, store:
 
 ```text
-- P0-1 cache comparisons under covered conditions
-- P0-3 greedy generate(use_cache=True)
-- P0-3 post-load manual cache split
-- P0-4 tiny CPU integration diagnostic in CI
-- P0-4 qualifying Psi=8/Psi=16 greedy generation and manual cache split
+value: null
+status: not_recorded_in_original_run
 ```
 
-Still not broadly validated:
+Do not convert unknown into `false`, and never guess `true`.
+
+For the current evidence handoff, record:
 
 ```text
-- beam search
-- broad do_sample/logits-processor combinations
-- variable-length batch generation
-- streamers
-- assisted generation
-- distributed/synced generation
+starting commit and branch
+exact status-porcelain hash
+staged/unstaged/untracked state
+clean state before tracked edits
+final commit
+clean state after commit
+explicit reviewer(s)
+review method/time/commit
+archive creation and verification times
 ```
 
-### 5.7 Dense path is not an efficiency claim
+Reviewer identity must come from explicit CLI/environment input. The authenticated GitHub login is not automatically the reviewer.
 
-The current HF screening path remains dense and quadratic in sequence length. P0-4 records time and CUDA memory only to diagnose feasibility and stability. Do not report those numbers as evidence for the paper's long-context efficiency claims.
+## 6. Exact and sanitized evidence
 
-## 6. Completed validation
+### Exact/private archive
 
-The detailed counts and commands are in [VALIDATION_STATUS.md](VALIDATION_STATUS.md) and [TESTING.md](TESTING.md).
+Preserve original bytes, source hashes, sizes, completion markers, and machine-readable raw events. Store it outside Git in the configured retention location.
 
-### P0-1
+Do not include checkpoints or model weights by default. If checkpoint retention is desired, handle it as a separate private asset and record only a manifest in the validation descriptor.
 
-Recorded passes include CPU fp32 quick/full, CUDA bf16 full, and CUDA fp16 quick across:
+### Sanitized/shareable archive
+
+Create a separate archive after scanning and redacting:
 
 ```text
-- logits and loss
-- shifted-label loss
-- logits_to_keep
-- shape sweeps
-- cache split and cached suffix
-- padding and sparse masks
-- zero-relevance stability
-- position/cache negative contracts
+secrets and tokens
+usernames and unnecessary hostnames
+local absolute paths
+cache paths
+private archive paths
+credential-bearing remotes
 ```
 
-### P0-2
+Preserve useful versions, GPU identity, metrics, relative repository paths, commands normalized to `python`, hashes, and verdicts.
 
-Recorded passes include CPU fp32 and CUDA bf16 quick/full comparisons across:
+The exact archive must never be published publicly. The sanitized archive may be published only when explicitly configured and verification passes.
+
+## 7. Required tooling behavior
+
+The design is detailed in [P1_PREFLIGHT_A_PLAN.md](P1_PREFLIGHT_A_PLAN.md). At minimum:
 
 ```text
-- prefill logits
-- external CE loss
-- KV cache tensors
-- per-layer hook outputs
-- prefix/suffix cache split
-- cached suffix vs full-forward suffix
-- long-position modulo compatibility branch
+- versioned JSON schema;
+- explicit reviewer input;
+- Git worktree collection at start/end;
+- deterministic allowlist-based archive packaging;
+- source-hash verification;
+- symlink/path-traversal/device-file rejection;
+- deterministic manifest and SHA256SUMS;
+- offline verifier;
+- tamper detection;
+- sanitization report;
+- truthful historical not-recorded representation;
+- compact archive descriptor under docs/validation_results/.
 ```
 
-P0-2 does not cover padding masks because the vendored reference lacks an attention-mask API. P0-1 covers mask behavior against the oracle.
+Prefer Python standard-library code and synthetic CI fixtures. CI must not require private P0-4 artifacts, GPU, Hub access, external storage, or release credentials.
 
-### P0-3
+## 8. Baseline tests
 
-Recorded smoke results:
-
-```text
-Psi=8
-  params: 966,850
-  steps: 40
-  seq_len: 128
-  initial_probe_loss: 8.215893
-  final_probe_loss: 4.312645
-  relative drop: 47.5085%
-
-Psi=16
-  params: 14,877,442
-  steps: 25
-  seq_len: 128
-  initial_probe_loss: 15.899660
-  final_probe_loss: 5.928024
-  relative drop: 62.7160%
-```
-
-Both runs recorded finite gradients, exact save/load logits under the test conditions, exact manual cache-split logits under the test conditions, and cache-enabled greedy generation.
-
-## 7. P0-4 recorded result
-
-P0-4 passed on the source commit recorded in [P0_4_SUMMARY.md](validation_results/P0_4_SUMMARY.md) and [P0_4_SUMMARY.json](validation_results/P0_4_SUMMARY.json). Both runs used the checked-in defaults without weakening the gate:
-
-```text
-GPT-2 vocabulary: 50,257
-sequence length: 4,096
-device: CUDA
-AMP dtype: bf16
-microbatch / gradient accumulation: 1 / 8
-optimizer steps: 50
-```
-
-| Metric | Psi=8 | Psi=16 |
-|---|---:|---:|
-| parameters | 4,134,146 | 27,546,626 |
-| probe loss | 11.140747 → 4.675382 | 15.799321 → 3.495601 |
-| relative drop | 58.0335% | 77.8750% |
-| max finite grad norm | 5.393857 | 23.194632 |
-| peak CUDA allocated | 3,156,709,888 bytes | 6,622,802,944 bytes |
-| peak CUDA reserved | 4,525,654,016 bytes | 9,130,999,808 bytes |
-| loaded-logits max abs | 0 | 0 |
-| cache-split max abs | 0 | 0.125, within configured atol/rtol |
-| prompt / generated length | 4 / 12 | 4 / 12 |
-| `qualification.qualified` | `true` | `true` |
-
-Every event in both 57-event metrics streams was reviewed. All train losses and gradient norms were finite; memory peaks stabilized after step 2; save/load, tokenizer reload, generation, and cache checks passed; qualifying markers were present and failure artifacts absent. The Psi=16 cache result passed the configured combined `atol=0.03, rtol=0.03` predicate and must not be interpreted as an absolute-only threshold.
-
-The run environment used Python 3.12.11, PyTorch 2.7.1+cu128, Transformers 4.57.6, CUDA 12.8, and an NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition. These results confirm the recorded short dense-reference smoke only. Runtime and memory are feasibility diagnostics, not evidence of the paper's efficiency claims.
-
-The original execution order and strict failure rules remain in [P0_4_PLAN.md](P0_4_PLAN.md) for reproduction. A reduced-context, CPU, non-bf16, or shorter run remains diagnostic and cannot replace the accepted evidence.
-
-## 8. Testing policy for future changes
-
-Minimum after documentation or experiment-harness changes:
+Before and after tracked changes:
 
 ```bash
 export PYTHONPATH=$PWD:$PWD/oracle
@@ -377,108 +259,109 @@ python p0_2_three_way_minimal/test_three_way_minimal.py \
   --quick
 ```
 
-If model/config/oracle/cache/generation/state-dict behavior changes, run the strongest relevant P0-1/P0-2 comparisons, including CUDA bf16 where available, and add a focused regression test.
+Also run focused syntax, schema, fixture, deterministic-package, sanitization, and tamper tests.
 
-A model-core change during P0-4 should not be mixed casually into a result-recording PR. First establish a focused diagnosis and the required requalification scope.
+A model-core diff is a scope violation. Do not turn P1-preflight A into a P0 requalification task.
 
-## 9. What is safe to assume
+## 9. P0-4 raw evidence audit
 
-Safe:
-
-```text
-- the HF math matches the oracle on validated small shapes
-- the HF implementation matches the vendored reference on validated shapes
-- validated cache splits are consistent across the three implementations
-- greedy DynamicCache-compatible generation works in smoke conditions
-- short TinyStories bf16 training works for Psi=8 and Psi=16
-- the P0-4 harness has passed static and tiny CPU integration checks
-- the recorded Psi=8/Psi=16 CUDA bf16 context-4096 short-run qualification passed
-```
-
-Not safe:
+Read the expected raw SHA-256 values from:
 
 ```text
-- paper-scale or paper-quality benchmark reproduction
-- efficient long-context memory or runtime
-- PEFT/LoRA/QLoRA/Unsloth compatibility
-- torch.compile stability at scale
-- broad generation compatibility
-- vLLM/SGLang serving compatibility
-- production readiness
+docs/validation_results/P0_4_SUMMARY.json
 ```
 
-## 10. Result logging
-
-Accepted compact summaries belong under:
+Locate the retained Psi=8/16 files only through the configured raw root or expected ignored output directories. At minimum verify:
 
 ```text
-docs/validation_results/
+Psi=8 summary.json and metrics.jsonl
+Psi=8 P0-4_COMPLETE.md
+Psi=16 summary.json and metrics.jsonl
+Psi=16 P0-4_COMPLETE.md
 ```
 
-For P0-4, use the template and create sanitized Markdown and JSON summaries. Preserve exact commands, environment versions, GPU identity/memory, qualification flags, losses, gradients, peak memory, reload/cache errors, and generation status.
+Do not regenerate substitute evidence if the originals are unavailable or hashes mismatch. Implement generic tooling, preserve the accepted P0-4 status, and report P1-preflight A as partial/blocked.
 
-Do not commit:
+## 10. Completion boundary
+
+P1-preflight A is complete only when:
 
 ```text
-outputs/
-checkpoints/
-*.safetensors
-*.bin
-*.pt
-*.pth
-*.ckpt
-Hugging Face caches
-wandb/
-large raw terminal logs
-local absolute-path reports
+schema/provenance/packaging/verifier/tests are implemented;
+reviewer input is explicit;
+current handoff worktree provenance is recorded;
+historical unknown provenance remains truthful;
+raw P0-4 files match committed hashes;
+exact archive is stored in configured external retention storage;
+sanitized archive is produced and verified;
+compact archive descriptor and policy updates are committed;
+quick P0 regression and repository hygiene pass;
+a focused draft PR is opened or exact push/PR commands are provided;
+no model behavior or P1 capability is changed.
 ```
 
-See [LOGGING_POLICY.md](LOGGING_POLICY.md) for the canonical policy.
+If raw files, reviewer input, retention storage, sanitization, or verification are unavailable, use `PARTIAL/BLOCKED WITH EVIDENCE` rather than weakening the requirements.
 
-## 11. Files requiring special care
+## 11. Core contracts retained from P0
+
+### Trim parameterization
 
 ```text
-multiscreen_transformers/modeling_multiscreen.py
-multiscreen_transformers/configuration_multiscreen.py
-oracle/paper_math_oracle.py
-oracle/test_against_hf_port.py
-p0_2_three_way_minimal/test_three_way_minimal.py
-scripts/p0_3_tinystories_stability.py
-scripts/p0_4_gpt2_context4096_smoke.py
-docs/VALIDATION_STATUS.md
-docs/HANDOFF.md
-AGENTS.md
+s_r_paper = -s_r_hf
 ```
 
-Changing these files changes either the baseline, its validation interpretation, or the agent instructions used for future development.
-
-## 12. After P0-4
-
-P0-4 is accurately recorded. A subsequent task may now select one focused P1 validation gate, but none of the following candidates is validated yet:
+### Oracle compute modes
 
 ```text
-P1-1: PEFT/LoRA smoke
-P1-2: QLoRA/bitsandbytes smoke
-P1-3: Unsloth loader/wrapper prototype
-P1-4: generation compatibility matrix
-P1-5: torch.compile smoke
+stable paper/oracle:
+  mipe_compute_dtype="fp32"
+  softmask_compute_dtype="fp32"
+
+low-precision reference compatibility:
+  mipe_compute_dtype="reference"
+  softmask_compute_dtype="reference"
 ```
 
-Recommended initial LoRA targets remain:
+### Dense implementation boundary
+
+The oracle and current HF screening path are correctness implementations, not evidence of paper-scale long-context efficiency.
+
+### DynamicCache and tied embedding
+
+Preserve current cache/position semantics and `tie_word_embeddings=True`. P1-preflight A must not touch these paths.
+
+## 12. Accepted P0-4 record
+
+The accepted record is in [P0_4_SUMMARY.md](validation_results/P0_4_SUMMARY.md) and [P0_4_SUMMARY.json](validation_results/P0_4_SUMMARY.json).
+
+Both accepted runs used:
 
 ```text
-q_proj
-k_proj
-v_proj
-g_proj
-o_proj
+GPT-2 vocabulary: 50,257
+sequence length: 4,096
+CUDA bf16
+microbatch / gradient accumulation: 1 / 8
+optimizer steps: 50
 ```
 
-`g_proj` should remain included in the first adapter experiment unless evidence justifies a narrower ablation.
+The recorded result includes finite losses and gradients, probe-loss decrease, save/load, tokenizer reload, greedy generation with cache, manual cache-split comparison, completion markers, and raw summary/metrics SHA-256 hashes.
 
-Do not combine all P1 tasks into one long-running goal. Choose one verifiable gate at a time.
+P1-preflight A may add a separate evidence-archive descriptor. It must not change the accepted training metrics.
 
-## 13. Final handoff report format
+## 13. Planned sequence after this gate
+
+```text
+P0.5-C1  architecture / initialization / all-scale contract
+P0.5-C2  long-position / MiPE / cache semantics
+P1-preflight B  gradient-checkpointing API modernization
+P0.5-C3  paper-training-contract smoke
+final P0 core requalification
+P1-1  PEFT/LoRA smoke
+```
+
+No later gate is validated merely because P1-preflight A is complete.
+
+## 14. Final report format
 
 ```text
 変更ファイル:
@@ -487,17 +370,37 @@ Do not combine all P1 tasks into one long-running goal. Choose one verifiable ga
 追加ファイル:
   - ...
 
+開発環境:
+  - active Conda environment:
+  - isolated environment created:
+  - uv usage:
+  - package changes:
+
 実行テスト:
   - ...
 
+Provenance:
+  - reviewer:
+  - original-run worktree status:
+  - handoff worktree state:
+
+Evidence retention:
+  - raw files and hash verification:
+  - exact/private archive:
+  - sanitized archive:
+  - archive verification:
+
 結果:
+  - COMPLETE or PARTIAL/BLOCKED WITH EVIDENCE
+
+未確認・制限:
   - ...
 
-未確認:
+作成したPR:
   - ...
 
 次にやるべきこと:
   - ...
 ```
 
-Always distinguish executed evidence from planned work. A static preflight, CI CPU diagnostic, or reduced local run must never be summarized as a qualifying GPU result.
+Always distinguish historical evidence, current evidence handoff, planned work, private storage, sanitized artifacts, and publicly retained artifacts.
