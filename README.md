@@ -2,49 +2,48 @@
 
 Unofficial Hugging Face Transformers-compatible implementation of the **Multiscreen** architecture, with a paper-math oracle and P0 validation tests.
 
-This repository is a research artifact. It is not an official implementation of the Multiscreen paper, and it does not claim paper-scale performance reproduction. The current status is best described as:
+This repository is a research artifact. It is not an official implementation of the Multiscreen paper, and it does not claim paper-scale performance reproduction.
 
-> **P0-qualified research implementation:** small-shape formula equivalence, three-way reference equivalence, cache/generation compatibility, and TinyStories Ψ=8/16 smoke training have passed.
+Current status:
 
-For the detailed validation record, see [docs/VALIDATION_STATUS.md](docs/VALIDATION_STATUS.md).
+> **P0-qualified research implementation based on P0-1/P0-2/P0-3.** The P0-4 GPT-2-vocab, context-4096 harness is merged and CPU-diagnosed, while qualifying CUDA bf16 Psi=8/Psi=16 runs remain pending.
 
-For development restart context, see [docs/HANDOFF.md](docs/HANDOFF.md).
+## Start here
 
-For compact validation run summaries, see [docs/validation_results/VALIDATION_LOG_INDEX.md](docs/validation_results/VALIDATION_LOG_INDEX.md).
-
-For future validation logging rules, see [docs/LOGGING_POLICY.md](docs/LOGGING_POLICY.md).
-
-For repository hygiene and release-readiness checks, see [docs/REPOSITORY_AUDIT.md](docs/REPOSITORY_AUDIT.md).
-
-
+- Development restart: [docs/HANDOFF.md](docs/HANDOFF.md)
+- Local Codex `/goal` continuation: [docs/CODEX_P0_4_HANDOFF.md](docs/CODEX_P0_4_HANDOFF.md)
+- Repository instructions for Codex: [AGENTS.md](AGENTS.md)
+- Detailed validation boundary: [docs/VALIDATION_STATUS.md](docs/VALIDATION_STATUS.md)
+- Reproduction commands: [docs/TESTING.md](docs/TESTING.md)
+- P0-4 execution plan: [docs/P0_4_PLAN.md](docs/P0_4_PLAN.md)
+- Known limitations: [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md)
+- Validation log index: [docs/validation_results/VALIDATION_LOG_INDEX.md](docs/validation_results/VALIDATION_LOG_INDEX.md)
+- Logging policy: [docs/LOGGING_POLICY.md](docs/LOGGING_POLICY.md)
+- Repository audit: [docs/REPOSITORY_AUDIT.md](docs/REPOSITORY_AUDIT.md)
 
 ## What is included
 
 ```text
-multiscreen_transformers/       HF Transformers-compatible model/config/data code
-scripts/                        tokenizer, training, smoke eval, P0-3 stability scripts
-configs/                        TinyStories/debug configs
-oracle/                         paper_math_oracle and HF-vs-oracle tests
-p0_2_three_way_minimal/          three-way comparison against dieOD/multiscreen-pytorch
-third_party/multiscreen-pytorch/ vendored reference implementation used for P0-2
-tokenizers/tinystories_spm768/   small 768-vocab TinyStories tokenizer for smoke tests
-docs/                           validation status, handoff notes, and reproducibility notes
+AGENTS.md                      Codex project instructions and validation rules
+multiscreen_transformers/     HF-compatible model, config, and data code
+scripts/                      tokenizer, training, P0-3, and P0-4 harnesses
+configs/                      Tiny/debug/P0-3/P0-4 configs
+oracle/                       paper_math_oracle and HF-vs-oracle tests
+p0_2_three_way_minimal/        three-way comparison against the reference
+third_party/multiscreen-pytorch/
+                              vendored dieOD reference used by P0-2
+tokenizers/tinystories_spm768/
+                              committed tokenizer used by P0-3
+docs/                         handoff, validation, testing, and result policy
 ```
 
-The vendored reference implementation is included under `third_party/` for reproducibility and retains its original Apache-2.0 license. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+The vendored reference retains its Apache-2.0 license. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ## Install
-
-A local editable install is recommended.
 
 ```bash
 python -m pip install -e .
 python -m pip install -r requirements.txt
-```
-
-For a quick non-install workflow, set:
-
-```bash
 export PYTHONPATH=$PWD:$PWD/oracle
 ```
 
@@ -63,8 +62,10 @@ config = MultiscreenConfig.from_psi(
 )
 model = MultiscreenForCausalLM(config).eval()
 input_ids = torch.randint(0, config.vocab_size, (1, 16))
+
 with torch.no_grad():
     out = model(input_ids=input_ids, use_cache=True, return_dict=True)
+
 print(out.logits.shape)
 ```
 
@@ -72,102 +73,142 @@ For AutoClass loading in the same process:
 
 ```python
 from multiscreen_transformers import register_multiscreen_auto_classes
+
 register_multiscreen_auto_classes()
 ```
 
-## P0 validation commands
-
-### P0-1: paper oracle vs HF implementation
+## Minimum baseline checks
 
 ```bash
-export PYTHONPATH=$PWD:$PWD/oracle
-
 python oracle/test_formula_units.py
 python oracle/test_paper_math_oracle_selfcheck.py
 python oracle/test_paper_math_oracle_smoke.py
 python oracle/test_against_hf_port.py --quick
-python oracle/test_against_hf_port.py
-python oracle/test_against_hf_port.py --device cuda:0 --dtype bf16
-```
-
-### P0-2: three-way comparison
-
-```bash
-export PYTHONPATH=$PWD:$PWD/oracle
 
 python p0_2_three_way_minimal/test_three_way_minimal.py \
   --reference-root third_party/multiscreen-pytorch \
   --hf-root . \
   --oracle-root oracle \
   --quick
-
-python p0_2_three_way_minimal/test_three_way_minimal.py \
-  --reference-root third_party/multiscreen-pytorch \
-  --hf-root . \
-  --oracle-root oracle
-
-python p0_2_three_way_minimal/test_three_way_minimal.py \
-  --reference-root third_party/multiscreen-pytorch \
-  --hf-root . \
-  --oracle-root oracle \
-  --device cuda:0 \
-  --dtype bf16
 ```
 
-### P0-3: TinyStories smoke training
+Full CPU and CUDA comparison commands are in [docs/TESTING.md](docs/TESTING.md).
 
-If the included tokenizer is present, run:
+## Validation status
+
+### P0-1: complete
+
+The dense paper-math oracle and HF implementation match under the recorded small-shape forward, loss, mask, position, and cache sweeps.
+
+### P0-2: complete
+
+The vendored unofficial PyTorch reference, HF implementation, and oracle match under the recorded CPU fp32 and CUDA bf16 three-way comparisons.
+
+### P0-3: complete
+
+Psi=8 and Psi=16 TinyStories bf16 smoke training passed, including:
+
+```text
+finite loss
+finite gradient norms
+probe-loss decrease
+save_pretrained / from_pretrained
+greedy generate(use_cache=True)
+manual cache split vs full-forward suffix
+```
+
+Recorded metrics are in [docs/validation_results/p0_3_results.json](docs/validation_results/p0_3_results.json).
+
+### P0-4: harness merged; qualifying execution pending
+
+PR #3 added:
+
+```text
+scripts/p0_4_gpt2_context4096_smoke.py
+configs/p0_4_multiscreen_psi8_gpt2_ctx4096/
+configs/p0_4_multiscreen_psi16_gpt2_ctx4096/
+docs/P0_4_PLAN.md
+docs/P0_4_RESULTS_TEMPLATE.md
+CI static preflight and tiny CPU end-to-end diagnostic
+```
+
+A qualifying P0-4 run requires:
+
+```text
+GPT-2 vocabulary = 50,257
+context = 4,096
+CUDA
+bf16
+at least 50 optimizer steps
+finite loss and gradients
+probe-loss decrease
+save/load comparison
+generation with cache
+manual cache-split comparison
+```
+
+A CPU, reduced-context, different-dtype, or shorter run remains diagnostic and must not be reported as a P0-4 pass.
+
+Static preflight:
 
 ```bash
-python scripts/p0_3_tinystories_stability.py \
-  --tokenizer-path tokenizers/tinystories_spm768 \
-  --cache-dir /path/to/hf_cache \
-  --device cuda:0 \
-  --amp-dtype bf16 \
-  --seq-len 128 \
-  --batch-size 4 \
-  --steps-per-psi 8:40,16:25 \
-  --output-dir outputs/p0_3_tinystories_stability
+python scripts/p0_4_gpt2_context4096_smoke.py \
+  --config-dir configs/p0_4_multiscreen_psi8_gpt2_ctx4096 \
+  --validate-config-only
+
+python scripts/p0_4_gpt2_context4096_smoke.py \
+  --config-dir configs/p0_4_multiscreen_psi16_gpt2_ctx4096 \
+  --validate-config-only
 ```
 
-To recreate the tokenizer:
+Qualifying Psi=8 command:
 
 ```bash
-python scripts/train_tokenizer_spm.py \
-  --dataset_name roneneldan/TinyStories \
-  --split train \
-  --text_column text \
-  --vocab_size 768 \
-  --max_samples 200000 \
-  --model_max_length 512 \
-  --output_dir tokenizers/tinystories_spm768 \
-  --cache_dir /path/to/hf_cache
+python scripts/p0_4_gpt2_context4096_smoke.py \
+  --config-dir configs/p0_4_multiscreen_psi8_gpt2_ctx4096
 ```
 
-## Current validation status
+Run Psi=16 only after reviewing a qualifying Psi=8 result:
 
-Summary:
+```bash
+python scripts/p0_4_gpt2_context4096_smoke.py \
+  --config-dir configs/p0_4_multiscreen_psi16_gpt2_ctx4096
+```
 
-- P0-1 complete: `paper_math_oracle` and HF implementation match on small-shape forward/loss/cache/mask sweeps.
-- P0-2 complete: vendored unofficial PyTorch reference, HF implementation, and oracle match in CPU fp32 and CUDA bf16 full sweeps.
-- P0-3 complete: Ψ=8 and Ψ=16 TinyStories bf16 smoke training passed, including save/load and DynamicCache-compatible generation.
+## Local Codex continuation
 
-Detailed records are in [docs/VALIDATION_STATUS.md](docs/VALIDATION_STATUS.md), with P0-3 metrics in [docs/validation_results/p0_3_results.json](docs/validation_results/p0_3_results.json).
+After cloning, start Codex from the repository root:
+
+```bash
+codex
+```
+
+Codex reads [AGENTS.md](AGENTS.md) before working. The ready-to-paste `/goal` prompt in [docs/CODEX_P0_4_HANDOFF.md](docs/CODEX_P0_4_HANDOFF.md) guides environment audit, baseline tests, Psi=8/Psi=16 qualification, evidence sanitization, documentation updates, and PR preparation.
+
+If `/goal` is unavailable:
+
+```bash
+codex features enable goals
+codex
+```
 
 ## Known limitations
 
 Not yet validated:
 
-- paper-scale pretraining or paper-level performance reproduction
-- long-context efficiency claims
+- qualifying P0-4 CUDA bf16 context-4096 execution
+- paper-scale pretraining or paper-quality reproduction
+- long-context retrieval at paper settings
+- long-context runtime or memory efficiency
 - custom Triton/windowed kernels
-- PEFT/LoRA/QLoRA or Unsloth integration
+- PEFT/LoRA/QLoRA or Unsloth
+- torch.compile stability at scale
+- broad generation compatibility
 - vLLM/SGLang serving
-- production-scale generation compatibility such as beam search, sampling processors, streamers, or assisted generation
-- packed dataset segment-isolation semantics
+- production readiness
 
-This implementation should be treated as a validated research baseline, not a production inference stack.
+The current HF path is a dense PyTorch correctness baseline. Do not use it to substantiate the paper's speed claims.
 
 ## License
 
-The repository is provided under Apache-2.0. The vendored reference implementation under `third_party/multiscreen-pytorch/` also retains Apache-2.0 licensing.
+The repository is provided under Apache-2.0. The vendored reference under `third_party/multiscreen-pytorch/` retains its original Apache-2.0 licensing.
