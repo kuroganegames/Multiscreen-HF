@@ -2,6 +2,8 @@
 
 For project handoff context and recommended next steps, see [HANDOFF.md](HANDOFF.md).
 
+For the long-running local Codex workflow that executes these checks and records P0-4 evidence, see [CODEX_P0_4_HANDOFF.md](CODEX_P0_4_HANDOFF.md).
+
 Run all commands from the repository root unless noted otherwise.
 
 ## Setup
@@ -76,7 +78,7 @@ python scripts/train_tokenizer_spm.py \
 
 ## P0-4
 
-P0-4 is implemented but its qualifying CUDA bf16 runs are not recorded yet. See [P0_4_PLAN.md](P0_4_PLAN.md) before execution.
+P0-4 is implemented and its CPU/static integration path passed in CI, but qualifying CUDA bf16 runs are not recorded yet. Read [P0_4_PLAN.md](P0_4_PLAN.md) before execution.
 
 Static config preflight; this does not download the tokenizer or dataset:
 
@@ -116,3 +118,5 @@ python scripts/p0_4_gpt2_context4096_smoke.py \
 ```
 
 A qualifying run uses GPT-2 vocab 50,257, sequence length 4,096, CUDA bf16, and at least 50 optimizer steps. Reduced runs write `P0-4_DIAGNOSTIC_COMPLETE.md`, not `P0-4_COMPLETE.md`.
+
+After accepted runs, record compact sanitized summaries under `docs/validation_results/`, update the validation log index and status documents, and rerun the P0-1/P0-2 quick suite.
