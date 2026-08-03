@@ -1,5 +1,8 @@
 # Apply validation log supplement
 
+> Historical pre-P0-4 import instructions. Do not apply this bundle to the
+> current tree; use the canonical [validation log index](../docs/validation_results/VALIDATION_LOG_INDEX.md).
+
 Copy this supplement into the repository root:
 
 ```bash

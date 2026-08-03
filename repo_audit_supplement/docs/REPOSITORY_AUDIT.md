@@ -1,16 +1,20 @@
 # Repository Audit
 
+> Historical pre-P0-4 import bundle. Do not use this copy for current status or
+> overwrite the live audit with it. See the canonical
+> [repository audit](../../docs/REPOSITORY_AUDIT.md).
+
 This document records a repository-hygiene and handoff-readiness audit for `kuroganegames/Multiscreen-HF`.
 
 It is intended to complement:
 
-- [`README.md`](../README.md)
-- [`docs/HANDOFF.md`](HANDOFF.md)
-- [`docs/VALIDATION_STATUS.md`](VALIDATION_STATUS.md)
-- [`docs/TESTING.md`](TESTING.md)
-- [`docs/KNOWN_LIMITATIONS.md`](KNOWN_LIMITATIONS.md)
-- [`docs/LOGGING_POLICY.md`](LOGGING_POLICY.md)
-- [`docs/validation_results/VALIDATION_LOG_INDEX.md`](validation_results/VALIDATION_LOG_INDEX.md)
+- [`README.md`](../../README.md)
+- [`docs/HANDOFF.md`](../../docs/HANDOFF.md)
+- [`docs/VALIDATION_STATUS.md`](../../docs/VALIDATION_STATUS.md)
+- [`docs/TESTING.md`](../../docs/TESTING.md)
+- [`docs/KNOWN_LIMITATIONS.md`](../../docs/KNOWN_LIMITATIONS.md)
+- [`docs/LOGGING_POLICY.md`](../../docs/LOGGING_POLICY.md)
+- [`docs/validation_results/VALIDATION_LOG_INDEX.md`](../../docs/validation_results/VALIDATION_LOG_INDEX.md)
 
 ## Audit summary
 

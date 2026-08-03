@@ -1,5 +1,8 @@
 # Apply repository audit document
 
+> Historical pre-P0-4 import instructions. Do not apply this bundle to the
+> current tree; use [docs/REPOSITORY_AUDIT.md](docs/REPOSITORY_AUDIT.md).
+
 Copy `docs/REPOSITORY_AUDIT.md` into the root of `kuroganegames/Multiscreen-HF`.
 
 ```bash

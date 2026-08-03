@@ -14,7 +14,7 @@ It is intended to complement:
 
 ## Audit summary
 
-Status: **P0-qualified repository; suitable for continuing research development.**
+Status: **P0-qualified through P0-4; suitable for continuing research development.**
 
 The repository contains the expected implementation, oracle, validation tests, reference implementation, tokenizer artifact, validation documentation, and handoff notes for the current P0 baseline.
 
@@ -43,6 +43,7 @@ scripts/
   train_tokenizer_spm.py
   train_pretrain_sft.py
   p0_3_tinystories_stability.py
+  p0_4_gpt2_context4096_smoke.py
   eval_smoke.py
   count_params.py
   cache_utils.py
@@ -90,11 +91,13 @@ docs/
     P0_2_SUMMARY.json
     P0_3_SUMMARY.md
     P0_3_SUMMARY.json
+    P0_4_SUMMARY.md
+    P0_4_SUMMARY.json
     P0-3_COMPLETE.md
     p0_3_results.json
 ```
 
-Some files may differ slightly by naming, but the repository should preserve the same information: implementation, oracle, P0-1/P0-2/P0-3 test runners, validation summaries, and handoff documentation.
+Some files may differ slightly by naming, but the repository should preserve the same information: implementation, oracle, P0-1/P0-2/P0-3/P0-4 test runners and validation summaries, and handoff documentation.
 
 ## Validation state expected in the repository
 
@@ -186,6 +189,36 @@ docs/validation_results/p0_3_results.json
 docs/validation_results/P0-3_COMPLETE.md
 ```
 
+### P0-4: GPT-2 vocabulary + context-4096 smoke
+
+Expected status: **passed**.
+
+Expected coverage:
+
+```text
+- Psi=8 and Psi=16 CUDA bf16
+- GPT-2 tokenizer vocabulary 50,257
+- sequence length 4,096
+- microbatch 1 and 50 optimizer steps
+- finite loss and gradient norms
+- configured probe-loss decrease
+- save/load and tokenizer reload
+- greedy generate(use_cache=True)
+- manual cache split within configured tolerances
+- reviewed summary/metrics hashes
+```
+
+Expected primary files:
+
+```text
+scripts/p0_4_gpt2_context4096_smoke.py
+docs/VALIDATION_STATUS.md
+docs/validation_results/P0_4_SUMMARY.md
+docs/validation_results/P0_4_SUMMARY.json
+```
+
+The raw outputs and checkpoints remain ignored and local. P0-4 runtime and memory are feasibility diagnostics only.
+
 ## Documentation readiness
 
 The documentation is considered handoff-ready if the following reading path works:
@@ -253,6 +286,7 @@ root = pathlib.Path('.')
 missing = []
 for md in root.rglob('*.md'):
     text = md.read_text(encoding='utf-8', errors='ignore')
+    text = re.sub(r'```.*?```', '', text, flags=re.S)
     for m in re.finditer(r'\[[^\]]+\]\(([^)]+)\)', text):
         link = m.group(1).split('#')[0]
         if not link or '://' in link or link.startswith('mailto:'):
@@ -341,12 +375,7 @@ The following limitations are acceptable for the current P0-qualified baseline i
 
 ## Suggested tag
 
-If all checks pass and the current repository corresponds to the P0-qualified artifact, create:
-
-```bash
-git tag p0-qualified-v0
-git push origin p0-qualified-v0
-```
+After the evidence PR is reviewed and merged, the completed P0-1 through P0-4 artifact may receive a new immutable tag such as `p0-4-qualified-v0`. If an earlier tag exists, do not move it; verify remote tags before choosing a new immutable name. Do not tag the unmerged evidence branch.
 
 Suggested release note:
 
@@ -356,6 +385,7 @@ P0-qualified unofficial HF Multiscreen implementation:
 - three-way reference equivalence
 - DynamicCache-compatible generation smoke
 - TinyStories Ψ=8/16 bf16 smoke training
+- GPT-2-vocabulary context-4096 CUDA bf16 Psi=8/16 short-run qualification
 ```
 
 ## Audit conclusion
@@ -365,6 +395,5 @@ If the expected files exist, P0 summaries are present, bytecode/checkpoints are 
 ```text
 - public GitHub baseline use
 - development handoff
-- P0-4 GPT-2 vocab + context 4096 smoke validation
-- later P1 ecosystem work
+- selection of one focused, explicitly scoped P1 validation gate
 ```

@@ -6,11 +6,28 @@ Implementation and reproducibility harness: **merged in PR #3**.
 
 Static Psi=8/Psi=16 preflight and tiny Psi=8 CPU end-to-end diagnostic: **passed in GitHub Actions**.
 
-Qualifying CUDA bf16 execution: **pending**.
+Qualifying CUDA bf16 execution: **complete for Psi=8 and Psi=16**.
 
-For a complete local Codex `/goal` workflow, see [CODEX_P0_4_HANDOFF.md](CODEX_P0_4_HANDOFF.md). Codex also reads the repository rules in [`AGENTS.md`](../AGENTS.md) when launched from the repository root.
+For the strict historical reproduction workflow, see [CODEX_P0_4_HANDOFF.md](CODEX_P0_4_HANDOFF.md). Codex also reads the repository rules in [`AGENTS.md`](../AGENTS.md) when launched from the repository root.
 
-P0-4 must not be marked complete in `docs/VALIDATION_STATUS.md` until qualifying runs have produced the required artifacts and their metrics have been reviewed. Static validation, CI CPU diagnostics, and reduced-context runs remain non-qualifying.
+P0-4 was marked complete only after both qualifying artifact streams were reviewed. Static validation, CI CPU diagnostics, and reduced-context runs remain non-qualifying substitutes.
+
+## Recorded result
+
+Reviewed compact evidence is in [validation_results/P0_4_SUMMARY.md](validation_results/P0_4_SUMMARY.md) and [validation_results/P0_4_SUMMARY.json](validation_results/P0_4_SUMMARY.json).
+
+| Metric | Psi=8 | Psi=16 |
+|---|---:|---:|
+| parameters | 4,134,146 | 27,546,626 |
+| optimizer steps | 50 | 50 |
+| probe loss | 11.140747 → 4.675382 | 15.799321 → 3.495601 |
+| relative drop | 58.0335% | 77.8750% |
+| peak allocated / reserved bytes | 3,156,709,888 / 4,525,654,016 | 6,622,802,944 / 9,130,999,808 |
+| reload max abs | 0 | 0 |
+| cache max abs | 0 | 0.125, within configured atol/rtol |
+| `qualification.qualified` | `true` | `true` |
+
+Both runs used GPT-2 vocabulary 50,257, context 4096, CUDA bf16, microbatch 1, gradient accumulation 8, gradient checkpointing, and 50 optimizer steps. All train losses and gradient norms were finite; probe loss decreased; save/load, tokenizer reload, generation, and cache checks passed. Runtime and memory remain feasibility diagnostics only.
 
 ## Objective
 
@@ -38,6 +55,8 @@ configs/p0_4_multiscreen_psi16_gpt2_ctx4096/run.json
 docs/P0_4_PLAN.md
 docs/P0_4_RESULTS_TEMPLATE.md
 docs/CODEX_P0_4_HANDOFF.md
+docs/validation_results/P0_4_SUMMARY.md
+docs/validation_results/P0_4_SUMMARY.json
 AGENTS.md
 ```
 
@@ -68,7 +87,7 @@ A reduced-context, CPU, non-bf16, or shorter run can still exercise the code pat
 
 For the project-level P0-4 completion record, review both intended model sizes. A Psi=8 pass does not imply a Psi=16 pass. If Psi=16 cannot complete on the available system, record the overall state as partial or blocked rather than complete.
 
-## Execution order
+## Recorded and reproduction order
 
 ### 1. Restore the P0 baseline
 
@@ -183,7 +202,7 @@ If evidence indicates a model-core, oracle, position, mask, cache, generation, o
 
 ## Recording the result
 
-Use `docs/P0_4_RESULTS_TEMPLATE.md`. Retain full outputs locally and commit only compact sanitized summaries.
+The accepted result follows `docs/P0_4_RESULTS_TEMPLATE.md`: full outputs remain local and ignored, while compact sanitized summaries are committed. Future reproductions must retain distinct raw outputs and add a new record rather than overwrite the accepted history.
 
 Suggested files:
 
@@ -222,4 +241,4 @@ docs/KNOWN_LIMITATIONS.md
 docs/validation_results/VALIDATION_LOG_INDEX.md
 ```
 
-Do not replace `pending` with `complete` based only on static config validation, CI CPU diagnostics, or a reduced local run.
+The completed verdict comes from reviewed qualifying Psi=8 and Psi=16 artifacts, not from static config validation, CI CPU diagnostics, or the reduced local diagnostic.

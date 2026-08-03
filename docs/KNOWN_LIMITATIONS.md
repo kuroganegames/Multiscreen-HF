@@ -6,7 +6,6 @@ This repository is a P0-qualified research implementation, not a full production
 
 - paper-scale pretraining
 - 28M/286M/1.3B reproduction
-- P0-4 qualifying GPT-2-vocab, context-4096 CUDA bf16 execution
 - long-context retrieval benchmarks at paper settings
 - long-context runtime efficiency
 - fused/windowed/Triton kernels
@@ -18,9 +17,9 @@ This repository is a P0-qualified research implementation, not a full production
 - packed dataset segment isolation
 - beam search and broad generation compatibility
 
-## P0-4 preparation status
+## P0-4 validated scope
 
-The P0-4 script, Psi=8/Psi=16 configs, plan, result template, and static config checks are present. This is implementation readiness only. Until a CUDA bf16 context-4096 run writes and passes review of `P0-4_COMPLETE.md`, P0-4 remains pending.
+Both intended P0-4 model orders passed the recorded CUDA bf16 context-4096 qualification. This establishes short-run feasibility and stability under one recorded hardware/software environment only; it does not validate paper-scale training, retrieval quality, long-context efficiency, or cross-hardware reproducibility. See [validation_results/P0_4_SUMMARY.md](validation_results/P0_4_SUMMARY.md).
 
 A reduced-context, CPU, non-bf16, or fewer-than-50-step run is explicitly labeled diagnostic and must not be reported as a P0-4 pass.
 

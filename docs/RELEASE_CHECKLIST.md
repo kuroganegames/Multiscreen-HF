@@ -47,7 +47,7 @@ python scripts/p0_4_gpt2_context4096_smoke.py \
 
 ## P0-4 result acceptance
 
-Before changing P0-4 from pending to complete, verify from the actual local artifacts:
+The current P0-4 record was accepted only after verifying the following against the actual local artifacts. Apply the same checklist to any future reproduction:
 
 ```text
 - Psi=8 qualifying run reviewed
@@ -70,22 +70,18 @@ If Psi=8 passes but Psi=16 cannot complete on available hardware, record a parti
 
 ## Suggested baseline tag
 
-The existing P0-1/P0-2/P0-3 baseline can use:
-
-```bash
-git tag p0-qualified-v0
-git push origin p0-qualified-v0
-```
-
-Use a new tag or release name for a future accepted P0-4 state rather than moving an existing tag.
+The completed P0-1 through P0-4 baseline should use a new immutable tag, such as `p0-4-qualified-v0`, only after the evidence PR is reviewed and merged. If an earlier tag exists, do not move it; verify remote tags before choosing a new immutable name. Do not create a tag from the evidence branch itself.
 
 ## Suggested current baseline release note
 
 ```text
-P0-qualified unofficial HF Multiscreen implementation.
-Validated: paper oracle equivalence, three-way reference equivalence,
-DynamicCache-compatible generation smoke, and TinyStories Psi=8/16 bf16 smoke training.
-P0-4 harness merged; qualifying GPT-2-vocab context-4096 CUDA bf16 execution pending.
-Not validated: paper-scale reproduction, long-context efficiency, Triton/windowed kernels,
-PEFT/LoRA/Unsloth, broad generation, and production serving.
+P0-qualified unofficial HF Multiscreen implementation through P0-4.
+Validated: paper-oracle equivalence, three-way reference equivalence,
+DynamicCache-compatible greedy generation smoke, TinyStories Psi=8/16 bf16
+smoke training, and qualifying GPT-2-vocabulary context-4096 CUDA bf16
+short-run training for Psi=8 and Psi=16.
+P0-4 runtime and memory are feasibility diagnostics only.
+Not validated: paper-scale reproduction, retrieval quality, long-context
+efficiency, Triton/windowed kernels, PEFT/LoRA/Unsloth, broad generation,
+or production serving.
 ```

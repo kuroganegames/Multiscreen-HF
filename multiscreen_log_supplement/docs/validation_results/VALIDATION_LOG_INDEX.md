@@ -1,5 +1,8 @@
 # Validation Log Index
 
+> Historical pre-P0-4 import bundle. Do not use this table as the current
+> validation index. See the canonical [validation log index](../../../docs/validation_results/VALIDATION_LOG_INDEX.md).
+
 This directory stores compact validation summaries for the P0-qualified Multiscreen-HF baseline.
 
 ## Current summaries

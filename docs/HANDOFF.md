@@ -2,15 +2,15 @@
 
 This is the primary development-restart document for `kuroganegames/Multiscreen-HF`.
 
-The repository contains a **P0-qualified research implementation** of Multiscreen for Hugging Face Transformers. P0-1, P0-2, and P0-3 are complete. PR #3 added and exercised the P0-4 harness, but the qualifying local CUDA bf16 context-4096 runs remain pending.
+The repository contains a **P0-qualified research implementation** of Multiscreen for Hugging Face Transformers. P0-1, P0-2, P0-3, and P0-4 are complete. Reviewed local CUDA bf16 context-4096 evidence is recorded for both Psi=8 and Psi=16.
 
 The current phase is therefore:
 
 ```text
-P0-4 execution, evidence review, and validation-record update
+selection of the next focused validation gate; no P1 gate has been selected or validated
 ```
 
-For Codex-based continuation after a local clone, read the root [`AGENTS.md`](../AGENTS.md) and [`CODEX_P0_4_HANDOFF.md`](CODEX_P0_4_HANDOFF.md).
+For ordinary continuation after a local clone, read the root [`AGENTS.md`](../AGENTS.md), [VALIDATION_STATUS.md](VALIDATION_STATUS.md), and the accepted [P0_4_SUMMARY.md](validation_results/P0_4_SUMMARY.md). Use [CODEX_P0_4_HANDOFF.md](CODEX_P0_4_HANDOFF.md) only for an intentional P0-4 reproduction or requalification.
 
 For repository hygiene checks, see [REPOSITORY_AUDIT.md](REPOSITORY_AUDIT.md).
 
@@ -24,13 +24,13 @@ For repository hygiene checks, see [REPOSITORY_AUDIT.md](REPOSITORY_AUDIT.md).
 | P0-2 | Complete | The vendored unofficial PyTorch reference, HF implementation, and oracle agree in recorded CPU fp32 and CUDA bf16 sweeps. |
 | P0-3 | Complete | Psi=8/16 TinyStories bf16 smoke training passed, including finite loss/gradients, save/load, cache split, and greedy generation. |
 | P0-4 harness | Merged | GPT-2 vocab/context-4096 harness, Psi=8/16 configs, plan, result template, static checks, and tiny CPU integration diagnostic were merged in PR #3. |
-| P0-4 qualifying execution | Pending | CUDA bf16, context 4096, at least 50 optimizer steps, Psi=8 first and Psi=16 second. |
+| P0-4 qualifying execution | Complete | Reviewed CUDA bf16 context-4096, 50-step Psi=8 and Psi=16 runs passed; see [P0_4_SUMMARY.md](validation_results/P0_4_SUMMARY.md). |
 | P1 ecosystem work | Not started as validated work | PEFT/LoRA, QLoRA, Unsloth, generation matrix, compile, and serving remain future work. |
 
 ### Baseline identity
 
 ```text
-Current status: P0-qualified research baseline based on P0-1/P0-2/P0-3
+Current status: P0-qualified research baseline through P0-4
 Primary implementation: multiscreen_transformers/modeling_multiscreen.py
 Primary config: multiscreen_transformers/configuration_multiscreen.py
 Primary equation oracle: oracle/paper_math_oracle.py
@@ -40,7 +40,7 @@ Codex local handoff: docs/CODEX_P0_4_HANDOFF.md
 Repository instructions for Codex: AGENTS.md
 ```
 
-P0-4 is an additional pending gate. Static config validation, CI CPU diagnostics, or reduced-context runs do not complete it.
+P0-4 is complete from reviewed qualifying Psi=8/Psi=16 CUDA bf16 artifacts. Static config validation, CI CPU diagnostics, and reduced-context runs remain non-qualifying substitutes.
 
 ## 2. First ten minutes after a fresh clone
 
@@ -89,7 +89,7 @@ python scripts/p0_4_gpt2_context4096_smoke.py \
   --validate-config-only
 ```
 
-If these checks pass, the checkout matches the expected merged baseline at the CPU/static level. It still has not reproduced the qualifying P0-4 CUDA runs.
+If these checks pass, the checkout matches the expected merged baseline at the CPU/static level. The accepted P0-4 GPU evidence is recorded separately; a fresh clone has not itself reproduced those CUDA runs.
 
 ## 3. Codex continuation
 
@@ -106,7 +106,7 @@ codex features enable goals
 codex
 ```
 
-Then use the complete prompt in [CODEX_P0_4_HANDOFF.md](CODEX_P0_4_HANDOFF.md). That goal is intentionally limited to P0-4 qualification and evidence recording. It defines both a successful completion state and a blocked-with-evidence state without weakening the gate.
+[CODEX_P0_4_HANDOFF.md](CODEX_P0_4_HANDOFF.md) is retained as a strict P0-4 reproduction/requalification prompt. P0-4 is no longer the pending next task; select a new focused gate explicitly rather than rerunning it by default.
 
 Do not start Codex from a parent directory and assume repository instructions were loaded. Confirm the working directory is the Git root.
 
@@ -249,6 +249,7 @@ Validated:
 - P0-3 greedy generate(use_cache=True)
 - P0-3 post-load manual cache split
 - P0-4 tiny CPU integration diagnostic in CI
+- P0-4 qualifying Psi=8/Psi=16 greedy generation and manual cache split
 ```
 
 Still not broadly validated:
@@ -325,54 +326,37 @@ Psi=16
 
 Both runs recorded finite gradients, exact save/load logits under the test conditions, exact manual cache-split logits under the test conditions, and cache-enabled greedy generation.
 
-## 7. P0-4 current state
+## 7. P0-4 recorded result
 
-PR #3 added:
-
-```text
-scripts/p0_4_gpt2_context4096_smoke.py
-configs/p0_4_multiscreen_psi8_gpt2_ctx4096/
-configs/p0_4_multiscreen_psi16_gpt2_ctx4096/
-docs/P0_4_PLAN.md
-docs/P0_4_RESULTS_TEMPLATE.md
-CI static preflight for both configs
-CI tiny Psi=8 CPU end-to-end diagnostic
-```
-
-The CI diagnostic exercised tokenizer loading, packed data, model construction, forward/backward, finite loss/gradient, save/load, generation, cache checks, and correct diagnostic-note classification. It did not use CUDA bf16 context 4096 and therefore is not a qualifying P0-4 result.
-
-A qualifying run requires:
+P0-4 passed on the source commit recorded in [P0_4_SUMMARY.md](validation_results/P0_4_SUMMARY.md) and [P0_4_SUMMARY.json](validation_results/P0_4_SUMMARY.json). Both runs used the checked-in defaults without weakening the gate:
 
 ```text
-GPT-2 vocabulary: exactly 50,257
-sequence length: exactly 4,096
+GPT-2 vocabulary: 50,257
+sequence length: 4,096
 device: CUDA
 AMP dtype: bf16
-optimizer steps: at least 50
-finite train loss and gradient norms
-probe-loss decrease
-save/load logits within configured tolerance
-greedy generate(use_cache=True)
-manual cache split within configured tolerance
-metrics.jsonl, summary.json, P0-4_COMPLETE.md
+microbatch / gradient accumulation: 1 / 8
+optimizer steps: 50
 ```
 
-A reduced-context, CPU, non-bf16, or shorter run writes `P0-4_DIAGNOSTIC_COMPLETE.md` and must remain diagnostic.
+| Metric | Psi=8 | Psi=16 |
+|---|---:|---:|
+| parameters | 4,134,146 | 27,546,626 |
+| probe loss | 11.140747 → 4.675382 | 15.799321 → 3.495601 |
+| relative drop | 58.0335% | 77.8750% |
+| max finite grad norm | 5.393857 | 23.194632 |
+| peak CUDA allocated | 3,156,709,888 bytes | 6,622,802,944 bytes |
+| peak CUDA reserved | 4,525,654,016 bytes | 9,130,999,808 bytes |
+| loaded-logits max abs | 0 | 0 |
+| cache-split max abs | 0 | 0.125, within configured atol/rtol |
+| prompt / generated length | 4 / 12 | 4 / 12 |
+| `qualification.qualified` | `true` | `true` |
 
-Execution order:
+Every event in both 57-event metrics streams was reviewed. All train losses and gradient norms were finite; memory peaks stabilized after step 2; save/load, tokenizer reload, generation, and cache checks passed; qualifying markers were present and failure artifacts absent. The Psi=16 cache result passed the configured combined `atol=0.03, rtol=0.03` predicate and must not be interpreted as an absolute-only threshold.
 
-```text
-1. baseline quick tests
-2. both config preflights
-3. optional Psi=8 reduced diagnostic
-4. qualifying Psi=8
-5. artifact and memory review
-6. qualifying Psi=16
-7. compact sanitized result records
-8. status-document updates and final regressions
-```
+The run environment used Python 3.12.11, PyTorch 2.7.1+cu128, Transformers 4.57.6, CUDA 12.8, and an NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition. These results confirm the recorded short dense-reference smoke only. Runtime and memory are feasibility diagnostics, not evidence of the paper's efficiency claims.
 
-If local hardware cannot complete an unweakened run, preserve evidence and record `partial`, `failed`, or `blocked`. Do not silently change the acceptance criteria.
+The original execution order and strict failure rules remain in [P0_4_PLAN.md](P0_4_PLAN.md) for reproduction. A reduced-context, CPU, non-bf16, or shorter run remains diagnostic and cannot replace the accepted evidence.
 
 ## 8. Testing policy for future changes
 
@@ -408,12 +392,12 @@ Safe:
 - greedy DynamicCache-compatible generation works in smoke conditions
 - short TinyStories bf16 training works for Psi=8 and Psi=16
 - the P0-4 harness has passed static and tiny CPU integration checks
+- the recorded Psi=8/Psi=16 CUDA bf16 context-4096 short-run qualification passed
 ```
 
 Not safe:
 
 ```text
-- P0-4 CUDA bf16 context-4096 qualification has passed
 - paper-scale or paper-quality benchmark reproduction
 - efficient long-context memory or runtime
 - PEFT/LoRA/QLoRA/Unsloth compatibility
@@ -470,7 +454,7 @@ Changing these files changes either the baseline, its validation interpretation,
 
 ## 12. After P0-4
 
-Only after the P0-4 outcome is accurately recorded should the project select a P1 task. Current candidates are:
+P0-4 is accurately recorded. A subsequent task may now select one focused P1 validation gate, but none of the following candidates is validated yet:
 
 ```text
 P1-1: PEFT/LoRA smoke

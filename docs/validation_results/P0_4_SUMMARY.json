@@ -1,0 +1,282 @@
+{
+  "gate": "P0-4",
+  "name": "GPT-2 vocabulary plus context-4096 short pretraining smoke",
+  "status": "passed",
+  "p0_4_status": "complete",
+  "tested_source_commit": "3d734d74e04ce6a320fb31cf3d8241f823ff43fa",
+  "source_branch": "validation/p0-4-local-cuda",
+  "run_date_utc": "2026-08-03",
+  "evidence_commit_note": "The later documentation commit is intentionally distinct from the tested source commit.",
+  "environment": {
+    "python": "3.12.11",
+    "torch": "2.7.1+cu128",
+    "transformers": "4.57.6",
+    "datasets": "5.0.1",
+    "tokenizers": "0.22.0",
+    "safetensors": "0.5.3",
+    "numpy": "1.26.4",
+    "accelerate": "1.6.0",
+    "trl": "1.9.2",
+    "sentencepiece": "0.2.0",
+    "cuda_runtime": "12.8",
+    "device": "cuda:0",
+    "gpu": "NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition",
+    "gpu_total_memory_bytes": 101973491712,
+    "compute_capability": "12.0",
+    "nvidia_driver": "595.71.05",
+    "bf16_supported": true
+  },
+  "prequalification_checks": {
+    "formula_units": "passed",
+    "oracle_selfcheck": "passed",
+    "oracle_smoke": "passed",
+    "p0_1_quick": {
+      "status": "passed",
+      "total_recorded_checks": 94
+    },
+    "p0_2_quick": {
+      "status": "passed",
+      "prefill_three_way": 12,
+      "cache_split_three_way": 28
+    },
+    "python_syntax": "passed",
+    "psi8_static_preflight": "passed",
+    "psi16_static_preflight": "passed"
+  },
+  "diagnostic": {
+    "psi": 8,
+    "sequence_length": 1024,
+    "optimizer_steps": 2,
+    "device": "cuda:0",
+    "amp_dtype": "bf16",
+    "status": "diagnostic_passed",
+    "qualified": false,
+    "completion_marker": "P0-4_DIAGNOSTIC_COMPLETE.md",
+    "counted_as_qualifying_evidence": false
+  },
+  "qualification_contract": {
+    "tokenizer_vocab_size": 50257,
+    "sequence_length": 4096,
+    "device_type": "cuda",
+    "amp_dtype": "bf16",
+    "microbatch_size": 1,
+    "minimum_optimizer_steps": 50,
+    "gradient_checkpointing": true,
+    "finite_losses": true,
+    "finite_gradient_norms": true,
+    "probe_loss_threshold": "absolute or relative configured threshold",
+    "save_reload_required": true,
+    "tokenizer_reload_required": true,
+    "loaded_logits_tolerance_required": true,
+    "generation_with_cache_required": true,
+    "manual_cache_split_required": true,
+    "summary_and_metrics_required": true,
+    "completion_marker_required": "P0-4_COMPLETE.md",
+    "failure_artifacts_absent_required": true,
+    "diagnostic_marker_absent_required": true
+  },
+  "commands": {
+    "path_sanitization_note": "The machine-local interpreter path was normalized to python; all harness arguments are exact.",
+    "psi8": "python scripts/p0_4_gpt2_context4096_smoke.py --config-dir configs/p0_4_multiscreen_psi8_gpt2_ctx4096",
+    "psi16": "python scripts/p0_4_gpt2_context4096_smoke.py --config-dir configs/p0_4_multiscreen_psi16_gpt2_ctx4096",
+    "reviewer_tokenizer_reload": "python -c \"from transformers import AutoTokenizer; paths=['outputs/p0_4_multiscreen_psi8_gpt2_ctx4096/checkpoint','outputs/p0_4_multiscreen_psi16_gpt2_ctx4096/checkpoint']; values=[(AutoTokenizer.from_pretrained(p, local_files_only=True, use_fast=True).__class__.__name__, len(AutoTokenizer.from_pretrained(p, local_files_only=True, use_fast=True))) for p in paths]; print(values)\""
+  },
+  "runs": [
+    {
+      "psi": 8,
+      "result": "passed",
+      "completion_timestamp_utc": "2026-08-03T15:59:10.372865Z",
+      "qualification_qualified": true,
+      "qualification_conditions": {
+        "gpt2_vocab_50257": true,
+        "context_4096": true,
+        "cuda_device": true,
+        "bf16_amp": true,
+        "optimizer_steps_at_least_50": true
+      },
+      "model": {
+        "parameter_count": 4134146,
+        "hidden_size": 64,
+        "num_hidden_layers": 8,
+        "num_attention_heads": 8,
+        "key_dim": 16,
+        "value_dim": 64,
+        "vocab_size": 50257,
+        "max_position_embeddings": 4096,
+        "gradient_checkpointing": true,
+        "dense_similarity_one_layer_lower_bound_bytes": 268435456
+      },
+      "data": {
+        "dataset": "roneneldan/TinyStories",
+        "train_split": "train[:20000]",
+        "texts_loaded": 20000,
+        "packed_chunks": 128,
+        "max_train_tokens": 524416,
+        "tokenizer_class": "GPT2TokenizerFast",
+        "tokenizer_vocab_size": 50257
+      },
+      "training": {
+        "sequence_length": 4096,
+        "microbatch_size": 1,
+        "gradient_accumulation_steps": 8,
+        "effective_batch_tokens": 32768,
+        "optimizer_steps": 50,
+        "learning_rate": 0.0006,
+        "weight_decay": 0.0,
+        "amp_dtype": "bf16",
+        "initial_probe_loss": 11.1407470703125,
+        "final_probe_loss": 4.675381660461426,
+        "absolute_loss_drop": 6.465365409851074,
+        "relative_loss_drop": 0.5803349963019777,
+        "train_loss_first": 11.186220645904541,
+        "train_loss_last": 5.8704047203063965,
+        "train_loss_min": 4.751792907714844,
+        "maximum_finite_gradient_norm": 5.393857002258301,
+        "elapsed_seconds": 107.68050092901103,
+        "peak_cuda_allocated_bytes": 3156709888,
+        "peak_cuda_reserved_bytes": 4525654016
+      },
+      "correctness": {
+        "all_train_losses_finite": true,
+        "all_gradient_norms_finite": true,
+        "probe_loss_decrease": "passed",
+        "save_reload": "passed",
+        "tokenizer_reload": "passed",
+        "loaded_logits_max_abs": 0.0,
+        "reload_atol": 0.00001,
+        "reload_rtol": 0.00001,
+        "generation_use_cache": "passed",
+        "prompt_length": 4,
+        "generated_length": 12,
+        "cache_split": "passed",
+        "cache_split_logits_max_abs": 0.0,
+        "cache_atol": 0.03,
+        "cache_rtol": 0.03
+      },
+      "evidence": {
+        "metrics_event_count": 57,
+        "completion_marker": "P0-4_COMPLETE.md",
+        "completion_marker_present": true,
+        "failure_artifacts_absent": true,
+        "diagnostic_marker_absent": true,
+        "summary_sha256": "ee866111911ad289a5d01303f53164bfb3065084030dc4f9267f9b29723ca4b5",
+        "metrics_sha256": "97b14ce7888cdbe14b19bc5dba859c63f02f4571e866edbb0c39b1ebe0e985ad"
+      }
+    },
+    {
+      "psi": 16,
+      "result": "passed",
+      "completion_timestamp_utc": "2026-08-03T16:07:54.047702Z",
+      "qualification_qualified": true,
+      "qualification_conditions": {
+        "gpt2_vocab_50257": true,
+        "context_4096": true,
+        "cuda_device": true,
+        "bf16_amp": true,
+        "optimizer_steps_at_least_50": true
+      },
+      "model": {
+        "parameter_count": 27546626,
+        "hidden_size": 256,
+        "num_hidden_layers": 16,
+        "num_attention_heads": 16,
+        "key_dim": 16,
+        "value_dim": 64,
+        "vocab_size": 50257,
+        "max_position_embeddings": 4096,
+        "gradient_checkpointing": true,
+        "dense_similarity_one_layer_lower_bound_bytes": 536870912
+      },
+      "data": {
+        "dataset": "roneneldan/TinyStories",
+        "train_split": "train[:20000]",
+        "texts_loaded": 20000,
+        "packed_chunks": 128,
+        "max_train_tokens": 524416,
+        "tokenizer_class": "GPT2TokenizerFast",
+        "tokenizer_vocab_size": 50257
+      },
+      "training": {
+        "sequence_length": 4096,
+        "microbatch_size": 1,
+        "gradient_accumulation_steps": 8,
+        "effective_batch_tokens": 32768,
+        "optimizer_steps": 50,
+        "learning_rate": 0.0006,
+        "weight_decay": 0.0,
+        "amp_dtype": "bf16",
+        "initial_probe_loss": 15.799321174621582,
+        "final_probe_loss": 3.495601177215576,
+        "absolute_loss_drop": 12.303719997406006,
+        "relative_loss_drop": 0.7787499134563735,
+        "train_loss_first": 15.670197367668152,
+        "train_loss_last": 4.472591578960419,
+        "train_loss_min": 3.6079599857330322,
+        "maximum_finite_gradient_norm": 23.194631576538086,
+        "elapsed_seconds": 425.8057991930109,
+        "peak_cuda_allocated_bytes": 6622802944,
+        "peak_cuda_reserved_bytes": 9130999808
+      },
+      "correctness": {
+        "all_train_losses_finite": true,
+        "all_gradient_norms_finite": true,
+        "probe_loss_decrease": "passed",
+        "save_reload": "passed",
+        "tokenizer_reload": "passed",
+        "loaded_logits_max_abs": 0.0,
+        "reload_atol": 0.00001,
+        "reload_rtol": 0.00001,
+        "generation_use_cache": "passed",
+        "prompt_length": 4,
+        "generated_length": 12,
+        "cache_split": "passed",
+        "cache_split_logits_max_abs": 0.125,
+        "cache_atol": 0.03,
+        "cache_rtol": 0.03,
+        "cache_tolerance_review": {
+          "violating_elements": 0,
+          "allowed_error_at_max_abs_element": 0.5212499499320984,
+          "maximum_difference_minus_allowed_error": -0.023936767131090164
+        }
+      },
+      "evidence": {
+        "metrics_event_count": 57,
+        "completion_marker": "P0-4_COMPLETE.md",
+        "completion_marker_present": true,
+        "failure_artifacts_absent": true,
+        "diagnostic_marker_absent": true,
+        "summary_sha256": "679f17d8de1cf6fc5324ea79b05b14afbcdcb0986d0101b51ea492ec814b406f",
+        "metrics_sha256": "28d2fe326c3d12ee92bfd1a747658751d5f7ce962a97b0781ad86369b0942269"
+      }
+    }
+  ],
+  "review": {
+    "raw_events_reviewed": true,
+    "event_sequence_verified": true,
+    "optimizer_step_sequence_verified": true,
+    "tokenizer_reload": {
+      "status": "passed",
+      "results": [
+        ["GPT2TokenizerFast", 50257],
+        ["GPT2TokenizerFast", 50257]
+      ]
+    },
+    "memory_growth_anomaly": false,
+    "optimizer_fallback": false,
+    "warnings": [
+      "Transformers 4.57.6 emitted a deprecation warning for the legacy gradient-checkpointing hook; checkpointed training completed.",
+      "Runtime and memory are feasibility diagnostics, not efficiency evidence."
+    ]
+  },
+  "limitations": [
+    "unofficial correctness-first research artifact",
+    "dense quadratic screening implementation",
+    "no paper-scale training or benchmark reproduction",
+    "no long-context retrieval-quality claim",
+    "no runtime or memory efficiency claim",
+    "no cross-hardware reproducibility claim",
+    "no optimized Triton or windowed kernel validation",
+    "no PEFT, LoRA, QLoRA, or Unsloth validation",
+    "no broad generation or production serving validation"
+  ]
+}

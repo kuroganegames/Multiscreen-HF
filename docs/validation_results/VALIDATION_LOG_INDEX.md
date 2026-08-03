@@ -1,6 +1,6 @@
 # Validation Log Index
 
-This directory stores compact validation summaries for the P0-qualified Multiscreen-HF baseline.
+This directory stores compact validation summaries for the P0-qualified Multiscreen-HF baseline through P0-4.
 
 ## Current summaries
 
@@ -9,6 +9,7 @@ This directory stores compact validation summaries for the P0-qualified Multiscr
 | P0-1 | [P0_1_SUMMARY.md](P0_1_SUMMARY.md) | [P0_1_SUMMARY.json](P0_1_SUMMARY.json) | passed |
 | P0-2 | [P0_2_SUMMARY.md](P0_2_SUMMARY.md) | [P0_2_SUMMARY.json](P0_2_SUMMARY.json) | passed |
 | P0-3 | [P0_3_SUMMARY.md](P0_3_SUMMARY.md) | [P0_3_SUMMARY.json](P0_3_SUMMARY.json) | passed |
+| P0-4 | [P0_4_SUMMARY.md](P0_4_SUMMARY.md) | [P0_4_SUMMARY.json](P0_4_SUMMARY.json) | passed |
 
 ## Scope
 
