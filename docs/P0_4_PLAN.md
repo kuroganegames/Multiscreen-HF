@@ -2,11 +2,15 @@
 
 ## Status
 
-Implementation and reproducibility harness: **prepared**.
+Implementation and reproducibility harness: **merged in PR #3**.
+
+Static Psi=8/Psi=16 preflight and tiny Psi=8 CPU end-to-end diagnostic: **passed in GitHub Actions**.
 
 Qualifying CUDA bf16 execution: **pending**.
 
-P0-4 must not be marked complete in `docs/VALIDATION_STATUS.md` until a qualifying run has produced `P0-4_COMPLETE.md` and its metrics have been reviewed.
+For a complete local Codex `/goal` workflow, see [CODEX_P0_4_HANDOFF.md](CODEX_P0_4_HANDOFF.md). Codex also reads the repository rules in [`AGENTS.md`](../AGENTS.md) when launched from the repository root.
+
+P0-4 must not be marked complete in `docs/VALIDATION_STATUS.md` until qualifying runs have produced the required artifacts and their metrics have been reviewed. Static validation, CI CPU diagnostics, and reduced-context runs remain non-qualifying.
 
 ## Objective
 
@@ -33,9 +37,11 @@ configs/p0_4_multiscreen_psi16_gpt2_ctx4096/config.json
 configs/p0_4_multiscreen_psi16_gpt2_ctx4096/run.json
 docs/P0_4_PLAN.md
 docs/P0_4_RESULTS_TEMPLATE.md
+docs/CODEX_P0_4_HANDOFF.md
+AGENTS.md
 ```
 
-The P0 model core, paper oracle, state-dict conversion, and cache implementation are intentionally unchanged by this task.
+The P0 model core, paper oracle, state-dict conversion, and cache implementation were intentionally unchanged by PR #3.
 
 ## Acceptance criteria
 
@@ -60,6 +66,8 @@ A run writes `P0-4_COMPLETE.md` only when all of the following are true:
 
 A reduced-context, CPU, non-bf16, or shorter run can still exercise the code path, but it writes `P0-4_DIAGNOSTIC_COMPLETE.md` and does not qualify P0-4.
 
+For the project-level P0-4 completion record, review both intended model sizes. A Psi=8 pass does not imply a Psi=16 pass. If Psi=16 cannot complete on the available system, record the overall state as partial or blocked rather than complete.
+
 ## Execution order
 
 ### 1. Restore the P0 baseline
@@ -79,6 +87,8 @@ python p0_2_three_way_minimal/test_three_way_minimal.py \
   --oracle-root oracle \
   --quick
 ```
+
+Do not proceed to qualifying training if the baseline quick suite fails. Separate environment failures from repository regressions before changing code.
 
 ### 2. Validate the checked-in P0-4 configs without downloading data
 
@@ -105,6 +115,8 @@ python scripts/p0_4_gpt2_context4096_smoke.py \
   --output-dir outputs/p0_4_psi8_ctx1024_diagnostic
 ```
 
+Verify that the reduced run writes `P0-4_DIAGNOSTIC_COMPLETE.md` and does not write `P0-4_COMPLETE.md`.
+
 ### 4. Qualifying Psi=8 run
 
 ```bash
@@ -112,7 +124,7 @@ python scripts/p0_4_gpt2_context4096_smoke.py \
   --config-dir configs/p0_4_multiscreen_psi8_gpt2_ctx4096
 ```
 
-Review `summary.json`, every event in `metrics.jsonl`, and `P0-4_COMPLETE.md` before proceeding.
+Review `summary.json`, every event in `metrics.jsonl`, and `P0-4_COMPLETE.md` before proceeding. Confirm `qualification.qualified=true` rather than relying only on the filename.
 
 ### 5. Qualifying Psi=16 run
 
@@ -122,6 +134,8 @@ Run only after Psi=8 passes and memory headroom is understood.
 python scripts/p0_4_gpt2_context4096_smoke.py \
   --config-dir configs/p0_4_multiscreen_psi16_gpt2_ctx4096
 ```
+
+Apply the same artifact and qualification review independently.
 
 ## Output contract
 
@@ -150,21 +164,54 @@ Psi=16: 1 x 16 x 4096 x 4096 x 2 bytes = 0.500 GiB per layer invocation
 
 The actual peak is substantially larger. The script records CUDA allocated/reserved peaks and a clearly labeled similarity-tensor lower bound. These figures diagnose feasibility; they must not be reported as an efficiency benchmark.
 
+Before retrying an OOM, check for unrelated GPU processes and confirm that microbatch 1 and gradient checkpointing are active. Do not weaken the qualifying context, dtype, Psi, or minimum-step rule.
+
 ## Failure triage
 
 For out-of-memory failures:
 
-1. Preserve `failure.json` and the last `metrics.jsonl` event.
+1. Preserve `failure.json` and the last `metrics.jsonl` event locally.
 2. Confirm gradient checkpointing is enabled and microbatch is 1.
-3. Run the 1024 diagnostic to separate correctness failures from 4096 memory pressure.
-4. Do not reduce the qualifying sequence length or bf16 requirement and still call the result P0-4 complete.
-5. Do not move to Psi=16 until Psi=8 has a reviewed qualifying result.
+3. Check available GPU memory and unrelated processes.
+4. Run the 1024 diagnostic to separate correctness failures from 4096 memory pressure.
+5. Do not reduce the qualifying sequence length or bf16 requirement and still call the result P0-4 complete.
+6. Do not move to Psi=16 until Psi=8 has a reviewed qualifying result.
 
-For cache or reload mismatches, rerun P0-1/P0-2 quick checks and then the relevant full or CUDA bf16 comparison before changing the model core.
+For cache or reload mismatches, rerun P0-1/P0-2 quick checks and identify whether the failure is in the harness, environment, or baseline before changing the model core.
+
+If evidence indicates a model-core, oracle, position, mask, cache, generation, or state-dict defect, create a focused diagnosis and a separate correctness change with the required stronger P0 reruns. Do not hide such a change inside a result-recording PR.
 
 ## Recording the result
 
-Use `docs/P0_4_RESULTS_TEMPLATE.md`. After both intended runs have been reviewed, update:
+Use `docs/P0_4_RESULTS_TEMPLATE.md`. Retain full outputs locally and commit only compact sanitized summaries.
+
+Suggested files:
+
+```text
+docs/validation_results/P0_4_SUMMARY.md
+docs/validation_results/P0_4_SUMMARY.json
+```
+
+Record SHA-256 for each accepted `summary.json` and `metrics.jsonl`, plus:
+
+```text
+- exact command
+- commit SHA
+- Python/package versions
+- GPU model and total memory
+- qualification conditions
+- losses and loss drop
+- maximum finite gradient norm
+- peak allocated/reserved CUDA memory
+- save/load logits error
+- cache-split logits error
+- generation status
+- pass, partial, failed, or blocked verdict
+```
+
+Remove secrets, unnecessary host/user identifiers, cache paths, local absolute paths, and checkpoint paths from committed summaries.
+
+After reviewed execution, update according to evidence:
 
 ```text
 README.md
@@ -175,4 +222,4 @@ docs/KNOWN_LIMITATIONS.md
 docs/validation_results/VALIDATION_LOG_INDEX.md
 ```
 
-Do not replace “pending” with “complete” based only on static config validation or a reduced diagnostic.
+Do not replace `pending` with `complete` based only on static config validation, CI CPU diagnostics, or a reduced local run.

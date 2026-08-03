@@ -1,21 +1,75 @@
 # Development Handoff
 
-This is the primary handoff document for resuming development of this repository after the P0 validation phase.
+This is the primary development-restart document for `kuroganegames/Multiscreen-HF`.
 
-The short version: this repository contains a **P0-qualified research implementation** of Multiscreen for Hugging Face Transformers. It has passed formula-level, reference-equivalence, cache/generation, and short TinyStories training checks. It is suitable as a correctness-first research baseline, but it is not yet a paper-scale, optimized, or production-serving implementation.
+The repository contains a **P0-qualified research implementation** of Multiscreen for Hugging Face Transformers. P0-1, P0-2, and P0-3 are complete. PR #3 added and exercised the P0-4 harness, but the qualifying local CUDA bf16 context-4096 runs remain pending.
 
-For final repository hygiene checks, see [REPOSITORY_AUDIT.md](REPOSITORY_AUDIT.md).
+The current phase is therefore:
 
-## Quick restart checklist
+```text
+P0-4 execution, evidence review, and validation-record update
+```
 
-Use this checklist after a fresh clone or after switching machines.
+For Codex-based continuation after a local clone, read the root [`AGENTS.md`](../AGENTS.md) and [`CODEX_P0_4_HANDOFF.md`](CODEX_P0_4_HANDOFF.md).
+
+For repository hygiene checks, see [REPOSITORY_AUDIT.md](REPOSITORY_AUDIT.md).
+
+## 1. Current project state
+
+### Milestones
+
+| Milestone | Status | Meaning |
+|---|---:|---|
+| P0-1 | Complete | `paper_math_oracle` and the HF implementation agree on validated small-shape formula, loss, mask, position, and cache behavior. |
+| P0-2 | Complete | The vendored unofficial PyTorch reference, HF implementation, and oracle agree in recorded CPU fp32 and CUDA bf16 sweeps. |
+| P0-3 | Complete | Psi=8/16 TinyStories bf16 smoke training passed, including finite loss/gradients, save/load, cache split, and greedy generation. |
+| P0-4 harness | Merged | GPT-2 vocab/context-4096 harness, Psi=8/16 configs, plan, result template, static checks, and tiny CPU integration diagnostic were merged in PR #3. |
+| P0-4 qualifying execution | Pending | CUDA bf16, context 4096, at least 50 optimizer steps, Psi=8 first and Psi=16 second. |
+| P1 ecosystem work | Not started as validated work | PEFT/LoRA, QLoRA, Unsloth, generation matrix, compile, and serving remain future work. |
+
+### Baseline identity
+
+```text
+Current status: P0-qualified research baseline based on P0-1/P0-2/P0-3
+Primary implementation: multiscreen_transformers/modeling_multiscreen.py
+Primary config: multiscreen_transformers/configuration_multiscreen.py
+Primary equation oracle: oracle/paper_math_oracle.py
+Primary validation record: docs/VALIDATION_STATUS.md
+Current execution plan: docs/P0_4_PLAN.md
+Codex local handoff: docs/CODEX_P0_4_HANDOFF.md
+Repository instructions for Codex: AGENTS.md
+```
+
+P0-4 is an additional pending gate. Static config validation, CI CPU diagnostics, or reduced-context runs do not complete it.
+
+## 2. First ten minutes after a fresh clone
+
+Clone and inspect the checkout:
+
+```bash
+git clone https://github.com/kuroganegames/Multiscreen-HF.git
+cd Multiscreen-HF
+
+git status --short --branch
+git log -1 --oneline
+```
+
+Install the local package and declared dependencies:
 
 ```bash
 python -m pip install -e .
 python -m pip install -r requirements.txt
 export PYTHONPATH=$PWD:$PWD/oracle
+```
 
+Run the minimum P0 baseline checks:
+
+```bash
+python oracle/test_formula_units.py
+python oracle/test_paper_math_oracle_selfcheck.py
+python oracle/test_paper_math_oracle_smoke.py
 python oracle/test_against_hf_port.py --quick
+
 python p0_2_three_way_minimal/test_three_way_minimal.py \
   --reference-root third_party/multiscreen-pytorch \
   --hf-root . \
@@ -23,113 +77,110 @@ python p0_2_three_way_minimal/test_three_way_minimal.py \
   --quick
 ```
 
-If both quick checks pass, the repository is in the expected P0-qualified state. For full reproduction commands, see [TESTING.md](TESTING.md). For the detailed validation record, see [VALIDATION_STATUS.md](VALIDATION_STATUS.md).
+Run the P0-4 static preflight:
 
-## 1. Current project state
+```bash
+python scripts/p0_4_gpt2_context4096_smoke.py \
+  --config-dir configs/p0_4_multiscreen_psi8_gpt2_ctx4096 \
+  --validate-config-only
 
-### Status
-
-```text
-Current status: P0-qualified research baseline
-Suggested baseline tag: p0-qualified-v0
-Primary implementation: multiscreen_transformers/modeling_multiscreen.py
-Primary validation record: docs/VALIDATION_STATUS.md
-Primary handoff document: docs/HANDOFF.md
+python scripts/p0_4_gpt2_context4096_smoke.py \
+  --config-dir configs/p0_4_multiscreen_psi16_gpt2_ctx4096 \
+  --validate-config-only
 ```
 
-### Completed milestones
+If these checks pass, the checkout matches the expected merged baseline at the CPU/static level. It still has not reproduced the qualifying P0-4 CUDA runs.
 
-| Milestone | Status | Meaning |
-|---|---:|---|
-| P0-1 | Complete | `paper_math_oracle` and HF implementation agree on small-shape formula/cache/mask tests. |
-| P0-2 | Complete | Unofficial PyTorch reference, HF implementation, and oracle agree in CPU fp32 and CUDA bf16 full sweeps. |
-| P0-3 | Complete | Ψ=8/16 TinyStories bf16 smoke training passed, including save/load and cache-enabled generation. |
+## 3. Codex continuation
 
-### Current confidence boundary
+Start Codex from the repository root so it reads `AGENTS.md`:
 
-You can currently trust this repository for:
-
-```text
-- small-shape Multiscreen forward correctness checks
-- HF AutoModel-compatible loading after registration
-- cache split behavior under validated conditions
-- DynamicCache-compatible greedy generate smoke path
-- TinyStories Ψ=8/16 bf16 smoke training
-- future research experiments that need a correctness-first HF baseline
+```bash
+codex
 ```
 
-Do **not** yet claim:
+If the `/goal` command is not available:
 
-```text
-- paper-scale performance reproduction
-- runtime efficiency advantage
-- long-context retrieval benchmark reproduction
-- production serving compatibility
-- Triton/windowed-kernel performance
-- PEFT/LoRA/Unsloth integration readiness
+```bash
+codex features enable goals
+codex
 ```
 
-## 2. Repository map
+Then use the complete prompt in [CODEX_P0_4_HANDOFF.md](CODEX_P0_4_HANDOFF.md). That goal is intentionally limited to P0-4 qualification and evidence recording. It defines both a successful completion state and a blocked-with-evidence state without weakening the gate.
+
+Do not start Codex from a parent directory and assume repository instructions were loaded. Confirm the working directory is the Git root.
+
+## 4. Repository map
 
 ```text
+AGENTS.md
+  Persistent repository-level instructions for Codex.
+
 multiscreen_transformers/
-  configuration_multiscreen.py   HF config, Ψ scaling, validation options
-  modeling_multiscreen.py        Main HF CausalLM implementation; current P0-qualified model core
-  data.py                        Dataset/preprocessing helpers
-  compile_utils.py               Compile-related helper utilities
+  configuration_multiscreen.py   HF config, Psi scaling, validation options
+  modeling_multiscreen.py        P0-qualified HF CausalLM implementation
+  data.py                        Packed dataset helper
+  compile_utils.py               Compile environment helpers
 
 oracle/
-  paper_math_oracle.py           Dense equation-oriented reference implementation
+  paper_math_oracle.py           Dense equation-oriented reference
   test_against_hf_port.py        P0-1 HF-vs-oracle sweep
-  test_formula_units.py          Formula-level unit tests
-  test_paper_math_oracle_*.py    Oracle smoke/self-check tests
+  test_formula_units.py          Formula-level tests
+  test_paper_math_oracle_*.py    Oracle self-check and smoke tests
 
 p0_2_three_way_minimal/
   test_three_way_minimal.py      P0-2 reference-vs-HF-vs-oracle comparison
 
 third_party/multiscreen-pytorch/
-  Vendored unofficial reference implementation used for P0-2
+  Vendored dieOD/multiscreen-pytorch reference used by P0-2
 
 scripts/
-  train_tokenizer_spm.py         Creates the 768-token TinyStories tokenizer
-  p0_3_tinystories_stability.py P0-3 smoke training harness
-  train_pretrain_sft.py          Larger TRL/SFT-style training entry point
-  eval_smoke.py                  Smoke evaluation helper
-  count_params.py                Parameter counting helper
-  cache_utils.py                 Cache-related helper
+  p0_3_tinystories_stability.py          P0-3 training harness
+  p0_4_gpt2_context4096_smoke.py         P0-4 training/qualification harness
+  train_pretrain_sft.py                  Larger TRL/SFT-style entry point
+  train_tokenizer_spm.py                 TinyStories 768-vocab tokenizer creation
+  eval_smoke.py, count_params.py, cache_utils.py
 
 configs/
-  Tiny/debug/P0 training configs
+  p0_4_multiscreen_psi8_gpt2_ctx4096/
+  p0_4_multiscreen_psi16_gpt2_ctx4096/
+  P0-3 and earlier debug/training configs
 
 tokenizers/tinystories_spm768/
-  768-vocab TinyStories tokenizer used for P0-3
+  Committed tokenizer used for P0-3 reproducibility
 
 docs/
-  VALIDATION_STATUS.md           Detailed validation record
-  TESTING.md                     Reproduction commands
-  KNOWN_LIMITATIONS.md           Explicit non-goals / unvalidated scope
-  HANDOFF.md                     This handoff document
-  validation_results/            Recorded P0-3 result files
+  HANDOFF.md                    Main development restart guide
+  CODEX_P0_4_HANDOFF.md         Clone-to-Codex goal workflow and full prompt
+  VALIDATION_STATUS.md          Canonical validation boundary
+  TESTING.md                    Reproduction commands
+  KNOWN_LIMITATIONS.md          Explicit unvalidated scope
+  P0_4_PLAN.md                  P0-4 execution and failure triage
+  P0_4_RESULTS_TEMPLATE.md      Human-readable result template
+  LOGGING_POLICY.md             Result logging and sanitization policy
+  REPOSITORY_AUDIT.md           Hygiene and handoff-readiness audit
+  RELEASE_CHECKLIST.md          Tag/release checklist
+  validation_results/           Accepted compact validation summaries
 ```
 
-## 3. Key design decisions
+## 5. Key design contracts
 
-### 3.1 HF implementation is the development baseline
+### 5.1 HF implementation is the extension baseline
 
-`multiscreen_transformers/modeling_multiscreen.py` is now the baseline implementation. It should be treated as the source to extend for future work.
-
-It is validated against two independent references:
+`multiscreen_transformers/modeling_multiscreen.py` is the current development baseline. It is validated against:
 
 ```text
 paper_math_oracle
-unofficial dieOD/multiscreen-pytorch reference
+dieOD/multiscreen-pytorch
 ```
 
-### 3.2 `paper_math_oracle` is dense and correctness-oriented
+This validation is strong for the recorded small-shape and smoke conditions, not for paper-scale training or optimized serving.
 
-The oracle is intentionally slow. It constructs dense `T x T` relevance matrices and should be used only for tiny correctness tests. It is not a speed or long-context reference.
+### 5.2 The oracle is dense and correctness-oriented
 
-### 3.3 `sr` parameterization has two equivalent forms
+`oracle/paper_math_oracle.py` deliberately follows the equations with dense tensors. It is intended for tiny correctness comparisons. It must not be used as a speed or long-context implementation reference.
+
+### 5.3 Trim parameterization
 
 Paper form:
 
@@ -145,267 +196,291 @@ inv_r = exp(sr) + 1
 alpha = clamp(1 - inv_r * (1 - sim), min=0) ** 2
 ```
 
-Conversion:
+Required conversion:
 
 ```text
 s_r_paper = -s_r_hf
 ```
 
-This relation is validated in oracle unit tests and P0 comparisons.
+Do not alter this mapping without a focused mathematical and three-way validation update.
 
-### 3.4 Oracle compute modes
+### 5.4 Oracle compute modes
 
-The oracle supports two MiPE/Softmask auxiliary compute modes:
+Stable paper/oracle checks:
 
 ```python
 mipe_compute_dtype="fp32"
 softmask_compute_dtype="fp32"
 ```
 
-This is the stable paper/oracle default.
-
-For reference-compatibility in low precision:
+Low-precision reference compatibility:
 
 ```python
 mipe_compute_dtype="reference"
 softmask_compute_dtype="reference"
 ```
 
-P0-2 uses `reference` mode to match the unofficial PyTorch reference in CUDA bf16 full sweeps. P0-1 should generally use the stable `fp32` mode.
+P0-2 uses reference-compatible behavior when matching the vendored low-precision implementation. P0-1 normally emphasizes stable fp32 auxiliary math.
 
-### 3.5 Position handling
+### 5.5 Position handling
 
-The paper oracle default is:
+Literal paper checks use:
 
 ```python
 position_rule="paper"
 ```
 
-The HF/reference-compatible path also supports:
+HF/reference compatibility can use:
 
 ```python
 position_rule="hf_mod_after_max_position"
 ```
 
-Use the paper default for equation checks. Use the HF/reference mode for compatibility tests involving the vendored implementation.
+The HF public API only supports the validated scalar contiguous position/cache contract. Arbitrary batch-specific offsets are not silently supported.
 
-### 3.6 DynamicCache support
+### 5.6 DynamicCache boundary
 
-The original HF port assumed legacy tuple/list `past_key_values`. Current Transformers generation can pass `DynamicCache` objects. The current implementation handles this by normalizing empty `DynamicCache` to prefill/no-cache behavior and converting non-empty cache objects to legacy form when possible.
+The HF implementation normalizes empty Transformers cache objects for prefill and converts compatible non-empty cache objects to the internal legacy tuple form.
 
-Validated DynamicCache paths:
+Validated:
 
 ```text
-- P0-1 quick after patch
-- P0-3 generate(use_cache=True)
-- post-load manual cache split in P0-3
+- P0-1 cache comparisons under covered conditions
+- P0-3 greedy generate(use_cache=True)
+- P0-3 post-load manual cache split
+- P0-4 tiny CPU integration diagnostic in CI
 ```
 
-Not broadly validated yet:
+Still not broadly validated:
 
 ```text
 - beam search
-- do_sample=True with full logits processors
+- broad do_sample/logits-processor combinations
+- variable-length batch generation
 - streamers
 - assisted generation
 - distributed/synced generation
 ```
 
-### 3.7 Dense implementation is not a speed claim
+### 5.7 Dense path is not an efficiency claim
 
-The current HF path is a dense PyTorch implementation. It is useful for validation and smoke training, not for evaluating the paper's speed claims. Windowed/fused/Triton screening kernels are future work.
+The current HF screening path remains dense and quadratic in sequence length. P0-4 records time and CUDA memory only to diagnose feasibility and stability. Do not report those numbers as evidence for the paper's long-context efficiency claims.
 
-## 4. Validation completed
+## 6. Completed validation
 
-The canonical validation record is [VALIDATION_STATUS.md](VALIDATION_STATUS.md). This section summarizes the gates.
+The detailed counts and commands are in [VALIDATION_STATUS.md](VALIDATION_STATUS.md) and [TESTING.md](TESTING.md).
 
-### 4.1 P0-1: oracle vs HF
+### P0-1
 
-Purpose: verify the HF implementation against a dense paper-math oracle.
-
-Passed:
+Recorded passes include CPU fp32 quick/full, CUDA bf16 full, and CUDA fp16 quick across:
 
 ```text
-- CPU fp32 quick
-- CPU fp32 full
-- CUDA bf16 full
-- CUDA fp16 quick
-```
-
-Covered:
-
-```text
-- logits
-- loss
-- labels_are_shifted
+- logits and loss
+- shifted-label loss
 - logits_to_keep
-- shape sweep
-- cache split
-- padding masks
-- zero relevance
-- position contract checks
+- shape sweeps
+- cache split and cached suffix
+- padding and sparse masks
+- zero-relevance stability
+- position/cache negative contracts
 ```
 
-### 4.2 P0-2: three-way comparison
+### P0-2
 
-Purpose: verify:
-
-```text
-dieOD/multiscreen-pytorch
-== HF multiscreen_transformers
-== paper_math_oracle
-```
-
-Passed:
-
-```text
-CPU fp32 quick:
-  prefill_three_way: 12
-  cache_split_three_way: 28
-
-CPU fp32 full:
-  prefill_three_way: 45
-  cache_split_three_way: 237
-
-CUDA bf16 quick:
-  prefill_three_way: 12
-  cache_split_three_way: 28
-
-CUDA bf16 full:
-  prefill_three_way: 45
-  cache_split_three_way: 237
-```
-
-Covered:
+Recorded passes include CPU fp32 and CUDA bf16 quick/full comparisons across:
 
 ```text
 - prefill logits
 - external CE loss
 - KV cache tensors
-- layer hook outputs
+- per-layer hook outputs
 - prefix/suffix cache split
 - cached suffix vs full-forward suffix
-- max-position modulo branch compatibility
+- long-position modulo compatibility branch
 ```
 
-Padding masks are not covered by P0-2 because the reference implementation does not expose an attention-mask API. Padding behavior is covered by P0-1.
+P0-2 does not cover padding masks because the vendored reference lacks an attention-mask API. P0-1 covers mask behavior against the oracle.
 
-### 4.3 P0-3: TinyStories smoke training
+### P0-3
 
-Purpose: verify short-run training stability and checkpoint/generation behavior for Ψ=8 and Ψ=16.
-
-Results:
+Recorded smoke results:
 
 ```text
-Ψ=8:
+Psi=8
   params: 966,850
+  steps: 40
+  seq_len: 128
   initial_probe_loss: 8.215893
   final_probe_loss: 4.312645
-  abs_loss_drop: 3.903248
-  rel_loss_drop: 47.5085%
+  relative drop: 47.5085%
 
-Ψ=16:
+Psi=16
   params: 14,877,442
+  steps: 25
+  seq_len: 128
   initial_probe_loss: 15.899660
   final_probe_loss: 5.928024
-  abs_loss_drop: 9.971636
-  rel_loss_drop: 62.7160%
+  relative drop: 62.7160%
 ```
 
-Confirmed:
+Both runs recorded finite gradients, exact save/load logits under the test conditions, exact manual cache-split logits under the test conditions, and cache-enabled greedy generation.
+
+## 7. P0-4 current state
+
+PR #3 added:
 
 ```text
-- finite loss
-- finite gradient norms
-- bf16 autocast training
-- save_pretrained / from_pretrained
-- post-load logits equality
-- manual cache split equality
-- generate(use_cache=True)
+scripts/p0_4_gpt2_context4096_smoke.py
+configs/p0_4_multiscreen_psi8_gpt2_ctx4096/
+configs/p0_4_multiscreen_psi16_gpt2_ctx4096/
+docs/P0_4_PLAN.md
+docs/P0_4_RESULTS_TEMPLATE.md
+CI static preflight for both configs
+CI tiny Psi=8 CPU end-to-end diagnostic
 ```
 
-Recorded result files:
+The CI diagnostic exercised tokenizer loading, packed data, model construction, forward/backward, finite loss/gradient, save/load, generation, cache checks, and correct diagnostic-note classification. It did not use CUDA bf16 context 4096 and therefore is not a qualifying P0-4 result.
+
+A qualifying run requires:
 
 ```text
-docs/validation_results/p0_3_results.json
-docs/validation_results/P0-3_COMPLETE.md
+GPT-2 vocabulary: exactly 50,257
+sequence length: exactly 4,096
+device: CUDA
+AMP dtype: bf16
+optimizer steps: at least 50
+finite train loss and gradient norms
+probe-loss decrease
+save/load logits within configured tolerance
+greedy generate(use_cache=True)
+manual cache split within configured tolerance
+metrics.jsonl, summary.json, P0-4_COMPLETE.md
 ```
 
-## 5. What is safe to assume now
+A reduced-context, CPU, non-bf16, or shorter run writes `P0-4_DIAGNOSTIC_COMPLETE.md` and must remain diagnostic.
 
-Safe assumptions for the next developer:
+Execution order:
 
 ```text
-- `modeling_multiscreen.py` is P0-qualified as a research baseline.
-- Forward math is consistent with the paper oracle on small shapes.
-- The HF implementation is consistent with the vendored unofficial reference on small shapes.
-- Basic cache behavior is consistent across oracle, HF, and reference.
-- DynamicCache-compatible greedy generation works in smoke tests.
-- Short TinyStories bf16 training works for Ψ=8 and Ψ=16.
+1. baseline quick tests
+2. both config preflights
+3. optional Psi=8 reduced diagnostic
+4. qualifying Psi=8
+5. artifact and memory review
+6. qualifying Psi=16
+7. compact sanitized result records
+8. status-document updates and final regressions
 ```
 
-Do **not** assume:
+If local hardware cannot complete an unweakened run, preserve evidence and record `partial`, `failed`, or `blocked`. Do not silently change the acceptance criteria.
 
-```text
-- paper-scale performance reproduction
-- long-context retrieval performance
-- speed advantage over Transformer baselines
-- efficient long-context memory use
-- PEFT/LoRA/Unsloth compatibility
-- production generation compatibility
-- serving compatibility with vLLM/SGLang
+## 8. Testing policy for future changes
+
+Minimum after documentation or experiment-harness changes:
+
+```bash
+export PYTHONPATH=$PWD:$PWD/oracle
+
+python oracle/test_formula_units.py
+python oracle/test_paper_math_oracle_selfcheck.py
+python oracle/test_paper_math_oracle_smoke.py
+python oracle/test_against_hf_port.py --quick
+
+python p0_2_three_way_minimal/test_three_way_minimal.py \
+  --reference-root third_party/multiscreen-pytorch \
+  --hf-root . \
+  --oracle-root oracle \
+  --quick
 ```
 
-## 6. Recommended next step: P0-4
+If model/config/oracle/cache/generation/state-dict behavior changes, run the strongest relevant P0-1/P0-2 comparisons, including CUDA bf16 where available, and add a focused regression test.
 
-Recommended next validation gate:
+A model-core change during P0-4 should not be mixed casually into a result-recording PR. First establish a focused diagnosis and the required requalification scope.
+
+## 9. What is safe to assume
+
+Safe:
 
 ```text
-P0-4: GPT-2 vocab + context 4096 short pretraining smoke test
+- the HF math matches the oracle on validated small shapes
+- the HF implementation matches the vendored reference on validated shapes
+- validated cache splits are consistent across the three implementations
+- greedy DynamicCache-compatible generation works in smoke conditions
+- short TinyStories bf16 training works for Psi=8 and Psi=16
+- the P0-4 harness has passed static and tiny CPU integration checks
 ```
 
-Purpose:
+Not safe:
 
 ```text
-- move beyond TinyStories 768-vocab smoke setting
-- test larger vocab and more realistic embedding size
-- test longer context and memory behavior
-- verify bf16 stability under a more realistic sequence length
+- P0-4 CUDA bf16 context-4096 qualification has passed
+- paper-scale or paper-quality benchmark reproduction
+- efficient long-context memory or runtime
+- PEFT/LoRA/QLoRA/Unsloth compatibility
+- torch.compile stability at scale
+- broad generation compatibility
+- vLLM/SGLang serving compatibility
+- production readiness
 ```
 
-Suggested minimal shape:
+## 10. Result logging
+
+Accepted compact summaries belong under:
 
 ```text
-model: Multiscreen Ψ=8 first, then Ψ=16 if Ψ=8 passes
-vocab: GPT-2 tokenizer, 50,257 tokens
-context: 1024 first, then 4096
-steps: short smoke, e.g. 50-200 depending on runtime
-batch: start with microbatch 1 and grad accumulation
-amp: bf16
-metrics: finite loss, loss decrease, save/load, generate/cache smoke, peak memory
+docs/validation_results/
 ```
 
-Caution:
+For P0-4, use the template and create sanitized Markdown and JSON summaries. Preserve exact commands, environment versions, GPU identity/memory, qualification flags, losses, gradients, peak memory, reload/cache errors, and generation status.
+
+Do not commit:
 
 ```text
-- Do not begin with Ψ=32.
-- Do not use this dense implementation to evaluate speed claims.
-- Watch memory carefully; dense screening is still O(T^2) in the current implementation.
+outputs/
+checkpoints/
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.ckpt
+Hugging Face caches
+wandb/
+large raw terminal logs
+local absolute-path reports
 ```
 
-## 7. Alternative next step: P1 ecosystem work
+See [LOGGING_POLICY.md](LOGGING_POLICY.md) for the canonical policy.
 
-If prioritizing ecosystem integration instead of P0-4, suggested P1 tasks are:
+## 11. Files requiring special care
 
 ```text
-P1-1: PEFT/LoRA adapter compatibility
-P1-2: QLoRA/bitsandbytes compatibility check
+multiscreen_transformers/modeling_multiscreen.py
+multiscreen_transformers/configuration_multiscreen.py
+oracle/paper_math_oracle.py
+oracle/test_against_hf_port.py
+p0_2_three_way_minimal/test_three_way_minimal.py
+scripts/p0_3_tinystories_stability.py
+scripts/p0_4_gpt2_context4096_smoke.py
+docs/VALIDATION_STATUS.md
+docs/HANDOFF.md
+AGENTS.md
+```
+
+Changing these files changes either the baseline, its validation interpretation, or the agent instructions used for future development.
+
+## 12. After P0-4
+
+Only after the P0-4 outcome is accurately recorded should the project select a P1 task. Current candidates are:
+
+```text
+P1-1: PEFT/LoRA smoke
+P1-2: QLoRA/bitsandbytes smoke
 P1-3: Unsloth loader/wrapper prototype
 P1-4: generation compatibility matrix
-P1-5: torch.compile smoke checks
+P1-5: torch.compile smoke
 ```
 
-Recommended LoRA target modules:
+Recommended initial LoRA targets remain:
 
 ```text
 q_proj
@@ -415,125 +490,30 @@ g_proj
 o_proj
 ```
 
-`g_proj` should be included because the gate path is likely important for language-modeling quality.
+`g_proj` should remain included in the first adapter experiment unless evidence justifies a narrower ablation.
 
-## 8. Immediate commands for a fresh checkout
+Do not combine all P1 tasks into one long-running goal. Choose one verifiable gate at a time.
 
-After cloning:
-
-```bash
-python -m pip install -e .
-python -m pip install -r requirements.txt
-export PYTHONPATH=$PWD:$PWD/oracle
-```
-
-Run P0-1 smoke:
-
-```bash
-python oracle/test_formula_units.py
-python oracle/test_paper_math_oracle_selfcheck.py
-python oracle/test_paper_math_oracle_smoke.py
-python oracle/test_against_hf_port.py --quick
-```
-
-Run P0-2 quick:
-
-```bash
-python p0_2_three_way_minimal/test_three_way_minimal.py \
-  --reference-root third_party/multiscreen-pytorch \
-  --hf-root . \
-  --oracle-root oracle \
-  --quick
-```
-
-Run P0-3 smoke if TinyStories/cache are available:
-
-```bash
-python scripts/p0_3_tinystories_stability.py \
-  --tokenizer-path tokenizers/tinystories_spm768 \
-  --cache-dir /path/to/hf_cache \
-  --device cuda:0 \
-  --amp-dtype bf16 \
-  --seq-len 128 \
-  --batch-size 4 \
-  --steps-per-psi 8:40,16:25 \
-  --output-dir outputs/p0_3_tinystories_stability
-```
-
-## 9. Files to preserve exactly
-
-These files are the most important baseline files and should be treated as checkpointed P0 artifacts:
+## 13. Final handoff report format
 
 ```text
-multiscreen_transformers/modeling_multiscreen.py
-multiscreen_transformers/configuration_multiscreen.py
-oracle/paper_math_oracle.py
-oracle/test_against_hf_port.py
-p0_2_three_way_minimal/test_three_way_minimal.py
-scripts/p0_3_tinystories_stability.py
-docs/VALIDATION_STATUS.md
-docs/HANDOFF.md
+変更ファイル:
+  - ...
+
+追加ファイル:
+  - ...
+
+実行テスト:
+  - ...
+
+結果:
+  - ...
+
+未確認:
+  - ...
+
+次にやるべきこと:
+  - ...
 ```
 
-If any of these change, rerun at least:
-
-```bash
-python oracle/test_against_hf_port.py --quick
-python p0_2_three_way_minimal/test_three_way_minimal.py \
-  --reference-root third_party/multiscreen-pytorch \
-  --hf-root . \
-  --oracle-root oracle \
-  --quick
-```
-
-For changes to cache/generation or `modeling_multiscreen.py`, also rerun a P0-3 quick smoke.
-
-## 10. GitHub publishing notes
-
-Do include:
-
-```text
-- source code
-- oracle tests
-- P0-2 tests
-- docs/ validation records
-- tokenizer if redistribution is acceptable for your use case
-- third_party notices and original license files
-```
-
-Do not include:
-
-```text
-- outputs/
-- checkpoint weights from smoke training
-- local cache directories
-- __pycache__/
-- .git/ from vendored third-party repos
-- local absolute-path logs
-```
-
-Third-party/data caveat:
-
-```text
-- `third_party/multiscreen-pytorch` retains its Apache-2.0 license.
-- The TinyStories-derived tokenizer is included for reproducibility; check the dataset's own license/terms before redistribution in contexts where that matters.
-```
-
-## 11. Suggested tag
-
-After uploading to GitHub, create a tag such as:
-
-```bash
-git tag p0-qualified-v0
-git push origin p0-qualified-v0
-```
-
-Suggested release note:
-
-```text
-P0-qualified unofficial HF Multiscreen implementation:
-- paper oracle equivalence
-- three-way reference equivalence
-- DynamicCache-compatible generation smoke
-- TinyStories Ψ=8/16 bf16 smoke training
-```
+Always distinguish executed evidence from planned work. A static preflight, CI CPU diagnostic, or reduced local run must never be summarized as a qualifying GPU result.
