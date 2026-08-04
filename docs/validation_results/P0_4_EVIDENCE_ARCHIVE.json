@@ -1,0 +1,221 @@
+{
+  "schema_version": "1.0.0",
+  "validation_gate": "P0-4",
+  "evidence_gate": "P1-preflight A",
+  "validation_status": "passed",
+  "evidence_status": "partial",
+  "tested_source": {
+    "repository": "kuroganegames/Multiscreen-HF",
+    "commit": "3d734d74e04ce6a320fb31cf3d8241f823ff43fa",
+    "branch": "validation/p0-4-local-cuda"
+  },
+  "original_run_provenance": {
+    "run_worktree_at_start": {
+      "status": "not_recorded_in_original_run",
+      "clean": null,
+      "staged_changes": null,
+      "unstaged_changes": null,
+      "untracked_count": null,
+      "porcelain_sha256": null,
+      "porcelain_format": null,
+      "collected_at_utc": null
+    },
+    "run_worktree_at_end": {
+      "status": "not_recorded_in_original_run",
+      "clean": null,
+      "staged_changes": null,
+      "unstaged_changes": null,
+      "untracked_count": null,
+      "porcelain_sha256": null,
+      "porcelain_format": null,
+      "collected_at_utc": null
+    },
+    "original_run_review": {
+      "status": "not_recorded_in_original_run",
+      "reviewers": []
+    }
+  },
+  "evidence_handoff_provenance": {
+    "implementation_base_commit": "34cbecd25bb38a6f92125071b1c08e42d71008f9",
+    "working_branch": "infra/p1-preflight-a-evidence-v1",
+    "worktree_before_edits": {
+      "status": "recorded",
+      "clean": true,
+      "staged_changes": false,
+      "unstaged_changes": false,
+      "untracked_count": 0,
+      "porcelain_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "porcelain_format": "git-status-porcelain-v1",
+      "collected_at_utc": "2026-08-04T13:59:50.625697Z"
+    },
+    "final_commit": {
+      "status": "pending",
+      "value": null
+    },
+    "worktree_after_commit": {
+      "status": "pending",
+      "clean": null,
+      "staged_changes": null,
+      "unstaged_changes": null,
+      "untracked_count": null,
+      "porcelain_sha256": null,
+      "porcelain_format": null,
+      "collected_at_utc": null
+    },
+    "archive_created_at_utc": {
+      "status": "recorded",
+      "value": "2026-08-04T15:40:04.150225Z"
+    },
+    "archive_verified_at_utc": {
+      "status": "recorded",
+      "value": "2026-08-04T16:07:26.277133Z"
+    }
+  },
+  "acceptance_review": {
+    "status": "pending",
+    "reviewers": []
+  },
+  "source_artifacts": [
+    {
+      "logical_name": "p0-4-psi8-summary",
+      "archive_path": "artifacts/p0-4/psi8/summary.json",
+      "size_bytes": 4123,
+      "sha256": "ee866111911ad289a5d01303f53164bfb3065084030dc4f9267f9b29723ca4b5",
+      "classification": "validation_summary",
+      "exact_bytes_retained": false,
+      "sanitized_copy_status": "verified"
+    },
+    {
+      "logical_name": "p0-4-psi8-metrics",
+      "archive_path": "artifacts/p0-4/psi8/metrics.jsonl",
+      "size_bytes": 30997,
+      "sha256": "97b14ce7888cdbe14b19bc5dba859c63f02f4571e866edbb0c39b1ebe0e985ad",
+      "classification": "validation_metrics",
+      "exact_bytes_retained": false,
+      "sanitized_copy_status": "verified"
+    },
+    {
+      "logical_name": "p0-4-psi8-completion-marker",
+      "archive_path": "artifacts/p0-4/psi8/P0-4_COMPLETE.md",
+      "size_bytes": 672,
+      "sha256": "241d751b3bc4f77d9d2f3b604521fa961a1bbf1dd6c34a0a515c623c2ee7b411",
+      "classification": "completion_marker",
+      "exact_bytes_retained": false,
+      "sanitized_copy_status": "verified"
+    },
+    {
+      "logical_name": "p0-4-psi16-summary",
+      "archive_path": "artifacts/p0-4/psi16/summary.json",
+      "size_bytes": 4111,
+      "sha256": "679f17d8de1cf6fc5324ea79b05b14afbcdcb0986d0101b51ea492ec814b406f",
+      "classification": "validation_summary",
+      "exact_bytes_retained": false,
+      "sanitized_copy_status": "verified"
+    },
+    {
+      "logical_name": "p0-4-psi16-metrics",
+      "archive_path": "artifacts/p0-4/psi16/metrics.jsonl",
+      "size_bytes": 31133,
+      "sha256": "28d2fe326c3d12ee92bfd1a747658751d5f7ce962a97b0781ad86369b0942269",
+      "classification": "validation_metrics",
+      "exact_bytes_retained": false,
+      "sanitized_copy_status": "verified"
+    },
+    {
+      "logical_name": "p0-4-psi16-completion-marker",
+      "archive_path": "artifacts/p0-4/psi16/P0-4_COMPLETE.md",
+      "size_bytes": 679,
+      "sha256": "aa2aa1f64b8c1551d5a466cc57c7ed98253a4fea741f1c0db88f5468ffb4a2d1",
+      "classification": "completion_marker",
+      "exact_bytes_retained": false,
+      "sanitized_copy_status": "verified"
+    }
+  ],
+  "archives": {
+    "exact_private": {
+      "status": "blocked",
+      "archive_filename": null,
+      "storage_class": null,
+      "storage_locator": null,
+      "sha256": null,
+      "size_bytes": null,
+      "manifest_sha256": null,
+      "created_at_utc": null,
+      "verified_at_utc": null,
+      "public": false,
+      "verification_report_sha256": null
+    },
+    "sanitized_shareable": {
+      "status": "verified",
+      "archive_filename": "validation-evidence-sanitized-p0-4-v1-r2.tar.gz",
+      "storage_class": "sanitized_staging",
+      "storage_locator": "local-sanitized-staging:p0-4/v1-r2",
+      "sha256": "d58a4c9ecf28f20a135f4ba2ce95c5a532a04ea92f36e5b54d893400ae4c62fd",
+      "size_bytes": 17961,
+      "manifest_sha256": "fb3e8688caa66315e4cdff9867cee6f4d07e775db28d0665aed2bcde1cfbaa7c",
+      "created_at_utc": "2026-08-04T15:40:04.150225Z",
+      "verified_at_utc": "2026-08-04T16:07:26.277133Z",
+      "public": false,
+      "verification_report_sha256": "fc08a32b4c6ff98f49437933d922c39d9d004a36957853568ee92de702793b2c"
+    }
+  },
+  "sanitization": {
+    "status": "verified",
+    "rules_applied": [
+      "bearer_token",
+      "cache_path",
+      "credential_url",
+      "file_uri",
+      "github_token",
+      "huggingface_token",
+      "json_secret_assignment",
+      "openai_token",
+      "python_interpreter",
+      "secret_assignment",
+      "sensitive_literal",
+      "unix_absolute_path",
+      "windows_absolute_path"
+    ],
+    "files_scanned": 6,
+    "replacement_count": 28,
+    "unresolved_findings": [],
+    "report_sha256": "36a81ac7d96c073c7d41bc37328136b9acd88d2248afffa6b017b56163d0a715"
+  },
+  "verification": {
+    "status": "partial",
+    "verifier_version": "1.0.0",
+    "reports": [
+      {
+        "archive_kind": "exact_private",
+        "status": "blocked",
+        "archive_sha256": null,
+        "verified_at_utc": null,
+        "errors": [
+          "External exact archive directory was not configured."
+        ]
+      },
+      {
+        "archive_kind": "sanitized_shareable",
+        "status": "verified",
+        "archive_sha256": "d58a4c9ecf28f20a135f4ba2ce95c5a532a04ea92f36e5b54d893400ae4c62fd",
+        "verified_at_utc": "2026-08-04T16:07:26.277133Z",
+        "errors": []
+      }
+    ]
+  },
+  "retention": {
+    "status": "partial",
+    "exact_private_retained": false,
+    "sanitized_archive_verified": true,
+    "public_asset_published": false,
+    "public_asset": null,
+    "descriptor_updated_at_utc": "2026-08-04T16:07:46Z"
+  },
+  "limitations": [
+    "The original P0-4 worktree state and original-run reviewer were not recorded during execution.",
+    "No explicit evidence reviewer was supplied for this handoff; the authenticated GitHub login was not treated as reviewer evidence.",
+    "MULTISCREEN_EVIDENCE_ARCHIVE_DIR was not configured, so no exact/private archive was created or retained.",
+    "The verified sanitized archive remains in ignored local staging and has not been published.",
+    "P0-4 remains accepted from its existing compact evidence; P1-preflight A does not validate model behavior or a new P1 capability."
+  ]
+}

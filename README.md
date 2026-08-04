@@ -8,15 +8,15 @@ Current status:
 
 > **P0-qualified research implementation through P0-4.** Reviewed local CUDA bf16 GPT-2-vocabulary, context-4096 qualifying runs passed for both Psi=8 and Psi=16. This remains a correctness/stability smoke result, not a paper-scale or efficiency result.
 
-Selected next gate:
+Current evidence-infrastructure gate:
 
-> **P1-preflight A: validation provenance and evidence retention v1.** This is evidence infrastructure only; no P1 model/ecosystem capability is validated by selecting or completing it.
+> **P1-preflight A: validation provenance and evidence retention v1 — partial.** The schema, standard-library provenance/packaging/verification tools, synthetic tests, and policy are implemented. All four retained P0-4 summary/metrics files matched their committed hashes; both completion markers were found and hashed for the new descriptor; and a sanitized archive verified locally. Durable exact/private retention is blocked because `MULTISCREEN_EVIDENCE_ARCHIVE_DIR` was not configured, and acceptance review remains pending because no explicit reviewer was supplied. P0-4 remains complete; no P1 model/ecosystem capability is validated.
 
 ## Start here
 
 - Development restart: [docs/HANDOFF.md](docs/HANDOFF.md)
-- Selected gate design: [docs/P1_PREFLIGHT_A_PLAN.md](docs/P1_PREFLIGHT_A_PLAN.md)
-- Local Codex `/goal` continuation: [docs/CODEX_P1_PREFLIGHT_A_HANDOFF.md](docs/CODEX_P1_PREFLIGHT_A_HANDOFF.md)
+- Historical P1-preflight A design: [docs/P1_PREFLIGHT_A_PLAN.md](docs/P1_PREFLIGHT_A_PLAN.md)
+- Historical P1-preflight A Codex Goal: [docs/CODEX_P1_PREFLIGHT_A_HANDOFF.md](docs/CODEX_P1_PREFLIGHT_A_HANDOFF.md)
 - Repository instructions for Codex: [AGENTS.md](AGENTS.md)
 - Detailed validation boundary: [docs/VALIDATION_STATUS.md](docs/VALIDATION_STATUS.md)
 - Reproduction commands: [docs/TESTING.md](docs/TESTING.md)
@@ -26,6 +26,8 @@ Selected next gate:
 - Known limitations: [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md)
 - Validation log index: [docs/validation_results/VALIDATION_LOG_INDEX.md](docs/validation_results/VALIDATION_LOG_INDEX.md)
 - Logging policy: [docs/LOGGING_POLICY.md](docs/LOGGING_POLICY.md)
+- Evidence archive policy: [docs/EVIDENCE_ARCHIVE_POLICY.md](docs/EVIDENCE_ARCHIVE_POLICY.md)
+- P0-4 evidence-retention descriptor: [docs/validation_results/P0_4_EVIDENCE_ARCHIVE.json](docs/validation_results/P0_4_EVIDENCE_ARCHIVE.json)
 - Repository audit: [docs/REPOSITORY_AUDIT.md](docs/REPOSITORY_AUDIT.md)
 
 ## What is included
@@ -105,6 +107,34 @@ python p0_2_three_way_minimal/test_three_way_minimal.py \
 
 Full CPU and CUDA comparison commands are in [docs/TESTING.md](docs/TESTING.md).
 
+The evidence tooling is standard-library-only and can be checked without site
+packages or network access:
+
+```bash
+python -S -m py_compile \
+  scripts/validation_evidence_common.py \
+  scripts/collect_validation_provenance.py \
+  scripts/package_validation_evidence.py \
+  scripts/verify_validation_evidence.py \
+  tests/test_validation_evidence*.py
+
+python -S -m unittest discover \
+  -s tests \
+  -p 'test_validation_evidence*.py' \
+  -v
+```
+
+The collector hashes the exact stdout from
+`git status --porcelain=v1 --untracked-files=all --ignore-submodules=none` and,
+when applicable, records privacy-safe recursive submodule state without raw
+paths. A review record requires an explicit reviewer and method, a full review
+commit, and an explicit raw-events-reviewed boolean.
+
+The verifier accepts exactly one canonical gzip member, enforces normalized
+USTAR member boundaries and padding, rescans every sanitized member including
+control metadata, and binds a supplied descriptor to the validation gate,
+tested-source commit, and complete source-artifact metadata.
+
 ## Validation status
 
 ### P0-1: complete
@@ -164,7 +194,7 @@ A CPU, reduced-context, different-dtype, or shorter run remains diagnostic and m
 
 ## P1-preflight A
 
-P1-preflight A will implement:
+P1-preflight A now provides:
 
 ```text
 explicit reviewer provenance
@@ -176,9 +206,36 @@ offline archive verification and tamper detection
 long-term off-repository evidence retention descriptors
 ```
 
-It must not change model behavior or accepted P0 metrics. The exact raw archive remains private and outside Git; only a verified sanitized archive may be published when explicitly configured.
+The current P0-4 backfill is deliberately partial. All four Psi=8/Psi=16
+summary and metrics files matched their committed hashes. Both completion markers
+were found and hashed for the new descriptor, and the sanitized archive passed offline verification. No exact/private archive
+was created because no external archive directory was configured; no reviewer
+was inferred in the absence of explicit input; and no public asset was
+published. The compact state is recorded in
+[P0_4_EVIDENCE_ARCHIVE.json](docs/validation_results/P0_4_EVIDENCE_ARCHIVE.json).
 
-See [docs/P1_PREFLIGHT_A_PLAN.md](docs/P1_PREFLIGHT_A_PLAN.md).
+After retrieving the ignored sanitized archive by its logical locator, verify
+it without extraction or network access:
+
+```bash
+SANITIZED_ARCHIVE=/path/to/retrieved/validation-evidence-sanitized-p0-4-v1-r2.tar.gz
+
+python -S scripts/verify_validation_evidence.py \
+  --archive "$SANITIZED_ARCHIVE" \
+  --expected-sha256 d58a4c9ecf28f20a135f4ba2ce95c5a532a04ea92f36e5b54d893400ae4c62fd \
+  --evidence-document docs/validation_results/P0_4_EVIDENCE_ARCHIVE.json \
+  --schema schemas/validation_evidence_v1.schema.json \
+  --json
+```
+
+The gate must not change model behavior or accepted P0 metrics. Exact evidence
+must remain private and outside Git; only a separately sanitized, verified
+archive may be published when explicitly configured. See
+[docs/EVIDENCE_ARCHIVE_POLICY.md](docs/EVIDENCE_ARCHIVE_POLICY.md).
+
+The original design is retained in
+[docs/P1_PREFLIGHT_A_PLAN.md](docs/P1_PREFLIGHT_A_PLAN.md); use the current
+[handoff](docs/HANDOFF.md) for operational continuation.
 
 ## Local Codex continuation
 
@@ -188,9 +245,13 @@ After cloning, start Codex from the repository root:
 codex
 ```
 
-Codex reads [AGENTS.md](AGENTS.md) before working. Use the ready-to-paste `/goal` prompt in [docs/CODEX_P1_PREFLIGHT_A_HANDOFF.md](docs/CODEX_P1_PREFLIGHT_A_HANDOFF.md).
+Codex reads [AGENTS.md](AGENTS.md) before working. Use
+[docs/HANDOFF.md](docs/HANDOFF.md) as the current operational entrypoint. The
+[original P1-preflight A Goal](docs/CODEX_P1_PREFLIGHT_A_HANDOFF.md) is retained
+as execution history; do not paste it as a fresh full-implementation request.
 
-Before starting the Goal, provide an explicit reviewer and durable archive directory:
+To complete the two currently blocked requirements, provide an explicit
+reviewer and durable archive directory before resuming the partial gate:
 
 ```bash
 export MULTISCREEN_EVIDENCE_REVIEWERS=kuroganegames
@@ -214,7 +275,7 @@ codex
 
 Not yet validated:
 
-- P1-preflight A evidence infrastructure
+- P1-preflight A acceptance review and durable exact/private retention
 - P1-preflight B gradient-checkpointing modernization
 - architecture/initialization/all-scale contract validation
 - long-position/MiPE semantics resolution

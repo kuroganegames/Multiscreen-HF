@@ -22,8 +22,13 @@ P0-4: GPT-2 vocab 50,257 + context 4096 short pretraining smoke
   reviewed compact evidence is recorded under docs/validation_results/
 
 P1-preflight A: validation provenance / evidence retention v1
-  selected
-  implementation pending
+  infrastructure implemented; status partial/blocked
+  four P0-4 summary/metrics files matched committed hashes
+  both completion markers were found and hashed for the new descriptor
+  sanitized archive verified locally
+  exact/private retention blocked: MULTISCREEN_EVIDENCE_ARCHIVE_DIR unset
+  acceptance review pending: no explicit reviewer supplied
+  no public asset
 
 P1 model/ecosystem capabilities
   none validated
@@ -44,11 +49,13 @@ docs/KNOWN_LIMITATIONS.md
 docs/P1_PREFLIGHT_A_PLAN.md
 docs/CODEX_P1_PREFLIGHT_A_HANDOFF.md
 docs/LOGGING_POLICY.md
+docs/EVIDENCE_ARCHIVE_POLICY.md
 docs/REPOSITORY_AUDIT.md
 docs/RELEASE_CHECKLIST.md
 docs/validation_results/VALIDATION_LOG_INDEX.md
 docs/validation_results/P0_4_SUMMARY.md
 docs/validation_results/P0_4_SUMMARY.json
+docs/validation_results/P0_4_EVIDENCE_ARCHIVE.json
 ```
 
 The P0-4 plan and Codex handoff are retained reproduction/history documents; they do not mean P0-4 is pending:
@@ -156,7 +163,31 @@ python p0_2_three_way_minimal/test_three_way_minimal.py \
   --quick
 ```
 
-Also run syntax and focused unit tests for every new evidence script, schema, archive fixture, tamper case, and sanitization case.
+For P1-preflight A evidence tooling, run the standard-library-only syntax and
+focused fixture suite:
+
+```bash
+python -S -m py_compile \
+  scripts/validation_evidence_common.py \
+  scripts/collect_validation_provenance.py \
+  scripts/package_validation_evidence.py \
+  scripts/verify_validation_evidence.py \
+  tests/test_validation_evidence*.py
+
+python -S -m unittest discover \
+  -s tests \
+  -p 'test_validation_evidence*.py' \
+  -v
+```
+
+The focused suite must cover schema and archive fixtures, deterministic
+packaging, tampering, sanitization, and offline verification.
+
+The verifier contract requires exactly one canonical gzip member, canonical
+normalized USTAR headers, member boundaries, and padding, and an independent
+rescan of every sanitized member including control metadata. When a descriptor
+is supplied, it must match the validation gate, tested-source commit, and full
+source-artifact set and metadata.
 
 If any of the following change in a later gate, rerun P0-1 and P0-2 at the strongest feasible level, including CUDA bf16 where available:
 
@@ -173,9 +204,9 @@ P1-preflight A must not change those files. A model-core diff is a scope violati
 
 ## P1-preflight A scope
 
-The intended implementation is described in [docs/P1_PREFLIGHT_A_PLAN.md](docs/P1_PREFLIGHT_A_PLAN.md) and the Codex Goal is in [docs/CODEX_P1_PREFLIGHT_A_HANDOFF.md](docs/CODEX_P1_PREFLIGHT_A_HANDOFF.md).
+The implemented infrastructure follows [docs/P1_PREFLIGHT_A_PLAN.md](docs/P1_PREFLIGHT_A_PLAN.md), and the Codex Goal is in [docs/CODEX_P1_PREFLIGHT_A_HANDOFF.md](docs/CODEX_P1_PREFLIGHT_A_HANDOFF.md).
 
-Expected in-scope work includes:
+The in-scope implementation includes:
 
 ```text
 scripts/collect_validation_provenance.py
@@ -213,6 +244,11 @@ acceptance review
 
 For the historical P0-4 run, facts not captured during execution must remain explicit `null`/`not_recorded_in_original_run`. Do not retroactively claim a clean worktree or an original-run reviewer.
 
+Recorded worktree provenance hashes the exact stdout bytes from
+`git status --porcelain=v1 --untracked-files=all --ignore-submodules=none`.
+When applicable, it also records privacy-safe state/count/hash summaries from
+`git submodule status --recursive`; shareable output never includes raw paths.
+
 Reviewer identity for the new evidence handoff must come from explicit input, for example:
 
 ```bash
@@ -220,6 +256,10 @@ export MULTISCREEN_EVIDENCE_REVIEWERS=kuroganegames
 ```
 
 The authenticated GitHub login is not automatically a reviewer.
+
+A recorded review also requires a non-empty explicit method, a full 40- or
+64-character hexadecimal review commit, and an explicitly supplied
+`raw-events-reviewed` boolean.
 
 Exact raw evidence must be written outside the repository to an explicitly configured user-controlled location:
 
@@ -234,6 +274,14 @@ export MULTISCREEN_P0_4_RAW_ROOT=/absolute/path/to/the/original/P0-4/raw-output-
 ```
 
 Exact archives stay private. A separately sanitized archive may be published only when explicitly configured and verified. Never publish the exact archive to a public GitHub release.
+
+Current P0-4 retention status is partial: all four summary/metrics files matched
+their committed hashes, both completion markers were found and hashed for the
+new descriptor, and the sanitized archive verified locally. Exact/private
+retention is blocked because `MULTISCREEN_EVIDENCE_ARCHIVE_DIR` was not
+configured; acceptance review is pending because no explicit reviewer was
+supplied; and no public asset exists. P0-4 remains complete, and no P1
+model/ecosystem capability is validated by this infrastructure.
 
 ## P0-4 qualification and reproduction rules
 
@@ -258,7 +306,7 @@ A CPU, shorter-context, different-dtype, or fewer-step run is diagnostic only. S
 
 ## Future validation strategy
 
-After P1-preflight A is reviewed and merged, the planned sequence is:
+After P1-preflight A is completed, reviewed, and merged, the planned sequence is:
 
 ```text
 P0.5-C1  architecture / initialization / all-scale contract
@@ -279,7 +327,11 @@ Compact accepted summaries and archive descriptors belong in:
 docs/validation_results/
 ```
 
-Follow `docs/LOGGING_POLICY.md`. Exact raw archives remain outside Git. Public artifacts must be sanitized and independently verifiable.
+Follow `docs/LOGGING_POLICY.md` and `docs/EVIDENCE_ARCHIVE_POLICY.md`. The
+current compact P0-4 retention state is recorded in
+`docs/validation_results/P0_4_EVIDENCE_ARCHIVE.json`; its partial/blocked
+retention status is independent of the accepted P0-4 result. Exact raw archives
+remain outside Git. Public artifacts must be sanitized and independently verified.
 
 Never commit:
 
