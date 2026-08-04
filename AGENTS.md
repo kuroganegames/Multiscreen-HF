@@ -20,16 +20,20 @@ P0-4: GPT-2 vocab 50,257 + context 4096 short pretraining smoke
   complete
   qualifying local CUDA bf16 Psi=8/Psi=16 runs passed
   reviewed compact evidence is recorded under docs/validation_results/
+
+P1-preflight A: validation provenance / evidence retention v1
+  selected
+  implementation pending
+
+P1 model/ecosystem capabilities
+  none validated
 ```
 
-The P0 validation phase is complete through P0-4. No P1 ecosystem capability is validated yet; select and validate one focused P1 gate at a time.
+P1-preflight A is evidence infrastructure. It does not validate a new model capability and must not be combined with gradient-checkpointing modernization, P0.5 core work, or PEFT/LoRA.
 
 ## Read before changing anything
 
 Read these files in order:
-
-The P0-4 plan and Codex handoff below are retained reproduction/history
-documents; they do not mean that P0-4 is still pending.
 
 ```text
 README.md
@@ -37,15 +41,25 @@ docs/HANDOFF.md
 docs/VALIDATION_STATUS.md
 docs/TESTING.md
 docs/KNOWN_LIMITATIONS.md
-docs/P0_4_PLAN.md
-docs/validation_results/P0_4_SUMMARY.md
-docs/CODEX_P0_4_HANDOFF.md
+docs/P1_PREFLIGHT_A_PLAN.md
+docs/CODEX_P1_PREFLIGHT_A_HANDOFF.md
 docs/LOGGING_POLICY.md
 docs/REPOSITORY_AUDIT.md
 docs/RELEASE_CHECKLIST.md
+docs/validation_results/VALIDATION_LOG_INDEX.md
+docs/validation_results/P0_4_SUMMARY.md
+docs/validation_results/P0_4_SUMMARY.json
 ```
 
-For model or oracle changes, also inspect:
+The P0-4 plan and Codex handoff are retained reproduction/history documents; they do not mean P0-4 is pending:
+
+```text
+docs/P0_4_PLAN.md
+docs/P0_4_RESULTS_TEMPLATE.md
+docs/CODEX_P0_4_HANDOFF.md
+```
+
+For model or oracle changes in later gates, also inspect:
 
 ```text
 multiscreen_transformers/configuration_multiscreen.py
@@ -81,25 +95,51 @@ Do not break these contracts:
 
 4. The current HF implementation contains DynamicCache compatibility logic. Greedy `generate(use_cache=True)` is smoke-tested; broad generation compatibility is not.
 
-5. The current screening implementation is dense and quadratic in sequence length. Never present its runtime or memory results as evidence of the paper's efficiency claims.
+5. The current screening implementation is dense and quadratic in sequence length. Never present runtime or memory results as evidence of the paper's efficiency claims.
 
 6. `tie_word_embeddings=True` is part of the architecture contract. Logits use normalized tied embeddings.
+
+7. Accepted evidence must remain truthful:
+
+   - do not alter accepted P0 metrics to fit a new schema;
+   - do not fabricate reviewer identity;
+   - do not infer historical clean-worktree state from a commit SHA;
+   - preserve unknown historical provenance as explicit `not_recorded` data;
+   - never upload exact raw evidence to a public location;
+   - do not commit raw archives, outputs, checkpoints, model weights, secrets, or private absolute paths.
+
+8. Preserve the development environment:
+
+   - Python environments are managed with Conda;
+   - `uv` is available as a scoped installation helper, not as a replacement for Conda;
+   - inspect the active environment before installing anything;
+   - use the current Conda environment when suitable;
+   - create a separate Conda or other isolated environment when isolation is useful;
+   - never delete or broadly mutate an existing environment or the Conda base environment;
+   - never install globally;
+   - do not run `conda update --all`, unconstrained `pip install -U`, broad `uv sync`, or equivalent changes;
+   - when using `uv`, target an explicit environment and do not rewrite unrelated lockfiles;
+   - record package versions before and after any environment change;
+   - prefer Python standard-library implementations for evidence tooling.
+
+Creating an isolated virtual environment is allowed during P1-preflight A.
 
 ## Git workflow
 
 - Start from an up-to-date `main` and a clean working tree.
 - Do not develop directly on `main`.
 - Create a focused branch for each validation or implementation step.
-- Keep changes scoped. Separate model-core changes from documentation-only or experiment-only changes when practical.
+- Keep changes scoped. Separate model-core changes from documentation, evidence, or experiment changes.
 - Do not rewrite or discard user changes.
-- Do not commit checkpoints, `outputs/`, caches, raw large logs, or generated model weights.
-- Before opening a PR, inspect `git diff`, `git status`, and the exact files staged.
+- Do not commit checkpoints, `outputs/`, caches, raw archives, raw large logs, or generated model weights.
+- Before opening a PR, inspect `git diff`, `git diff --check`, `git status`, and the exact files staged.
+- Do not merge the final PR automatically.
 
 ## Testing policy
 
 Always run the tests relevant to the files changed.
 
-Minimum baseline after a fresh clone or documentation/experiment-harness change:
+Minimum baseline after a fresh clone or documentation/evidence-tooling change:
 
 ```bash
 export PYTHONPATH=$PWD:$PWD/oracle
@@ -116,21 +156,9 @@ python p0_2_three_way_minimal/test_three_way_minimal.py \
   --quick
 ```
 
-Also run syntax/config checks for the P0-4 harness:
+Also run syntax and focused unit tests for every new evidence script, schema, archive fixture, tamper case, and sanitization case.
 
-```bash
-python -m py_compile scripts/p0_4_gpt2_context4096_smoke.py
-
-python scripts/p0_4_gpt2_context4096_smoke.py \
-  --config-dir configs/p0_4_multiscreen_psi8_gpt2_ctx4096 \
-  --validate-config-only
-
-python scripts/p0_4_gpt2_context4096_smoke.py \
-  --config-dir configs/p0_4_multiscreen_psi16_gpt2_ctx4096 \
-  --validate-config-only
-```
-
-If any of the following change, rerun P0-1 and P0-2 at the strongest feasible level, including CUDA bf16 where available:
+If any of the following change in a later gate, rerun P0-1 and P0-2 at the strongest feasible level, including CUDA bf16 where available:
 
 ```text
 multiscreen_transformers/modeling_multiscreen.py
@@ -141,11 +169,75 @@ state_dict conversion
 position or mask behavior
 ```
 
-If cache/generation behavior changes, add or extend a focused generation/cache test and run a P0-3 or P0-4 diagnostic in addition to the P0 quick checks.
+P1-preflight A must not change those files. A model-core diff is a scope violation, not a reason to expand the gate.
+
+## P1-preflight A scope
+
+The intended implementation is described in [docs/P1_PREFLIGHT_A_PLAN.md](docs/P1_PREFLIGHT_A_PLAN.md) and the Codex Goal is in [docs/CODEX_P1_PREFLIGHT_A_HANDOFF.md](docs/CODEX_P1_PREFLIGHT_A_HANDOFF.md).
+
+Expected in-scope work includes:
+
+```text
+scripts/collect_validation_provenance.py
+scripts/package_validation_evidence.py
+scripts/verify_validation_evidence.py
+schemas/validation_evidence_v1.schema.json
+focused evidence-tooling tests
+docs/EVIDENCE_ARCHIVE_POLICY.md
+docs/validation_results/P0_4_EVIDENCE_ARCHIVE.json
+policy, handoff, index, release-checklist, CI, and ignore updates
+isolated virtual-environment creation when useful
+```
+
+Expected out-of-scope work includes:
+
+```text
+model/config/oracle/cache/generation/state-dict behavior
+P0 training harness or config changes
+new P0-4 GPU training
+P1-preflight B
+P0.5-C1/C2/C3
+PEFT/LoRA/QLoRA/Unsloth
+broad generation, compile, serving, or Triton work
+```
+
+## Provenance and retention rules
+
+Separate three concepts:
+
+```text
+original validation-run provenance
+evidence-packaging/handoff provenance
+acceptance review
+```
+
+For the historical P0-4 run, facts not captured during execution must remain explicit `null`/`not_recorded_in_original_run`. Do not retroactively claim a clean worktree or an original-run reviewer.
+
+Reviewer identity for the new evidence handoff must come from explicit input, for example:
+
+```bash
+export MULTISCREEN_EVIDENCE_REVIEWERS=kuroganegames
+```
+
+The authenticated GitHub login is not automatically a reviewer.
+
+Exact raw evidence must be written outside the repository to an explicitly configured user-controlled location:
+
+```bash
+export MULTISCREEN_EVIDENCE_ARCHIVE_DIR=/absolute/path/outside/the/repository
+```
+
+When a fresh checkout does not contain the original ignored outputs:
+
+```bash
+export MULTISCREEN_P0_4_RAW_ROOT=/absolute/path/to/the/original/P0-4/raw-output-root
+```
+
+Exact archives stay private. A separately sanitized archive may be published only when explicitly configured and verified. Never publish the exact archive to a public GitHub release.
 
 ## P0-4 qualification and reproduction rules
 
-P0-4 qualification is intentionally strict. A run is qualifying only when all of these are true:
+P0-4 remains complete from accepted evidence. A future reproduction is qualifying only when all strict conditions are met:
 
 ```text
 GPT-2 tokenizer vocabulary = 50,257
@@ -153,57 +245,48 @@ sequence length = 4,096
 device = CUDA
 AMP dtype = bf16
 optimizer steps >= 50
-finite train losses
-finite gradient norms
-probe loss decreases by configured threshold
-save_pretrained / from_pretrained passes
-the saved tokenizer is reloadable
-loaded logits pass configured tolerances
-generate(use_cache=True) appends tokens
-manual cache split matches full-forward suffix
-metrics.jsonl and summary.json are written
-P0-4_COMPLETE.md exists and failure artifacts are absent
+finite train losses and gradient norms
+configured probe-loss decrease
+save/load and tokenizer reload
+generation with cache
+manual cache-split comparison
+summary/metrics and completion marker
+failure artifacts absent
 ```
 
-A CPU, shorter-context, different-dtype, or fewer-step run is diagnostic only, even when all diagnostic checks pass. It must not be used to mark P0-4 complete.
+A CPU, shorter-context, different-dtype, or fewer-step run is diagnostic only. Static validation or CI diagnostics do not replace the accepted CUDA evidence.
 
-Execution order:
+## Future validation strategy
 
-1. Verify environment and baseline quick tests.
-2. Run both P0-4 config preflights.
-3. Optionally run a reduced Psi=8 diagnostic.
-4. Run qualifying Psi=8.
-5. Review loss, memory, reload, generation, and cache artifacts.
-6. Run qualifying Psi=16 only after Psi=8 passes and memory headroom is understood.
-7. Sanitize and record compact results under `docs/validation_results/`.
-8. Update status documentation only from reviewed evidence.
+After P1-preflight A is reviewed and merged, the planned sequence is:
 
-Do not silently weaken the qualifying criteria to work around an OOM or environment limitation. Preserve failure artifacts and report the run as blocked or failed.
+```text
+P0.5-C1  architecture / initialization / all-scale contract
+P0.5-C2  long-position / MiPE / cache semantics
+P1-preflight B  gradient-checkpointing API modernization
+P0.5-C3  paper-training-contract smoke
+final P0 core requalification
+P1-1  PEFT/LoRA smoke
+```
 
-## Future validation and change strategy
-
-During any P0-4 reproduction or follow-up validation:
-
-- Prefer fixing environment, data, tokenizer, config, logging, or harness issues before touching the model core.
-- Do not change `modeling_multiscreen.py`, the paper oracle, cache semantics, or state-dict conversion merely to make a long-context run pass.
-- If evidence indicates a model-core defect, stop the qualifying sequence, create a focused diagnosis, explain which P0 contract is implicated, and rerun the required P0 comparison suite after any fix.
-- Do not describe any P1 capability as validated without a separate focused gate and recorded evidence.
+Do not describe any later gate as validated until it has a focused implementation, test contract, reviewed evidence, and status update.
 
 ## Validation records
 
-Compact accepted summaries belong in:
+Compact accepted summaries and archive descriptors belong in:
 
 ```text
 docs/validation_results/
 ```
 
-Follow `docs/LOGGING_POLICY.md`. Keep machine-readable JSON and a human-readable Markdown summary. Remove local absolute paths, secrets, usernames, cache paths, and large raw logs before committing.
+Follow `docs/LOGGING_POLICY.md`. Exact raw archives remain outside Git. Public artifacts must be sanitized and independently verifiable.
 
 Never commit:
 
 ```text
 outputs/
 checkpoint directories
+raw evidence archives
 *.safetensors
 *.bin
 *.pt
@@ -212,6 +295,7 @@ checkpoint directories
 local Hugging Face caches
 wandb/
 large raw terminal logs
+private absolute-path reports
 ```
 
 ## Reporting format
@@ -221,9 +305,10 @@ At each checkpoint, report:
 ```text
 Checkpoint:
 Commands executed:
+Environment:
 Files changed:
 Tests and results:
-Artifacts produced:
+Evidence status:
 Current blocker or risk:
 Next checkpoint:
 ```
@@ -233,10 +318,14 @@ At completion, report:
 ```text
 変更ファイル:
 追加ファイル:
+開発環境:
 実行テスト:
+Provenance:
+Evidence retention:
 結果:
-未確認:
+未確認・制限:
+作成したPR:
 次にやるべきこと:
 ```
 
-Be precise about what was actually executed. Never infer a GPU pass from CI, static validation, or a diagnostic run.
+Be precise about what was executed and what is historical, inferred, unavailable, staged, private, sanitized, or publicly retained.
