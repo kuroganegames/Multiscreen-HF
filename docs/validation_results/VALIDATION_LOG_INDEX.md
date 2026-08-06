@@ -1,6 +1,8 @@
 # Validation Log Index
 
-This directory stores compact validation summaries for the P0-qualified Multiscreen-HF baseline through P0-4.
+This directory stores compact validation summaries for the P0-qualified
+Multiscreen-HF baseline through P0-4 and separately labeled staged Level 1
+records that have not yet been accepted.
 
 ## Current summaries
 
@@ -10,6 +12,17 @@ This directory stores compact validation summaries for the P0-qualified Multiscr
 | P0-2 | [P0_2_SUMMARY.md](P0_2_SUMMARY.md) | [P0_2_SUMMARY.json](P0_2_SUMMARY.json) | passed |
 | P0-3 | [P0_3_SUMMARY.md](P0_3_SUMMARY.md) | [P0_3_SUMMARY.json](P0_3_SUMMARY.json) | passed |
 | P0-4 | [P0_4_SUMMARY.md](P0_4_SUMMARY.md) | [P0_4_SUMMARY.json](P0_4_SUMMARY.json) | passed |
+
+## Staged Level 1 records
+
+| Gate | Plan | Compact result | Machine-readable contract | Acceptance state |
+|---|---|---|---|---|
+| P0.5-C1 | [P0_5_C1_PLAN.md](../P0_5_C1_PLAN.md) | [P0_5_C1_SUMMARY.md](P0_5_C1_SUMMARY.md) | [P0_5_C1_ARCHITECTURE_MANIFEST.json](P0_5_C1_ARCHITECTURE_MANIFEST.json) | REVIEW_REQUIRED |
+
+The C1 focused local gate has passed, but the result is not accepted until its
+draft pull request is reviewed and merged. C2 and later Level 1 stages remain
+unstarted. This staged record does not change the accepted P0 boundary or the
+P0-4 evidence-retention status below.
 
 ## Evidence retention
 

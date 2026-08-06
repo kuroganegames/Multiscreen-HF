@@ -14,6 +14,36 @@ python -m pip install -r requirements.txt
 export PYTHONPATH=$PWD:$PWD/oracle
 ```
 
+## P0.5-C1
+
+P0.5-C1 checks the paper architecture, initialization, all-scale state shapes,
+normalized tied embeddings, config round trips, and packed-text contract. Its
+Psi=8/16/32/48/64 model construction is meta-only and does not allocate real
+paper-scale weights.
+
+```bash
+python -m py_compile \
+  scripts/generate_paper_scale_manifest.py \
+  tests/test_paper_architecture_contract.py \
+  tests/test_paper_initialization_contract.py \
+  tests/test_packed_text_contract.py
+
+python -m unittest discover -s tests -p 'test_paper_architecture_contract.py' -v
+python -m unittest discover -s tests -p 'test_paper_initialization_contract.py' -v
+python -m unittest discover -s tests -p 'test_packed_text_contract.py' -v
+
+python scripts/generate_paper_scale_manifest.py \
+  --check docs/validation_results/P0_5_C1_ARCHITECTURE_MANIFEST.json
+python -m json.tool \
+  docs/validation_results/P0_5_C1_ARCHITECTURE_MANIFEST.json \
+  >/dev/null
+```
+
+See [P0_5_C1_PLAN.md](P0_5_C1_PLAN.md) for the independent count derivation and
+[P0_5_C1_SUMMARY.md](validation_results/P0_5_C1_SUMMARY.md) for the staged local
+result. The stage remains `REVIEW_REQUIRED` until its focused draft PR is
+reviewed and merged.
+
 ## P0-1
 
 ```bash
