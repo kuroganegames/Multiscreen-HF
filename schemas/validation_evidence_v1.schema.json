@@ -1,0 +1,370 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/kuroganegames/Multiscreen-HF/schemas/validation_evidence_v1.schema.json",
+  "title": "Multiscreen validation evidence descriptor v1",
+  "description": "A compact descriptor that keeps original-run provenance, later evidence-handoff provenance, acceptance review, and archive retention distinct.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "validation_gate",
+    "evidence_gate",
+    "validation_status",
+    "evidence_status",
+    "tested_source",
+    "original_run_provenance",
+    "evidence_handoff_provenance",
+    "acceptance_review",
+    "source_artifacts",
+    "archives",
+    "sanitization",
+    "verification",
+    "retention",
+    "limitations"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "validation_gate": {
+      "type": "string",
+      "minLength": 1
+    },
+    "evidence_gate": {
+      "type": "string",
+      "minLength": 1
+    },
+    "validation_status": {
+      "enum": ["passed", "failed", "partial", "not_validated"]
+    },
+    "evidence_status": {
+      "enum": ["pending", "partial", "blocked", "complete"]
+    },
+    "tested_source": {
+      "$ref": "#/$defs/testedSource"
+    },
+    "original_run_provenance": {
+      "$ref": "#/$defs/originalRunProvenance"
+    },
+    "evidence_handoff_provenance": {
+      "$ref": "#/$defs/evidenceHandoffProvenance"
+    },
+    "acceptance_review": {
+      "$ref": "#/$defs/reviewState"
+    },
+    "source_artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/sourceArtifact"
+      }
+    },
+    "archives": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["exact_private", "sanitized_shareable"],
+      "properties": {
+        "exact_private": {
+          "$ref": "#/$defs/archiveDescriptor"
+        },
+        "sanitized_shareable": {
+          "$ref": "#/$defs/archiveDescriptor"
+        }
+      }
+    },
+    "sanitization": {
+      "$ref": "#/$defs/sanitizationState"
+    },
+    "verification": {
+      "$ref": "#/$defs/verificationState"
+    },
+    "retention": {
+      "$ref": "#/$defs/retentionState"
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "gitObjectId": {
+      "type": "string",
+      "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+    },
+    "nullableSha256": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "utcTimestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]+)?Z$"
+    },
+    "nullableUtcTimestamp": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]+)?Z$"
+    },
+    "testedSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "commit", "branch"],
+      "properties": {
+        "repository": {
+          "type": "string",
+          "minLength": 1
+        },
+        "commit": {
+          "$ref": "#/$defs/gitObjectId"
+        },
+        "branch": {
+          "type": ["string", "null"],
+          "minLength": 1
+        }
+      }
+    },
+    "worktreeObservation": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "clean", "staged_changes", "unstaged_changes", "untracked_count", "porcelain_sha256", "porcelain_format", "collected_at_utc"],
+          "properties": {
+            "status": {"const": "recorded"},
+            "clean": {"type": "boolean"},
+            "staged_changes": {"type": "boolean"},
+            "unstaged_changes": {"type": "boolean"},
+            "untracked_count": {"type": "integer", "minimum": 0},
+            "porcelain_sha256": {"$ref": "#/$defs/sha256"},
+            "porcelain_format": {"const": "git-status-porcelain-v1"},
+            "collected_at_utc": {"$ref": "#/$defs/utcTimestamp"}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "clean", "staged_changes", "unstaged_changes", "untracked_count", "porcelain_sha256", "porcelain_format", "collected_at_utc"],
+          "properties": {
+            "status": {"enum": ["not_recorded_in_original_run", "pending", "not_applicable"]},
+            "clean": {"type": "null"},
+            "staged_changes": {"type": "null"},
+            "unstaged_changes": {"type": "null"},
+            "untracked_count": {"type": "null"},
+            "porcelain_sha256": {"type": "null"},
+            "porcelain_format": {"type": "null"},
+            "collected_at_utc": {"type": "null"}
+          }
+        }
+      ]
+    },
+    "reviewer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["identifier", "role", "review_method", "reviewed_at_utc", "review_commit", "raw_events_reviewed"],
+      "properties": {
+        "identifier": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.@/-]{0,127}$"
+        },
+        "role": {
+          "enum": ["original_run_reviewer", "acceptance_reviewer", "evidence_reviewer"]
+        },
+        "review_method": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reviewed_at_utc": {
+          "$ref": "#/$defs/utcTimestamp"
+        },
+        "review_commit": {
+          "$ref": "#/$defs/gitObjectId"
+        },
+        "raw_events_reviewed": {
+          "type": "boolean"
+        }
+      }
+    },
+    "reviewState": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "reviewers"],
+          "properties": {
+            "status": {"const": "recorded"},
+            "reviewers": {
+              "type": "array",
+              "minItems": 1,
+              "items": {"$ref": "#/$defs/reviewer"}
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "reviewers"],
+          "properties": {
+            "status": {"enum": ["not_recorded_in_original_run", "pending", "not_applicable"]},
+            "reviewers": {"type": "array", "maxItems": 0}
+          }
+        }
+      ]
+    },
+    "statusSha": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "value"],
+          "properties": {
+            "status": {"const": "recorded"},
+            "value": {"$ref": "#/$defs/gitObjectId"}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "value"],
+          "properties": {
+            "status": {"enum": ["pending", "not_applicable", "not_recorded_in_original_run"]},
+            "value": {"type": "null"}
+          }
+        }
+      ]
+    },
+    "statusTimestamp": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "value"],
+          "properties": {
+            "status": {"const": "recorded"},
+            "value": {"$ref": "#/$defs/utcTimestamp"}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "value"],
+          "properties": {
+            "status": {"enum": ["pending", "not_applicable", "not_recorded_in_original_run"]},
+            "value": {"type": "null"}
+          }
+        }
+      ]
+    },
+    "originalRunProvenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["run_worktree_at_start", "run_worktree_at_end", "original_run_review"],
+      "properties": {
+        "run_worktree_at_start": {"$ref": "#/$defs/worktreeObservation"},
+        "run_worktree_at_end": {"$ref": "#/$defs/worktreeObservation"},
+        "original_run_review": {"$ref": "#/$defs/reviewState"}
+      }
+    },
+    "evidenceHandoffProvenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["implementation_base_commit", "working_branch", "worktree_before_edits", "final_commit", "worktree_after_commit", "archive_created_at_utc", "archive_verified_at_utc"],
+      "properties": {
+        "implementation_base_commit": {"$ref": "#/$defs/gitObjectId"},
+        "working_branch": {"type": "string", "minLength": 1},
+        "worktree_before_edits": {"$ref": "#/$defs/worktreeObservation"},
+        "final_commit": {"$ref": "#/$defs/statusSha"},
+        "worktree_after_commit": {"$ref": "#/$defs/worktreeObservation"},
+        "archive_created_at_utc": {"$ref": "#/$defs/statusTimestamp"},
+        "archive_verified_at_utc": {"$ref": "#/$defs/statusTimestamp"}
+      }
+    },
+    "sourceArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["logical_name", "archive_path", "size_bytes", "sha256", "classification", "exact_bytes_retained", "sanitized_copy_status"],
+      "properties": {
+        "logical_name": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$"},
+        "archive_path": {"type": "string", "pattern": "^artifacts/[A-Za-z0-9_.@/+ -]+$"},
+        "size_bytes": {"type": "integer", "minimum": 0},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "classification": {
+          "enum": ["validation_summary", "validation_metrics", "completion_marker", "provenance", "command_record", "environment_record", "other"]
+        },
+        "exact_bytes_retained": {"type": "boolean"},
+        "sanitized_copy_status": {"enum": ["verified", "pending", "failed", "not_applicable"]}
+      }
+    },
+    "archiveDescriptor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "archive_filename", "storage_class", "storage_locator", "sha256", "size_bytes", "manifest_sha256", "created_at_utc", "verified_at_utc", "public", "verification_report_sha256"],
+      "properties": {
+        "status": {"enum": ["verified", "pending", "blocked", "failed", "not_applicable"]},
+        "archive_filename": {"type": ["string", "null"], "pattern": "^[^/\\\\]+\\.tar\\.gz$"},
+        "storage_class": {"type": ["string", "null"], "enum": ["private_external", "sanitized_staging", "public_release", null]},
+        "storage_locator": {"type": ["string", "null"], "minLength": 1},
+        "sha256": {"$ref": "#/$defs/nullableSha256"},
+        "size_bytes": {"type": ["integer", "null"], "minimum": 0},
+        "manifest_sha256": {"$ref": "#/$defs/nullableSha256"},
+        "created_at_utc": {"$ref": "#/$defs/nullableUtcTimestamp"},
+        "verified_at_utc": {"$ref": "#/$defs/nullableUtcTimestamp"},
+        "public": {"type": ["boolean", "null"]},
+        "verification_report_sha256": {"$ref": "#/$defs/nullableSha256"}
+      }
+    },
+    "sanitizationState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "rules_applied", "files_scanned", "replacement_count", "unresolved_findings", "report_sha256"],
+      "properties": {
+        "status": {"enum": ["verified", "pending", "blocked", "failed", "not_applicable"]},
+        "rules_applied": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "files_scanned": {"type": "integer", "minimum": 0},
+        "replacement_count": {"type": "integer", "minimum": 0},
+        "unresolved_findings": {"type": "array", "items": {"type": "object"}},
+        "report_sha256": {"$ref": "#/$defs/nullableSha256"}
+      }
+    },
+    "verificationResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["archive_kind", "status", "archive_sha256", "verified_at_utc", "errors"],
+      "properties": {
+        "archive_kind": {"enum": ["exact_private", "sanitized_shareable"]},
+        "status": {"enum": ["verified", "failed", "pending", "blocked"]},
+        "archive_sha256": {"$ref": "#/$defs/nullableSha256"},
+        "verified_at_utc": {"$ref": "#/$defs/nullableUtcTimestamp"},
+        "errors": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "verificationState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "verifier_version", "reports"],
+      "properties": {
+        "status": {"enum": ["verified", "partial", "pending", "blocked", "failed"]},
+        "verifier_version": {"const": "1.0.0"},
+        "reports": {"type": "array", "items": {"$ref": "#/$defs/verificationResult"}}
+      }
+    },
+    "retentionState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "exact_private_retained", "sanitized_archive_verified", "public_asset_published", "public_asset", "descriptor_updated_at_utc"],
+      "properties": {
+        "status": {"enum": ["verified", "partial", "pending", "blocked", "failed"]},
+        "exact_private_retained": {"type": "boolean"},
+        "sanitized_archive_verified": {"type": "boolean"},
+        "public_asset_published": {"type": "boolean"},
+        "public_asset": {"type": ["string", "null"], "minLength": 1},
+        "descriptor_updated_at_utc": {"$ref": "#/$defs/utcTimestamp"}
+      }
+    }
+  }
+}

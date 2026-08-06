@@ -8,6 +8,40 @@ on:
   workflow_dispatch:
 
 jobs:
+  evidence-tooling:
+    name: Evidence tooling (stdlib only)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+      TZ: UTC
+      LC_ALL: C.UTF-8
+      MULTISCREEN_EVIDENCE_REVIEWERS: ""
+      MULTISCREEN_EVIDENCE_ARCHIVE_DIR: ""
+      MULTISCREEN_P0_4_RAW_ROOT: ""
+      MULTISCREEN_EVIDENCE_PUBLIC_RELEASE_TAG: ""
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Compile dependency-free evidence tools
+        run: |
+          python -S -m py_compile \
+            scripts/collect_validation_provenance.py \
+            scripts/validation_evidence_common.py \
+            scripts/package_validation_evidence.py \
+            scripts/verify_validation_evidence.py \
+            tests/test_validation_evidence*.py
+
+      - name: Synthetic evidence-tooling tests
+        run: python -S -m unittest discover -s tests -p 'test_validation_evidence*.py' -v
+
   p0-smoke:
     name: P0 CPU smoke
     runs-on: ubuntu-latest

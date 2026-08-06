@@ -1,8 +1,14 @@
 # Codex Goal Handoff: P1-preflight A Validation Provenance and Evidence Retention v1
 
-This is the local-Codex entry point for implementing the next selected gate after the accepted P0-4 evidence PR.
+> **Retained original execution handoff.** The infrastructure in this Goal has
+> been implemented. P1-preflight A is currently partial/blocked pending explicit
+> acceptance review and durable external exact/private retention. Use
+> [HANDOFF.md](HANDOFF.md) for current operational continuation; do not paste the
+> full original Goal below as a fresh implementation request.
 
-## Current phase
+This was the local-Codex entry point for implementing the selected gate after the accepted P0-4 evidence PR.
+
+## Phase recorded when this handoff was created
 
 ```text
 Repository: kuroganegames/Multiscreen-HF
@@ -69,7 +75,7 @@ The user's Python development environments are managed with Conda. `uv` is insta
 
 Codex must preserve the current environment. It may use the active Conda environment when suitable or create an isolated environment when isolation is useful. It must not modify or delete the Conda base environment, perform broad upgrades, install packages globally, or rewrite unrelated lock/configuration files.
 
-## Ready-to-paste `/goal` prompt
+## Original ready-to-paste `/goal` prompt (retained history)
 
 Paste the complete block below into Codex from the repository root.
 

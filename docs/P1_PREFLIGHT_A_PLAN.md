@@ -1,6 +1,12 @@
 # P1-preflight A Plan: Validation Provenance and Evidence Retention v1
 
-## Status
+> **Retained original design record.** The infrastructure described here has
+> been implemented. P1-preflight A is currently partial/blocked pending explicit
+> acceptance review and durable external exact/private retention. Use
+> [HANDOFF.md](HANDOFF.md) for current operational guidance; do not rerun this
+> plan as a fresh implementation task.
+
+## Status when this design was selected
 
 ```text
 Gate: P1-preflight A
@@ -10,7 +16,8 @@ Model capability validated by this gate: none
 
 This gate improves the trustworthiness, reproducibility, and retention of validation evidence before any P1 ecosystem capability is attempted. It does not modify Multiscreen mathematics, model behavior, training behavior, or the accepted P0-1 through P0-4 verdicts.
 
-The Codex execution handoff and ready-to-paste Goal are in [CODEX_P1_PREFLIGHT_A_HANDOFF.md](CODEX_P1_PREFLIGHT_A_HANDOFF.md).
+The original Codex execution handoff and Goal are retained in
+[CODEX_P1_PREFLIGHT_A_HANDOFF.md](CODEX_P1_PREFLIGHT_A_HANDOFF.md).
 
 ## Why this gate comes next
 

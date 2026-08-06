@@ -4,13 +4,21 @@ This is the primary development-restart document for `kuroganegames/Multiscreen-
 
 The repository contains a **P0-qualified correctness-first research implementation** of Multiscreen for Hugging Face Transformers. P0-1, P0-2, P0-3, and P0-4 are complete. Reviewed CUDA bf16 GPT-2-vocabulary, context-4096 evidence is recorded for Psi=8 and Psi=16.
 
-The selected next gate is:
+The current evidence-infrastructure gate and status are:
 
 ```text
-P1-preflight A: Validation provenance / evidence retention v1
+P1-preflight A: Validation provenance / evidence retention v1 — PARTIAL/BLOCKED WITH EVIDENCE
 ```
 
 This is an infrastructure gate. It does not validate a new model capability and must not be combined with P1-preflight B, P0.5 core work, or PEFT/LoRA.
+
+The infrastructure is implemented and tested. All four retained P0-4
+summary/metrics files matched their committed hashes; both completion markers
+were found and hashed for the new descriptor; and a sanitized archive verified
+locally. Durable exact/private retention is blocked because
+`MULTISCREEN_EVIDENCE_ARCHIVE_DIR` was not configured; acceptance review is
+pending because no explicit reviewer was supplied; and no public asset exists.
+P0-4 remains complete and no P1 model/ecosystem capability is validated.
 
 Start with:
 
@@ -20,6 +28,8 @@ Start with:
 - canonical validation boundary: [VALIDATION_STATUS.md](VALIDATION_STATUS.md)
 - accepted P0-4 evidence: [P0_4_SUMMARY.md](validation_results/P0_4_SUMMARY.md) and [P0_4_SUMMARY.json](validation_results/P0_4_SUMMARY.json)
 - current logging policy: [LOGGING_POLICY.md](LOGGING_POLICY.md)
+- evidence archive policy: [EVIDENCE_ARCHIVE_POLICY.md](EVIDENCE_ARCHIVE_POLICY.md)
+- P0-4 retention descriptor: [P0_4_EVIDENCE_ARCHIVE.json](validation_results/P0_4_EVIDENCE_ARCHIVE.json)
 - repository audit: [REPOSITORY_AUDIT.md](REPOSITORY_AUDIT.md)
 
 Use [CODEX_P0_4_HANDOFF.md](CODEX_P0_4_HANDOFF.md) only for an intentional P0-4 reproduction or requalification.
@@ -32,7 +42,7 @@ Use [CODEX_P0_4_HANDOFF.md](CODEX_P0_4_HANDOFF.md) only for an intentional P0-4 
 | P0-2 | Complete | Vendored unofficial reference, HF implementation, and oracle three-way comparisons passed under recorded CPU fp32 and CUDA bf16 conditions. |
 | P0-3 | Complete | Psi=8/16 TinyStories bf16 smoke training passed, including finite loss/gradients, save/load, cache split, and greedy generation. |
 | P0-4 | Complete | Psi=8/16 GPT-2-vocabulary, context-4096 CUDA bf16 qualification passed and compact reviewed evidence was committed. |
-| P1-preflight A | Selected | Reviewer/worktree provenance and exact/sanitized evidence retention v1 are to be implemented. |
+| P1-preflight A | Partial/blocked | Tooling, schema, policy, source-hash audit, and sanitized verification are complete; explicit review and external exact/private retention remain blocked. |
 | P1-preflight B | Not started | Gradient-checkpointing API modernization remains separate. |
 | P0.5-C1/C2/C3 | Not started | Core-completion checks remain separate from evidence infrastructure. |
 | P1 ecosystem capabilities | None validated | PEFT/LoRA, QLoRA, Unsloth, generation matrix, compile, and serving remain future gates. |
@@ -41,7 +51,7 @@ Use [CODEX_P0_4_HANDOFF.md](CODEX_P0_4_HANDOFF.md) only for an intentional P0-4 
 
 ```text
 Current baseline: P0-qualified research implementation through P0-4
-Current main merge after P0-4 evidence: f538ed053292cba1834766a80d0b61167a42d4a2
+P1-preflight A implementation base (origin/main at branch creation): 34cbecd25bb38a6f92125071b1c08e42d71008f9
 Primary implementation: multiscreen_transformers/modeling_multiscreen.py
 Primary config: multiscreen_transformers/configuration_multiscreen.py
 Primary equation oracle: oracle/paper_math_oracle.py
@@ -49,9 +59,17 @@ Canonical validation status: docs/VALIDATION_STATUS.md
 Accepted P0-4 summary: docs/validation_results/P0_4_SUMMARY.{md,json}
 Selected gate design: docs/P1_PREFLIGHT_A_PLAN.md
 Selected Codex Goal: docs/CODEX_P1_PREFLIGHT_A_HANDOFF.md
+Evidence archive policy: docs/EVIDENCE_ARCHIVE_POLICY.md
+P0-4 retention descriptor: docs/validation_results/P0_4_EVIDENCE_ARCHIVE.json
 ```
 
-P0-4 remains complete from its accepted evidence. P1-preflight A adds provenance and retention metadata; it must not rewrite the original metrics or imply a new model validation result.
+P0-4 remains complete from its accepted evidence. The current descriptor
+truthfully records that all four summary/metrics files matched their committed
+hashes, both completion markers were found and hashed for the new descriptor,
+and a sanitized archive verified locally. Exact/private retention is blocked,
+acceptance review is pending, and no public asset exists. P1-preflight A remains
+partial and must not rewrite the original metrics, imply a new model validation
+result, or validate any P1 capability.
 
 ## 2. First ten minutes after a fresh clone
 
@@ -111,7 +129,8 @@ codex features enable goals
 codex
 ```
 
-Before running the P1-preflight A Goal, configure the reviewer and a user-controlled archive directory outside the repository:
+To complete the current partial gate, configure an explicit reviewer and a
+user-controlled archive directory outside the repository:
 
 ```bash
 export MULTISCREEN_EVIDENCE_REVIEWERS=kuroganegames
@@ -132,7 +151,9 @@ export MULTISCREEN_EVIDENCE_PUBLIC_RELEASE_TAG=p0-4-qualified-v0
 
 Never publish the exact raw archive to a public release.
 
-Use the complete prompt in [CODEX_P1_PREFLIGHT_A_HANDOFF.md](CODEX_P1_PREFLIGHT_A_HANDOFF.md).
+The original implementation prompt is retained in
+[CODEX_P1_PREFLIGHT_A_HANDOFF.md](CODEX_P1_PREFLIGHT_A_HANDOFF.md). Do not
+replay it; use this handoff to complete only the blockers recorded above.
 
 ## 4. P1-preflight A purpose
 
@@ -144,7 +165,7 @@ The gate addresses three evidence-review follow-ups:
 3. long-term raw evidence retention with separate exact/private and sanitized/shareable archives.
 ```
 
-Expected implementation areas:
+Implemented infrastructure:
 
 ```text
 scripts/collect_validation_provenance.py
@@ -182,17 +203,22 @@ For the current evidence handoff, record:
 
 ```text
 starting commit and branch
-exact status-porcelain hash
+SHA-256 and byte count of exact `git status --porcelain=v1 --untracked-files=all --ignore-submodules=none` stdout
+privacy-safe recursive submodule state/hash/count when applicable
 staged/unstaged/untracked state
 clean state before tracked edits
 final commit
 clean state after commit
 explicit reviewer(s)
-review method/time/commit
+review method/time/full commit/raw-events-reviewed boolean
 archive creation and verification times
 ```
 
 Reviewer identity must come from explicit CLI/environment input. The authenticated GitHub login is not automatically the reviewer.
+
+The collector rejects a recorded review unless the method is non-empty, the
+review commit is a full 40- or 64-character hexadecimal object ID, and
+`--raw-events-reviewed` is explicitly `true` or `false`.
 
 ## 6. Exact and sanitized evidence
 
@@ -240,6 +266,78 @@ The design is detailed in [P1_PREFLIGHT_A_PLAN.md](P1_PREFLIGHT_A_PLAN.md). At m
 
 Prefer Python standard-library code and synthetic CI fixtures. CI must not require private P0-4 artifacts, GPU, Hub access, external storage, or release credentials.
 
+The verifier accepts exactly one canonical gzip member, reconstructs canonical
+normalized USTAR headers/boundaries/padding, and rescans every sanitized
+member—including `MANIFEST.json`, `SHA256SUMS`, and the sanitization report.
+A supplied descriptor is bound to the archive, validation gate, tested-source
+commit, and complete source-artifact set and metadata.
+
+### Standard-library tooling and recovery
+
+The evidence tools and synthetic security fixtures require only the Python
+standard library:
+
+```bash
+python -S -m py_compile \
+  scripts/validation_evidence_common.py \
+  scripts/collect_validation_provenance.py \
+  scripts/package_validation_evidence.py \
+  scripts/verify_validation_evidence.py \
+  tests/test_validation_evidence*.py
+
+python -S -m unittest discover \
+  -s tests \
+  -p 'test_validation_evidence*.py' \
+  -v
+```
+
+Create a recorded review only with an explicit reviewer, non-empty method,
+full 40- or 64-character commit, and explicit raw-events-reviewed boolean:
+
+```bash
+python -S scripts/collect_validation_provenance.py \
+  --reviewer "$MULTISCREEN_EVIDENCE_REVIEWERS" \
+  --review-method "raw-event and archive review" \
+  --review-commit "$(git rev-parse HEAD)" \
+  --raw-events-reviewed true \
+  --json
+```
+
+Given an allowlisted package-input JSON and the original raw root, create new
+non-overwriting exact and sanitized archives:
+
+```bash
+PACKAGE_INPUT=/path/to/allowlisted-p0-4-package-input.json
+SANITIZED_STAGING=/path/to/ignored/sanitized-staging
+
+python -S scripts/package_validation_evidence.py \
+  --input "$PACKAGE_INPUT" \
+  --root "raw=${MULTISCREEN_P0_4_RAW_ROOT:?must be configured}" \
+  --mode both \
+  --exact-output "${MULTISCREEN_EVIDENCE_ARCHIVE_DIR:?must be configured}/validation-evidence-exact-p0-4-v1.tar.gz" \
+  --sanitized-output "$SANITIZED_STAGING/validation-evidence-sanitized-p0-4-v1-r2.tar.gz" \
+  --repository-root . \
+  --json
+```
+
+For a restore drill, retrieve the current sanitized archive by its logical
+locator and verify it before any extraction:
+
+```bash
+SANITIZED_ARCHIVE=/path/to/retrieved/validation-evidence-sanitized-p0-4-v1-r2.tar.gz
+
+python -S scripts/verify_validation_evidence.py \
+  --archive "$SANITIZED_ARCHIVE" \
+  --expected-sha256 d58a4c9ecf28f20a135f4ba2ce95c5a532a04ea92f36e5b54d893400ae4c62fd \
+  --evidence-document docs/validation_results/P0_4_EVIDENCE_ARCHIVE.json \
+  --schema schemas/validation_evidence_v1.schema.json \
+  --json
+```
+
+The exact/private recovery command becomes valid only after the external
+archive is created, the descriptor is updated with its hashes, and an
+explicit reviewer completes acceptance. Never publish that exact archive.
+
 ## 8. Baseline tests
 
 Before and after tracked changes:
@@ -282,6 +380,14 @@ Psi=16 P0-4_COMPLETE.md
 
 Do not regenerate substitute evidence if the originals are unavailable or hashes mismatch. Implement generic tooling, preserve the accepted P0-4 status, and report P1-preflight A as partial/blocked.
 
+For this handoff, both Psi=8/16 `summary.json` and `metrics.jsonl` files
+matched the four committed hashes. Both `P0-4_COMPLETE.md` markers were found
+and hashed for the new descriptor. The sanitized archive verified locally.
+Exact/private retention remains blocked because
+`MULTISCREEN_EVIDENCE_ARCHIVE_DIR` was not configured; acceptance review is
+pending because no explicit reviewer was supplied; and no public asset exists.
+These retention gaps do not reopen the accepted P0-4 result.
+
 ## 10. Completion boundary
 
 P1-preflight A is complete only when:
@@ -291,7 +397,8 @@ schema/provenance/packaging/verifier/tests are implemented;
 reviewer input is explicit;
 current handoff worktree provenance is recorded;
 historical unknown provenance remains truthful;
-raw P0-4 files match committed hashes;
+all four P0-4 summary/metrics files match their committed hashes;
+both completion markers are found and hashed for the descriptor;
 exact archive is stored in configured external retention storage;
 sanitized archive is produced and verified;
 compact archive descriptor and policy updates are committed;

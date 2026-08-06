@@ -95,6 +95,14 @@ tmp_validation/
 tmp/
 temp/
 
+# Validation-evidence packaging stays local unless a compact descriptor is explicitly added
+.validation_evidence_staging/
+validation-evidence-private-*.tar.gz
+validation-evidence-exact-*.tar.gz
+validation-evidence-sanitized-*.tar.gz
+validation-evidence-*-verification.json
+validation-evidence-*-package-input.json
+
 # Third-party vendored repo internals
 third_party/**/.git/
 third_party/**/__pycache__/
