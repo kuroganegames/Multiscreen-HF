@@ -40,9 +40,73 @@ python -m json.tool \
 ```
 
 See [P0_5_C1_PLAN.md](P0_5_C1_PLAN.md) for the independent count derivation and
-[P0_5_C1_SUMMARY.md](validation_results/P0_5_C1_SUMMARY.md) for the staged local
-result. The stage remains `REVIEW_REQUIRED` until its focused draft PR is
-reviewed and merged.
+[P0_5_C1_SUMMARY.md](validation_results/P0_5_C1_SUMMARY.md) for the focused
+result. C1 was reviewed and merged as PR #9.
+
+## P0.5-C2
+
+P0.5-C2 separates the literal paper MiPE rule
+(`paper_absolute`) from the historical compatibility rule
+(`reference_mod_after_wrap_boundary`). The reference boundary is
+inclusive: wrapping begins at
+`mipe_reference_wrap_boundary`. Missing fields migrate to reference
+mode with the boundary resolved from `max_position_embeddings`;
+paper mode is always an explicit choice.
+
+Run the focused C2 position/config/cache suite first:
+
+```bash
+export PYTHONPATH=$PWD:$PWD/oracle
+
+python -m py_compile \
+  multiscreen_transformers/configuration_multiscreen.py \
+  multiscreen_transformers/modeling_multiscreen.py \
+  oracle/paper_math_oracle.py \
+  tests/test_mipe_position_cache_contract.py
+
+python -m unittest discover \
+  -s tests \
+  -p 'test_mipe_position_cache_contract.py' \
+  -v
+
+python -m unittest discover -s tests -p 'test_paper_architecture_contract.py' -v
+```
+
+Then run the stable oracle checks and the strongest required P0-1/P0-2 CPU and
+CUDA bf16 comparisons:
+
+```bash
+python oracle/test_formula_units.py
+python oracle/test_paper_math_oracle_selfcheck.py
+python oracle/test_paper_math_oracle_smoke.py
+
+python oracle/test_against_hf_port.py
+python oracle/test_against_hf_port.py --device cuda:0 --dtype bf16
+
+python p0_2_three_way_minimal/test_three_way_minimal.py \
+  --reference-root third_party/multiscreen-pytorch \
+  --hf-root . \
+  --oracle-root oracle
+
+python p0_2_three_way_minimal/test_three_way_minimal.py \
+  --reference-root third_party/multiscreen-pytorch \
+  --hf-root . \
+  --oracle-root oracle \
+  --device cuda:0 \
+  --dtype bf16
+```
+
+Stable paper/long-boundary correctness uses fp32 auxiliary MiPE and Softmask
+math. The low-precision `reference` auxiliary mode is a separate
+compatibility lane; bf16 may collapse distinct large positions and fp16 may
+become non-finite. A direct test at position 131,071 does not allocate a dense
+131K forward and must not be reported as long-context feasibility or
+efficiency.
+
+See [P0_5_C2_PLAN.md](P0_5_C2_PLAN.md) and the proposed
+[MiPE position ADR](adr/ADR-0001-mipe-position-semantics.md), plus the compact
+[C2 result](validation_results/P0_5_C2_SUMMARY.md). The local gate has passed,
+but C2 remains `REVIEW_REQUIRED` and unaccepted until review and merge.
 
 ## P0-1
 

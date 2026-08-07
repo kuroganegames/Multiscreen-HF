@@ -25,6 +25,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import math
+import operator
 from typing import Any, Literal, Mapping, NamedTuple, Optional, Sequence
 
 import torch
@@ -32,7 +33,15 @@ from torch import nn
 import torch.nn.functional as F
 
 
-PositionRule = Literal["paper", "hf_mod_after_max_position"]
+PAPER_ABSOLUTE = "paper_absolute"
+REFERENCE_MOD_AFTER_WRAP_BOUNDARY = "reference_mod_after_wrap_boundary"
+_PAPER_POSITION_RULES = frozenset({"paper", PAPER_ABSOLUTE})
+_REFERENCE_POSITION_RULES = frozenset(
+    {"hf_mod_after_max_position", REFERENCE_MOD_AFTER_WRAP_BOUNDARY}
+)
+PositionRule = Literal[
+    "paper", "hf_mod_after_max_position", "paper_absolute", "reference_mod_after_wrap_boundary"
+]
 ComputeDTypeRule = Literal["fp32", "reference"]
 ScreeningCache = tuple[torch.Tensor, torch.Tensor]
 
@@ -58,11 +67,11 @@ class PaperMultiscreenConfig:
     norm_eps: float = 1e-12
     tanh_norm_eps: float = 1e-8
     labels_are_shifted: bool = False
-    # The paper formula uses absolute position i.  The current HF port also has
-    # an optional modulo behavior after max_position_embeddings.  Keep paper as
-    # the default; use the HF rule only when intentionally reproducing that port
-    # outside the training context.
+    # Direct oracle construction remains paper-oriented. Canonical names match
+    # the C2 HF config; the two pre-C2 names remain accepted aliases.
     position_rule: PositionRule = "paper"
+    # Dormant in paper mode; resolved for deterministic reference migration.
+    mipe_reference_wrap_boundary: Optional[int] = None
     # Numerical reference mode.  The paper/oracle default is stable fp32
     # auxiliary math for MiPE and Softmask under bf16/fp16.  For compatibility
     # with the original unofficial PyTorch reference implementation, set these
@@ -101,6 +110,19 @@ class PaperMultiscreenConfig:
     def from_hf_config(cls, hf_config: Any, **overrides: Any) -> "PaperMultiscreenConfig":
         """Build an oracle config from a MultiscreenConfig-like HF object."""
 
+        max_position_embeddings = int(
+            _get_attr_any(hf_config, "max_position_embeddings", "max_seq_len")
+        )
+        hf_position_mode = getattr(hf_config, "mipe_position_mode", None)
+        if hf_position_mode is None:
+            # Serialized pre-C2 HF configs used the reference modulo rule.
+            position_rule = REFERENCE_MOD_AFTER_WRAP_BOUNDARY
+        else:
+            position_rule = str(hf_position_mode)
+        wrap_boundary = getattr(hf_config, "mipe_reference_wrap_boundary", None)
+        if wrap_boundary is None:
+            wrap_boundary = max_position_embeddings
+
         data = {
             "vocab_size": int(_get_attr_any(hf_config, "vocab_size")),
             "hidden_size": int(_get_attr_any(hf_config, "hidden_size", "hidden_dim")),
@@ -108,7 +130,9 @@ class PaperMultiscreenConfig:
             "num_attention_heads": int(_get_attr_any(hf_config, "num_attention_heads", "num_heads")),
             "key_dim": int(_get_attr_any(hf_config, "key_dim")),
             "value_dim": int(_get_attr_any(hf_config, "value_dim")),
-            "max_position_embeddings": int(_get_attr_any(hf_config, "max_position_embeddings", "max_seq_len")),
+            "max_position_embeddings": max_position_embeddings,
+            "position_rule": position_rule,
+            "mipe_reference_wrap_boundary": wrap_boundary,
             "mipe_threshold": float(getattr(hf_config, "mipe_threshold", 256.0)),
             "initializer_range": float(getattr(hf_config, "initializer_range", 0.1)),
             "mipe_compute_dtype": str(getattr(hf_config, "mipe_compute_dtype", "fp32")),
@@ -132,8 +156,22 @@ class PaperMultiscreenConfig:
             raise ValueError("value_dim must be positive")
         if self.mipe_threshold <= 0:
             raise ValueError("mipe_threshold must be positive")
-        if self.position_rule not in {"paper", "hf_mod_after_max_position"}:
+        if self.position_rule not in _PAPER_POSITION_RULES | _REFERENCE_POSITION_RULES:
             raise ValueError(f"unknown position_rule: {self.position_rule!r}")
+        if self.mipe_reference_wrap_boundary is None:
+            self.mipe_reference_wrap_boundary = self.max_position_embeddings
+        if isinstance(self.mipe_reference_wrap_boundary, bool):
+            raise ValueError("mipe_reference_wrap_boundary must be a positive integer")
+        try:
+            self.mipe_reference_wrap_boundary = operator.index(
+                self.mipe_reference_wrap_boundary
+            )
+        except TypeError as exc:
+            raise ValueError(
+                "mipe_reference_wrap_boundary must be a positive integer"
+            ) from exc
+        if self.mipe_reference_wrap_boundary <= 0:
+            raise ValueError("mipe_reference_wrap_boundary must be a positive integer")
         if self.mipe_compute_dtype not in {"fp32", "reference"}:
             raise ValueError(f"unknown mipe_compute_dtype: {self.mipe_compute_dtype!r}")
         if self.softmask_compute_dtype not in {"fp32", "reference"}:
@@ -149,6 +187,96 @@ class OracleOutput(NamedTuple):
     past_key_values: Optional[tuple[ScreeningCache, ...]]
     all_hidden_states: Optional[tuple[torch.Tensor, ...]]
     aux: Optional[dict[str, list[torch.Tensor]]]
+
+
+def _validate_oracle_legacy_cache(
+    past_key_values: Optional[Sequence[ScreeningCache]],
+    *,
+    config: PaperMultiscreenConfig,
+    batch_size: int,
+    expected_device: torch.device,
+    expected_dtype: torch.dtype,
+) -> tuple[Optional[tuple[ScreeningCache, ...]], int]:
+    """Validate the oracle's complete zero-based contiguous prefix cache."""
+
+    if past_key_values is None or len(past_key_values) == 0:
+        return None, 0
+    if not isinstance(past_key_values, (tuple, list)):
+        raise TypeError("oracle past_key_values must be a tuple or list")
+    if len(past_key_values) != config.num_hidden_layers:
+        raise ValueError(
+            f"past_key_values length {len(past_key_values)} != "
+            f"num layers {config.num_hidden_layers}"
+        )
+
+    validated: list[ScreeningCache] = []
+    prefix_length: Optional[int] = None
+    for layer_idx, layer_cache in enumerate(past_key_values):
+        if not isinstance(layer_cache, (tuple, list)) or len(layer_cache) != 2:
+            raise TypeError(f"past_key_values[{layer_idx}] must be a (key, value) pair")
+        key, value = layer_cache
+        if not isinstance(key, torch.Tensor) or not isinstance(value, torch.Tensor):
+            raise TypeError(f"past_key_values[{layer_idx}] key/value must be tensors")
+        if key.ndim != 4 or value.ndim != 4:
+            raise ValueError(
+                f"past_key_values[{layer_idx}] key/value must both have rank 4"
+            )
+        if (
+            tuple(key.shape[:2]) != (batch_size, config.num_attention_heads)
+            or key.shape[-1] != config.key_dim
+        ):
+            raise ValueError(
+                f"past_key_values[{layer_idx}] key has invalid shape {tuple(key.shape)}"
+            )
+        if (
+            tuple(value.shape[:2]) != (batch_size, config.num_attention_heads)
+            or value.shape[-1] != config.value_dim
+        ):
+            raise ValueError(
+                f"past_key_values[{layer_idx}] value has invalid shape {tuple(value.shape)}"
+            )
+        layer_length = int(key.shape[2])
+        if int(value.shape[2]) != layer_length:
+            raise ValueError(f"past_key_values[{layer_idx}] key/value lengths differ")
+        if prefix_length is None:
+            prefix_length = layer_length
+        elif layer_length != prefix_length:
+            raise ValueError("all oracle cache layers must have the same prefix length")
+        if key.device != expected_device or value.device != expected_device:
+            raise ValueError(
+                f"past_key_values[{layer_idx}] must be on {expected_device}"
+            )
+        if key.dtype != expected_dtype or value.dtype != expected_dtype:
+            raise ValueError(
+                f"past_key_values[{layer_idx}] must use dtype {expected_dtype}"
+            )
+        validated.append((key, value))
+
+    return tuple(validated), 0 if prefix_length is None else prefix_length
+
+
+def _expected_cache_dtype(x: torch.Tensor) -> torch.dtype:
+    """Return the projection/cache dtype under the active autocast context."""
+
+    device_type = x.device.type
+    try:
+        autocast_enabled = torch.is_autocast_enabled(device_type)
+    except TypeError:  # pragma: no cover - compatibility with older torch.
+        autocast_enabled = torch.is_autocast_enabled() if device_type == "cuda" else False
+    if not autocast_enabled:
+        return x.dtype
+    # Autocast does not cast float64 (or other non-eligible dtypes) to its
+    # target dtype, so cache validation must preserve the actual input dtype.
+    if x.dtype not in {torch.float16, torch.bfloat16, torch.float32}:
+        return x.dtype
+    try:
+        return torch.get_autocast_dtype(device_type)
+    except (AttributeError, TypeError):  # pragma: no cover - older torch fallback.
+        if device_type == "cuda":
+            return torch.get_autocast_gpu_dtype()
+        if device_type == "cpu":
+            return torch.get_autocast_cpu_dtype()
+        return x.dtype
 
 
 def dtype_safe_eps(x: torch.Tensor, eps: float) -> float:
@@ -245,19 +373,25 @@ def _effective_positions(
     w: torch.Tensor,
     max_position_embeddings: int,
     position_rule: PositionRule,
+    mipe_reference_wrap_boundary: Optional[int] = None,
 ) -> torch.Tensor:
     """Return position values for MiPE.
 
-    ``position_rule='paper'`` is literal equation (6).  ``'hf_mod_after_max_position'``
-    reproduces the extra modulo branch in the current HF port for long positions.
+    Paper aliases implement literal equation (6). Reference aliases reproduce
+    the extra modulo branch at and after an explicit wrap boundary.
     """
 
-    if position_rule == "paper":
+    if position_rule in _PAPER_POSITION_RULES:
         return positions.unsqueeze(-1).expand(-1, w.numel())
-    if position_rule == "hf_mod_after_max_position":
+    if position_rule in _REFERENCE_POSITION_RULES:
+        boundary = (
+            max_position_embeddings
+            if mipe_reference_wrap_boundary is None
+            else mipe_reference_wrap_boundary
+        )
         pos = positions.unsqueeze(-1)
         w_b = w.unsqueeze(0)
-        return torch.where(pos >= max_position_embeddings, torch.remainder(pos, w_b), pos)
+        return torch.where(pos >= boundary, torch.remainder(pos, w_b), pos)
     raise ValueError(f"unknown position_rule: {position_rule!r}")
 
 
@@ -270,6 +404,7 @@ def apply_mipe(
     threshold: float,
     max_position_embeddings: int,
     position_rule: PositionRule = "paper",
+    mipe_reference_wrap_boundary: Optional[int] = None,
     compute_dtype_rule: ComputeDTypeRule = "fp32",
 ) -> tuple[torch.Tensor, torch.Tensor]:
     """Apply MiPE to q and k.
@@ -297,6 +432,7 @@ def apply_mipe(
         w=w_f,
         max_position_embeddings=max_position_embeddings,
         position_rule=position_rule,
+        mipe_reference_wrap_boundary=mipe_reference_wrap_boundary,
     )
     angles = pos * (math.pi * gamma / w_f).unsqueeze(0)  # (T, H)
     cos_a = torch.cos(angles).to(dtype=q.dtype).unsqueeze(0)  # (1, T, H)
@@ -418,6 +554,7 @@ class PaperGatedScreeningLayer(nn.Module):
             threshold=cfg.mipe_threshold,
             max_position_embeddings=cfg.max_position_embeddings,
             position_rule=cfg.position_rule,
+            mipe_reference_wrap_boundary=cfg.mipe_reference_wrap_boundary,
             compute_dtype_rule=cfg.mipe_compute_dtype,
         )
 
@@ -590,18 +727,25 @@ class PaperMultiscreenForCausalLM(nn.Module):
         bsz, seq_len = input_ids.shape
         x = self.embed_input_ids(input_ids)
 
-        past_len = 0
-        if past_key_values is not None and len(past_key_values) > 0:
-            if len(past_key_values) != len(self.layers):
-                raise ValueError(f"past_key_values length {len(past_key_values)} != num layers {len(self.layers)}")
-            past_len = int(past_key_values[0][0].shape[2])
-        else:
-            past_key_values = None
+        past_key_values, past_len = _validate_oracle_legacy_cache(
+            past_key_values,
+            config=self.config,
+            batch_size=bsz,
+            expected_device=x.device,
+            expected_dtype=_expected_cache_dtype(x),
+        )
         had_past = past_key_values is not None
         if start_pos is None:
             start_pos = past_len
         else:
-            start_pos = int(start_pos)
+            if isinstance(start_pos, bool):
+                raise TypeError("start_pos must be an integer")
+            try:
+                start_pos = operator.index(start_pos)
+            except TypeError as exc:
+                raise TypeError("start_pos must be an integer") from exc
+            if start_pos < 0:
+                raise ValueError("start_pos must be nonnegative")
 
         if self.config.strict_cache_positions:
             if had_past and start_pos != past_len:

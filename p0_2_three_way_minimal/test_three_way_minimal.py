@@ -224,6 +224,8 @@ def make_hf_config(HFConfig: type, case: ShapeCase, *, dtype: torch.dtype) -> An
         strict_cache_positions=True,
         mipe_compute_dtype=compute_mode_for_dtype(dtype),
         softmask_compute_dtype=compute_mode_for_dtype(dtype),
+        mipe_position_mode="reference_mod_after_wrap_boundary",
+        mipe_reference_wrap_boundary=case.max_seq_len,
     )
 
 
@@ -231,8 +233,9 @@ def make_paper_config(PaperConfig: type, hf_config: Any) -> Any:
     return PaperConfig.from_hf_config(
         hf_config,
         # The original reference has the same post-max-position modulo branch as
-        # the HF port.  For literal paper tests use the oracle default instead.
-        position_rule="hf_mod_after_max_position",
+        # the HF port.  Use the canonical reference mode and explicit boundary.
+        position_rule="reference_mod_after_wrap_boundary",
+        mipe_reference_wrap_boundary=hf_config.mipe_reference_wrap_boundary,
         strict_cache_positions=True,
         # Match the original reference's low-precision MiPE/Softmask rounding.
         # Without this, bf16 full cases that exceed max_seq_len can differ in
