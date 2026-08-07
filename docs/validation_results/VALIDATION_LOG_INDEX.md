@@ -17,12 +17,14 @@ records that have not yet been accepted.
 
 | Gate | Plan | Compact result | Machine-readable contract | Acceptance state |
 |---|---|---|---|---|
-| P0.5-C1 | [P0_5_C1_PLAN.md](../P0_5_C1_PLAN.md) | [P0_5_C1_SUMMARY.md](P0_5_C1_SUMMARY.md) | [P0_5_C1_ARCHITECTURE_MANIFEST.json](P0_5_C1_ARCHITECTURE_MANIFEST.json) | REVIEW_REQUIRED |
+| P0.5-C1 | [P0_5_C1_PLAN.md](../P0_5_C1_PLAN.md) | [P0_5_C1_SUMMARY.md](P0_5_C1_SUMMARY.md) | [P0_5_C1_ARCHITECTURE_MANIFEST.json](P0_5_C1_ARCHITECTURE_MANIFEST.json) | accepted; PR #9 merged |
+| P0.5-C2 | [P0_5_C2_PLAN.md](../P0_5_C2_PLAN.md) | [P0_5_C2_SUMMARY.md](P0_5_C2_SUMMARY.md) | focused deterministic tests | REVIEW_REQUIRED |
 
-The C1 focused local gate has passed, but the result is not accepted until its
-draft pull request is reviewed and merged. C2 and later Level 1 stages remain
-unstarted. This staged record does not change the accepted P0 boundary or the
-P0-4 evidence-retention status below.
+C1 was reviewed and merged as focused PR #9. The C2 focused local gate has
+passed, but C2 is not accepted until its separate draft pull request is
+reviewed and merged. Stage 3 and later Level 1 stages remain unstarted. These
+staged records do not change the accepted P0 boundary or the P0-4
+evidence-retention status below.
 
 ## Evidence retention
 

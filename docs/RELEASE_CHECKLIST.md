@@ -2,20 +2,32 @@
 
 This checklist is for tagging, handing off, or resuming work from the P0-qualified baseline.
 
-## Current selected gate
+## Current staged gate
 
 ```text
-P1-preflight A: Validation provenance / evidence retention v1 — PARTIAL/BLOCKED WITH EVIDENCE
+P0.5-C2: long-position / MiPE / cache semantics — local pass, REVIEW_REQUIRED
 ```
 
-The design and Codex handoff are:
+The focused C2 records are:
+
+```text
+docs/adr/ADR-0001-mipe-position-semantics.md
+docs/P0_5_C2_PLAN.md
+docs/validation_results/P0_5_C2_SUMMARY.md
+```
+
+C1 was reviewed and merged as PR #9. C2 remains unaccepted until its separate
+draft PR is reviewed and merged; Stage 3 must not begin first.
+
+The separate evidence-infrastructure design and historical Codex handoff are:
 
 ```text
 docs/P1_PREFLIGHT_A_PLAN.md
 docs/CODEX_P1_PREFLIGHT_A_HANDOFF.md
 ```
 
-P1-preflight A is evidence infrastructure. It must not change model behavior or mark any P1 model/ecosystem capability as validated.
+P1-preflight A remains evidence infrastructure and remains partial/blocked. C2
+does not complete its private retention or acceptance-review requirements.
 
 P1-preflight A infrastructure is implemented and tested, but the gate remains
 `PARTIAL/BLOCKED WITH EVIDENCE`. All four retained Psi=8/Psi=16 summary and

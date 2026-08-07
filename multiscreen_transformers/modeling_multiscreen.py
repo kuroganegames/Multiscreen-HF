@@ -7,6 +7,7 @@ Hugging Face ``PreTrainedModel`` classes.
 from __future__ import annotations
 
 import math
+import operator
 import weakref
 from collections.abc import Mapping, Sequence
 from typing import Any, Optional
@@ -27,7 +28,11 @@ except ImportError:  # pragma: no cover - compatibility with older releases.
 from transformers.modeling_outputs import BaseModelOutputWithPast, CausalLMOutputWithPast
 from transformers.utils import logging
 
-from .configuration_multiscreen import MultiscreenConfig
+from .configuration_multiscreen import (
+    MIPE_POSITION_MODE_PAPER_ABSOLUTE,
+    MIPE_POSITION_MODE_REFERENCE,
+    MultiscreenConfig,
+)
 
 logger = logging.get_logger(__name__)
 
@@ -55,6 +60,30 @@ def _tanh_norm(x: torch.Tensor, *, eps: float = 1e-8) -> torch.Tensor:
     norm = x.norm(dim=-1, keepdim=True)
     scale = torch.where(norm > safe_eps, torch.tanh(norm) / norm.clamp_min(safe_eps), torch.ones_like(norm))
     return scale * x
+
+
+def _multiscreen_expected_cache_dtype(x: torch.Tensor) -> torch.dtype:
+    """Return the projection/cache dtype under the active autocast context."""
+
+    device_type = x.device.type
+    try:
+        autocast_enabled = torch.is_autocast_enabled(device_type)
+    except TypeError:  # pragma: no cover - compatibility with older torch.
+        autocast_enabled = torch.is_autocast_enabled() if device_type == "cuda" else False
+    if not autocast_enabled:
+        return x.dtype
+    # Autocast leaves float64 (and other non-eligible dtypes) unchanged. Cache
+    # validation must follow the projection result rather than the target dtype.
+    if x.dtype not in {torch.float16, torch.bfloat16, torch.float32}:
+        return x.dtype
+    try:
+        return torch.get_autocast_dtype(device_type)
+    except (AttributeError, TypeError):  # pragma: no cover - older torch fallback.
+        if device_type == "cuda":
+            return torch.get_autocast_gpu_dtype()
+        if device_type == "cpu":
+            return torch.get_autocast_cpu_dtype()
+        return x.dtype
 
 
 def convert_original_state_dict_for_causal_lm(
@@ -158,10 +187,9 @@ def _multiscreen_cache_seq_length(past_key_values) -> int:
 def _multiscreen_normalize_past_key_values_for_forward(past_key_values):
     """Convert HF Cache/DynamicCache to the legacy tuple format used internally.
 
-    GenerationMixin can pass an empty DynamicCache during prefill.  The current
-    Multiscreen forward path uses legacy tuple caches, so an empty Cache is
-    normalized to None, and a non-empty Cache is converted with to_legacy_cache()
-    when that method is available.
+    Empty DynamicCache values are treated as no cache. Transformers 4.x Cache
+    objects expose ``to_legacy_cache``; Transformers 5.x DynamicCache exposes
+    per-layer ``keys``/``values`` instead. Other cache layouts are rejected.
     """
 
     if past_key_values is None:
@@ -169,18 +197,133 @@ def _multiscreen_normalize_past_key_values_for_forward(past_key_values):
 
     past_length = _multiscreen_cache_seq_length(past_key_values)
 
-    # Empty DynamicCache during prefill.  Treat it as no cache.
-    if past_length == 0 and hasattr(past_key_values, "get_seq_length"):
-        return None, 0
-
     to_legacy_cache = getattr(past_key_values, "to_legacy_cache", None)
     if callable(to_legacy_cache):
         legacy = to_legacy_cache()
         if legacy is None or len(legacy) == 0:
             return None, 0
-        return legacy, past_length
+        if all(
+            layer_cache is None
+            or (
+                isinstance(layer_cache, (tuple, list))
+                and len(layer_cache) == 2
+                and layer_cache[0] is None
+                and layer_cache[1] is None
+            )
+            for layer_cache in legacy
+        ):
+            return None, 0
+        return tuple(legacy), past_length
 
-    return past_key_values, past_length
+    layers = getattr(past_key_values, "layers", None)
+    if layers is not None:
+        layers = list(layers)
+        if not layers:
+            return None, 0
+        if all(
+            getattr(layer, "keys", None) is None
+            and getattr(layer, "values", None) is None
+            for layer in layers
+        ):
+            return None, 0
+        legacy_layers: list[ScreeningCache] = []
+        for layer_idx, layer in enumerate(layers):
+            key = getattr(layer, "keys", None)
+            value = getattr(layer, "values", None)
+            if key is None or value is None:
+                raise TypeError(
+                    "Unsupported Transformers Cache layer for Multiscreen: "
+                    f"layer {layer_idx} does not expose keys and values."
+                )
+            legacy_layers.append((key, value))
+        if not legacy_layers:
+            return None, 0
+        return tuple(legacy_layers), past_length
+
+    if isinstance(past_key_values, (tuple, list)):
+        if len(past_key_values) == 0:
+            return None, 0
+        return tuple(past_key_values), past_length
+
+    raise TypeError(
+        "Unsupported past_key_values cache type for Multiscreen: "
+        f"{type(past_key_values)!r}. Expected a legacy tuple/list or DynamicCache."
+    )
+
+
+def _multiscreen_validate_legacy_cache(
+    past_key_values,
+    *,
+    num_layers: int,
+    batch_size: int,
+    num_heads: int,
+    key_dim: int,
+    value_dim: int,
+    expected_device: torch.device,
+    expected_dtype: torch.dtype,
+    reported_length: int,
+) -> tuple[Optional[tuple[ScreeningCache, ...]], int]:
+    """Validate the complete zero-based prefix cache before screening math."""
+
+    if past_key_values is None:
+        return None, 0
+    if not isinstance(past_key_values, (tuple, list)):
+        raise TypeError("normalized past_key_values must be a tuple or list")
+    if len(past_key_values) != num_layers:
+        raise ValueError(
+            f"past_key_values must contain {num_layers} layer caches, got {len(past_key_values)}."
+        )
+
+    validated: list[ScreeningCache] = []
+    prefix_length: Optional[int] = None
+    for layer_idx, layer_cache in enumerate(past_key_values):
+        if not isinstance(layer_cache, (tuple, list)) or len(layer_cache) != 2:
+            raise TypeError(f"past_key_values[{layer_idx}] must be a (key, value) pair")
+        key, value = layer_cache
+        if not isinstance(key, torch.Tensor) or not isinstance(value, torch.Tensor):
+            raise TypeError(f"past_key_values[{layer_idx}] key/value must be tensors")
+        if key.ndim != 4 or value.ndim != 4:
+            raise ValueError(
+                f"past_key_values[{layer_idx}] key/value must both have rank 4, "
+                f"got {key.ndim} and {value.ndim}"
+            )
+        expected_key_prefix = (batch_size, num_heads)
+        expected_value_prefix = (batch_size, num_heads)
+        if tuple(key.shape[:2]) != expected_key_prefix or key.shape[-1] != key_dim:
+            raise ValueError(
+                f"past_key_values[{layer_idx}] key must have shape "
+                f"({batch_size}, {num_heads}, T, {key_dim}), got {tuple(key.shape)}"
+            )
+        if tuple(value.shape[:2]) != expected_value_prefix or value.shape[-1] != value_dim:
+            raise ValueError(
+                f"past_key_values[{layer_idx}] value must have shape "
+                f"({batch_size}, {num_heads}, T, {value_dim}), got {tuple(value.shape)}"
+            )
+        layer_length = int(key.shape[2])
+        if int(value.shape[2]) != layer_length:
+            raise ValueError(f"past_key_values[{layer_idx}] key/value lengths differ")
+        if prefix_length is None:
+            prefix_length = layer_length
+        elif layer_length != prefix_length:
+            raise ValueError("all past_key_values layers must have the same prefix length")
+        if key.device != expected_device or value.device != expected_device:
+            raise ValueError(
+                f"past_key_values[{layer_idx}] must be on {expected_device}, "
+                f"got {key.device} and {value.device}"
+            )
+        if key.dtype != expected_dtype or value.dtype != expected_dtype:
+            raise ValueError(
+                f"past_key_values[{layer_idx}] must use dtype {expected_dtype}, "
+                f"got {key.dtype} and {value.dtype}"
+            )
+        validated.append((key, value))
+
+    actual_length = 0 if prefix_length is None else prefix_length
+    if reported_length != actual_length:
+        raise ValueError(
+            f"cache reports length {reported_length}, but tensors contain {actual_length} tokens"
+        )
+    return tuple(validated), actual_length
 # -----------------------------------------------------------------------------
 
 class MultiscreenPreTrainedModel(PreTrainedModel):
@@ -325,13 +468,6 @@ class MultiscreenModel(MultiscreenPreTrainedModel):
             return_dict = bool(use_return_dict)
         kwargs.pop("num_items_in_batch", None)
 
-        if past_key_values is not None and len(past_key_values) == 0:
-            past_key_values = None
-        if past_key_values is not None and len(past_key_values) != len(self.layers):
-            raise ValueError(
-                f"past_key_values must contain {len(self.layers)} layer caches, got {len(past_key_values)}."
-            )
-
         if kwargs:
             # Keep forward permissive, but surface likely typo/debug information.
             # ``warning_once`` caches calls, so every argument must be hashable.
@@ -368,32 +504,50 @@ class MultiscreenModel(MultiscreenPreTrainedModel):
         W_norm = _unit_normalize(self.embed.weight)
         hidden_states = F.embedding(input_ids, W_norm) * self.s_E.exp()
 
-        if past_key_values is not None and len(past_key_values) > 0:
-            past_key_values, past_length = _multiscreen_normalize_past_key_values_for_forward(past_key_values)
-        else:
-            past_length = 0
+        past_key_values, reported_past_length = (
+            _multiscreen_normalize_past_key_values_for_forward(past_key_values)
+        )
+        past_key_values, past_length = _multiscreen_validate_legacy_cache(
+            past_key_values,
+            num_layers=len(self.layers),
+            batch_size=batch_size,
+            num_heads=self.config.num_attention_heads,
+            key_dim=self.config.key_dim,
+            value_dim=self.config.value_dim,
+            expected_device=hidden_states.device,
+            expected_dtype=_multiscreen_expected_cache_dtype(hidden_states),
+            reported_length=reported_past_length,
+        )
 
-        if start_pos is None:
-            if position_ids is not None:
-                start_pos = self._start_pos_from_position_ids(
-                    position_ids=position_ids,
-                    seq_len=seq_len,
-                    strict=bool(self.config.strict_position_ids),
-                )
-            else:
-                start_pos = past_length
-        elif position_ids is not None:
-            logger.warning_once(
-                "Multiscreen consumes a scalar `start_pos`; `position_ids` are ignored when `start_pos` is provided."
+        explicit_start_pos = None
+        if start_pos is not None:
+            explicit_start_pos = self._coerce_nonnegative_position(start_pos, "start_pos")
+        position_start_pos = None
+        if position_ids is not None:
+            position_start_pos = self._start_pos_from_position_ids(
+                position_ids=position_ids,
+                batch_size=batch_size,
+                seq_len=seq_len,
+                strict=bool(self.config.strict_position_ids),
             )
+        if explicit_start_pos is not None and position_start_pos is not None:
+            if explicit_start_pos != position_start_pos:
+                raise ValueError(
+                    f"start_pos={explicit_start_pos} conflicts with position_ids start "
+                    f"{position_start_pos}"
+                )
+        if start_pos is None:
+            start_pos = position_start_pos if position_start_pos is not None else past_length
+        else:
+            start_pos = explicit_start_pos
 
         if bool(getattr(self.config, "strict_cache_positions", True)):
-            if past_length > 0 and int(start_pos) != past_length:
+            if past_length > 0 and start_pos != past_length:
                 raise ValueError(
                     "Multiscreen cached decoding requires a contiguous prefix cache starting at position 0; "
                     f"got start_pos={start_pos} but past_length={past_length}."
                 )
-            if past_length == 0 and int(start_pos) != 0:
+            if past_length == 0 and start_pos != 0:
                 raise ValueError(
                     "Multiscreen full-context/no-cache calls require start_pos=0. "
                     "Offset position_ids without a prefix cache are not supported because MiPE and the "
@@ -493,9 +647,22 @@ class MultiscreenModel(MultiscreenPreTrainedModel):
         )
 
     @staticmethod
+    def _coerce_nonnegative_position(value: Any, name: str) -> int:
+        if isinstance(value, bool):
+            raise TypeError(f"{name} must be an integer")
+        try:
+            position = operator.index(value)
+        except TypeError as exc:
+            raise TypeError(f"{name} must be an integer") from exc
+        if position < 0:
+            raise ValueError(f"{name} must be nonnegative")
+        return position
+
+    @staticmethod
     def _start_pos_from_position_ids(
         *,
         position_ids: torch.LongTensor,
+        batch_size: Optional[int] = None,
         seq_len: int,
         strict: bool,
     ) -> int:
@@ -506,8 +673,23 @@ class MultiscreenModel(MultiscreenPreTrainedModel):
         misalign MiPE and the distance softmask, so strict mode fails loudly.
         """
 
+        if not isinstance(position_ids, torch.Tensor):
+            raise TypeError("position_ids must be a tensor")
         if position_ids.dim() != 2:
             raise ValueError("position_ids must have shape (batch, sequence_length)")
+        integer_dtypes = {
+            torch.uint8,
+            torch.int8,
+            torch.int16,
+            torch.int32,
+            torch.int64,
+        }
+        if position_ids.dtype not in integer_dtypes:
+            raise TypeError("position_ids must use an integer dtype")
+        if batch_size is not None and int(position_ids.shape[0]) != batch_size:
+            raise ValueError(
+                f"position_ids batch {position_ids.shape[0]} does not match input batch {batch_size}"
+            )
         if int(position_ids.shape[1]) != seq_len:
             raise ValueError(
                 f"position_ids length {position_ids.shape[1]} does not match input sequence length {seq_len}"
@@ -516,14 +698,19 @@ class MultiscreenModel(MultiscreenPreTrainedModel):
             return 0
 
         start_pos = int(position_ids[0, 0].item())
+        if start_pos < 0:
+            raise ValueError("position_ids must be nonnegative")
+        if seq_len - 1 > torch.iinfo(torch.int64).max - start_pos:
+            raise ValueError("position_ids contiguous range exceeds int64")
+        positions_i64 = position_ids.to(dtype=torch.int64)
         expected = torch.arange(
             start_pos,
             start_pos + seq_len,
             device=position_ids.device,
-            dtype=position_ids.dtype,
+            dtype=torch.int64,
         ).unsqueeze(0).expand(position_ids.shape[0], -1)
 
-        if not torch.equal(position_ids, expected):
+        if not torch.equal(positions_i64, expected):
             message = (
                 "Multiscreen only supports batch-shared contiguous position_ids, "
                 "because the reference cache API is based on a scalar start_pos. "
@@ -534,6 +721,44 @@ class MultiscreenModel(MultiscreenPreTrainedModel):
             if strict:
                 raise ValueError(message)
             logger.warning_once(message)
+        return start_pos
+
+    @staticmethod
+    def _start_pos_from_cache_position(
+        *, cache_position: torch.LongTensor, seq_len: int
+    ) -> int:
+        if not isinstance(cache_position, torch.Tensor):
+            raise TypeError("cache_position must be a tensor")
+        if cache_position.dim() != 1:
+            raise ValueError("cache_position must have shape (sequence_length,)")
+        integer_dtypes = {
+            torch.uint8,
+            torch.int8,
+            torch.int16,
+            torch.int32,
+            torch.int64,
+        }
+        if cache_position.dtype not in integer_dtypes:
+            raise TypeError("cache_position must use an integer dtype")
+        if int(cache_position.numel()) != seq_len:
+            raise ValueError(
+                f"cache_position length {cache_position.numel()} does not match sequence length {seq_len}"
+            )
+        if seq_len == 0:
+            raise ValueError("cache_position must not be empty")
+        start_pos = int(cache_position[0].item())
+        if start_pos < 0:
+            raise ValueError("cache_position must be nonnegative")
+        if seq_len - 1 > torch.iinfo(torch.int64).max - start_pos:
+            raise ValueError("cache_position contiguous range exceeds int64")
+        expected = torch.arange(
+            start_pos,
+            start_pos + seq_len,
+            device=cache_position.device,
+            dtype=torch.int64,
+        )
+        if not torch.equal(cache_position.to(dtype=torch.int64), expected):
+            raise ValueError("cache_position must be a contiguous increasing range")
         return start_pos
 
     @staticmethod
@@ -886,28 +1111,114 @@ class MultiscreenForCausalLM(MultiscreenPreTrainedModel, GenerationMixin):
                 raise ValueError("Pass only one of `past_key_values` or original-api `kv_caches`, not both.")
             past_key_values = kv_caches
 
-        if past_key_values is not None and len(past_key_values) > 0:
-            past_key_values, past_length = _multiscreen_normalize_past_key_values_for_forward(past_key_values)
-            if input_ids.shape[1] > past_length:
+        if input_ids.dim() != 2:
+            raise ValueError("input_ids must have shape (batch, sequence_length)")
+        batch_size, original_input_length = input_ids.shape
+        past_key_values, reported_past_length = (
+            _multiscreen_normalize_past_key_values_for_forward(past_key_values)
+        )
+        past_key_values, past_length = _multiscreen_validate_legacy_cache(
+            past_key_values,
+            num_layers=self.config.num_hidden_layers,
+            batch_size=batch_size,
+            num_heads=self.config.num_attention_heads,
+            key_dim=self.config.key_dim,
+            value_dim=self.config.value_dim,
+            expected_device=input_ids.device,
+            expected_dtype=_multiscreen_expected_cache_dtype(self.multiscreen.embed.weight),
+            reported_length=reported_past_length,
+        )
+
+        if past_length > 0:
+            input_contains_prefix = original_input_length > past_length
+            if cache_position is not None:
+                suffix_length = int(cache_position.numel())
+                if suffix_length == original_input_length:
+                    input_contains_prefix = False
+                elif not (
+                    input_contains_prefix
+                    and suffix_length == original_input_length - past_length
+                ):
+                    raise ValueError(
+                        f"cache_position length {suffix_length} matches neither the entire "
+                        f"already-sliced input length {original_input_length} nor the inferred "
+                        f"full-input suffix for cached length {past_length}"
+                    )
+                cache_start = MultiscreenModel._start_pos_from_cache_position(
+                    cache_position=cache_position,
+                    seq_len=suffix_length,
+                )
+                if cache_start != past_length:
+                    raise ValueError(
+                        f"cache_position starts at {cache_start}, expected cached length {past_length}"
+                    )
+                if input_contains_prefix:
+                    input_ids = input_ids[:, past_length:]
+            elif input_contains_prefix:
                 input_ids = input_ids[:, past_length:]
+                suffix_length = int(input_ids.shape[1])
             else:
-                input_ids = input_ids[:, -1:]
-            # Cache length is the source of truth during generation. A stale
-            # explicit start_pos or arbitrary position_ids would misalign
-            # MiPE/softmask positions.
+                # Treat already-sliced multi-token input as the new suffix.
+                suffix_length = original_input_length
+
+            if suffix_length <= 0:
+                raise ValueError("cached generation requires at least one new token")
+            if start_pos is not None:
+                explicit_start = MultiscreenModel._coerce_nonnegative_position(
+                    start_pos, "start_pos"
+                )
+                if explicit_start != past_length:
+                    raise ValueError(
+                        f"start_pos={explicit_start} conflicts with cached length {past_length}"
+                    )
+            if position_ids is not None:
+                position_ids_for_suffix = position_ids
+                if (
+                    position_ids.dim() == 2
+                    and int(position_ids.shape[1]) == original_input_length
+                    and suffix_length < original_input_length
+                ):
+                    position_ids_for_suffix = position_ids[:, -suffix_length:]
+                position_start = MultiscreenModel._start_pos_from_position_ids(
+                    position_ids=position_ids_for_suffix,
+                    batch_size=batch_size,
+                    seq_len=suffix_length,
+                    strict=bool(self.config.strict_position_ids),
+                )
+                if position_start != past_length:
+                    raise ValueError(
+                        f"position_ids start at {position_start}, expected cached length {past_length}"
+                    )
             start_pos = past_length
         else:
-            if start_pos is None:
-                if cache_position is not None and cache_position.numel() > 0:
-                    start_pos = int(cache_position[0].item())
-                elif position_ids is not None:
-                    start_pos = MultiscreenModel._start_pos_from_position_ids(
-                        position_ids=position_ids,
-                        seq_len=int(input_ids.shape[1]),
-                        strict=bool(self.config.strict_position_ids),
-                    )
-                else:
-                    start_pos = 0
+            seq_len = original_input_length
+            cache_start = None
+            if cache_position is not None:
+                cache_start = MultiscreenModel._start_pos_from_cache_position(
+                    cache_position=cache_position,
+                    seq_len=seq_len,
+                )
+            position_start = None
+            if position_ids is not None:
+                position_start = MultiscreenModel._start_pos_from_position_ids(
+                    position_ids=position_ids,
+                    batch_size=batch_size,
+                    seq_len=seq_len,
+                    strict=bool(self.config.strict_position_ids),
+                )
+            explicit_start = None
+            if start_pos is not None:
+                explicit_start = MultiscreenModel._coerce_nonnegative_position(
+                    start_pos, "start_pos"
+                )
+            supplied_starts = [
+                value for value in (cache_start, position_start, explicit_start) if value is not None
+            ]
+            if supplied_starts and any(value != supplied_starts[0] for value in supplied_starts[1:]):
+                raise ValueError("cache_position, position_ids, and start_pos disagree")
+            start_pos = supplied_starts[0] if supplied_starts else 0
+            if bool(getattr(self.config, "strict_cache_positions", True)) and start_pos != 0:
+                raise ValueError("generation without a prefix cache requires start_pos=0")
 
         # The model consumes scalar `start_pos`; forwarding arbitrary
         # `position_ids` would give the false impression that batch-specific
@@ -991,7 +1302,9 @@ class GatedScreeningBlock(nn.Module):
         self.dK = d_k
         self.dV = d_v
         self.wth = float(config.mipe_threshold)
-        self.max_seq_len = int(config.max_position_embeddings)
+        self.max_seq_len = int(config.max_position_embeddings)  # compatibility alias
+        self.mipe_position_mode = str(config.mipe_position_mode)
+        self.mipe_reference_wrap_boundary = int(config.mipe_reference_wrap_boundary)
         self.mipe_compute_dtype = str(config.mipe_compute_dtype)
         self.softmask_compute_dtype = str(config.softmask_compute_dtype)
 
@@ -1108,7 +1421,10 @@ class GatedScreeningBlock(nn.Module):
     @staticmethod
     def _select_compute_dtype(input_dtype: torch.dtype, mode: str) -> torch.dtype:
         if mode == "fp32":
-            return torch.float32
+            # Stable auxiliary math is an fp32 floor, not a float64 downcast.
+            return (
+                torch.float32 if input_dtype in {torch.float16, torch.bfloat16} else input_dtype
+            )
         if mode == "reference":
             return input_dtype
         raise ValueError(f"Unknown Multiscreen compute dtype mode: {mode!r}")
@@ -1133,8 +1449,17 @@ class GatedScreeningBlock(nn.Module):
 
         positions = torch.arange(start_pos, start_pos + seq_len, device=q.device, dtype=compute_dtype)
         pos_2d = positions.unsqueeze(1)
-        w_2d = w_float.unsqueeze(0)
-        effective_pos = torch.where(pos_2d >= self.max_seq_len, pos_2d % w_2d, pos_2d)
+        if self.mipe_position_mode == MIPE_POSITION_MODE_PAPER_ABSOLUTE:
+            effective_pos = pos_2d.expand(-1, w_float.numel())
+        elif self.mipe_position_mode == MIPE_POSITION_MODE_REFERENCE:
+            w_2d = w_float.unsqueeze(0)
+            effective_pos = torch.where(
+                pos_2d >= self.mipe_reference_wrap_boundary,
+                torch.remainder(pos_2d, w_2d),
+                pos_2d,
+            )
+        else:  # Config validation should make this unreachable.
+            raise RuntimeError(f"Unknown MiPE position mode: {self.mipe_position_mode!r}")
         angles = effective_pos * (math.pi * phi / w_float).unsqueeze(0)
 
         cos_a = torch.cos(angles).to(dtype=q.dtype)

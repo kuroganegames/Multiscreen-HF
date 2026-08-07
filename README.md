@@ -12,6 +12,10 @@ Current evidence-infrastructure gate:
 
 > **P1-preflight A: validation provenance and evidence retention v1 — partial.** The schema, standard-library provenance/packaging/verification tools, synthetic tests, and policy are implemented. All four retained P0-4 summary/metrics files matched their committed hashes; both completion markers were found and hashed for the new descriptor; and a sanitized archive verified locally. Durable exact/private retention is blocked because `MULTISCREEN_EVIDENCE_ARCHIVE_DIR` was not configured, and acceptance review remains pending because no explicit reviewer was supplied. P0-4 remains complete; no P1 model/ecosystem capability is validated.
 
+Staged Level 1 Core status: **P0.5-C1 is merged; P0.5-C2 passed locally and is
+`REVIEW_REQUIRED`.** C2 is not accepted until its focused draft PR is reviewed
+and merged; Stage 3 has not started.
+
 ## Start here
 
 - Development restart: [docs/HANDOFF.md](docs/HANDOFF.md)
@@ -29,6 +33,9 @@ Current evidence-infrastructure gate:
 - Evidence archive policy: [docs/EVIDENCE_ARCHIVE_POLICY.md](docs/EVIDENCE_ARCHIVE_POLICY.md)
 - P0-4 evidence-retention descriptor: [docs/validation_results/P0_4_EVIDENCE_ARCHIVE.json](docs/validation_results/P0_4_EVIDENCE_ARCHIVE.json)
 - Repository audit: [docs/REPOSITORY_AUDIT.md](docs/REPOSITORY_AUDIT.md)
+- C2 semantic decision: [docs/adr/ADR-0001-mipe-position-semantics.md](docs/adr/ADR-0001-mipe-position-semantics.md)
+- C2 plan: [docs/P0_5_C2_PLAN.md](docs/P0_5_C2_PLAN.md)
+- C2 local result: [docs/validation_results/P0_5_C2_SUMMARY.md](docs/validation_results/P0_5_C2_SUMMARY.md)
 
 ## What is included
 
@@ -72,6 +79,7 @@ config = MultiscreenConfig.from_psi(
     max_seq_len=128,
     key_dim=16,
     value_dim=64,
+    mipe_position_mode="paper_absolute",
 )
 model = MultiscreenForCausalLM(config).eval()
 input_ids = torch.randint(0, config.vocab_size, (1, 16))
@@ -277,8 +285,7 @@ Not yet validated:
 
 - P1-preflight A acceptance review and durable exact/private retention
 - P1-preflight B gradient-checkpointing modernization
-- architecture/initialization/all-scale contract validation
-- long-position/MiPE semantics resolution
+- P0.5-C2 merge acceptance (the focused local gate has passed)
 - paper-training-contract smoke
 - paper-scale pretraining or paper-quality reproduction
 - long-context retrieval at paper settings
