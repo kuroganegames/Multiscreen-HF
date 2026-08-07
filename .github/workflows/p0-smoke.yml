@@ -42,6 +42,64 @@ jobs:
       - name: Synthetic evidence-tooling tests
         run: python -S -m unittest discover -s tests -p 'test_validation_evidence*.py' -v
 
+  c1-lower-bound:
+    name: P0.5-C1 declared lower bounds
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up minimum Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: "pip"
+
+      - name: Upgrade packaging tools
+        run: python -m pip install --upgrade pip setuptools wheel
+
+      - name: Install declared lower bounds
+        run: |
+          python -m pip install --extra-index-url https://download.pytorch.org/whl/cpu "torch==2.4.0+cpu"
+          python -m pip install "transformers==4.57.0"
+          python -m pip install -e . --no-deps
+
+      - name: Verify pinned environment
+        run: |
+          python - <<'PY'
+          from importlib.metadata import version
+
+          import torch
+          import transformers
+
+          assert version("torch").startswith("2.4.0")
+          assert version("transformers") == "4.57.0"
+          print("torch:", torch.__version__)
+          print("transformers:", transformers.__version__)
+          PY
+
+      - name: Run P0.5-C1 focused contracts
+        env:
+          PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/oracle:${{ github.workspace }}/third_party/multiscreen-pytorch
+        run: |
+          python -m py_compile \
+            scripts/generate_paper_scale_manifest.py \
+            tests/test_paper_architecture_contract.py \
+            tests/test_paper_initialization_contract.py \
+            tests/test_packed_text_contract.py
+          python -m unittest discover -s tests -p 'test_paper_architecture_contract.py' -v
+          python -m unittest discover -s tests -p 'test_paper_initialization_contract.py' -v
+          python -m unittest discover -s tests -p 'test_packed_text_contract.py' -v
+          python scripts/generate_paper_scale_manifest.py \
+            --check docs/validation_results/P0_5_C1_ARCHITECTURE_MANIFEST.json
+          python -m json.tool \
+            docs/validation_results/P0_5_C1_ARCHITECTURE_MANIFEST.json \
+            >/dev/null
+
   p0-smoke:
     name: P0 CPU smoke
     runs-on: ubuntu-latest
@@ -87,6 +145,25 @@ jobs:
             oracle/*.py \
             scripts/*.py \
             p0_2_three_way_minimal/*.py
+
+      - name: P0.5-C1 paper architecture and initialization contracts
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+          PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/oracle:${{ github.workspace }}/third_party/multiscreen-pytorch
+        run: |
+          python -m py_compile \
+            scripts/generate_paper_scale_manifest.py \
+            tests/test_paper_architecture_contract.py \
+            tests/test_paper_initialization_contract.py \
+            tests/test_packed_text_contract.py
+          python -m unittest discover -s tests -p 'test_paper_architecture_contract.py' -v
+          python -m unittest discover -s tests -p 'test_paper_initialization_contract.py' -v
+          python -m unittest discover -s tests -p 'test_packed_text_contract.py' -v
+          python scripts/generate_paper_scale_manifest.py \
+            --check docs/validation_results/P0_5_C1_ARCHITECTURE_MANIFEST.json
+          python -m json.tool \
+            docs/validation_results/P0_5_C1_ARCHITECTURE_MANIFEST.json \
+            >/dev/null
 
       - name: P0-4 static config preflight
         env:
