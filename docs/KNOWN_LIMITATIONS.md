@@ -29,6 +29,41 @@ The current HF path is still a dense PyTorch implementation for screening. It is
 
 At context 4096, dense similarity, mask, activation, gradient, and optimizer-state memory can be substantial. The P0-4 script records memory for diagnosability, not as an efficiency benchmark.
 
+P0.5-C2 uses direct scalar-position and tiny-shape tests for the paper's
+long-position MiPE equation, including position 131,071. It does not execute a
+dense 131K forward and provides no evidence for 131K memory feasibility,
+runtime, retrieval quality, or the paper's optimized window-skipping claims.
+
+## MiPE position and numerical modes
+
+P0.5-C2 proposes two explicit serialized position semantics:
+
+```text
+paper_absolute
+reference_mod_after_wrap_boundary
+```
+
+The reference transition is inclusive: a position equal to
+`mipe_reference_wrap_boundary` is wrapped per head by the learned,
+potentially fractional window. This compatibility rule is not algebraically
+equivalent to the paper's unwrapped absolute-position equation.
+
+Configs missing the new fields resolve to the historical reference behavior,
+with `mipe_reference_wrap_boundary=max_position_embeddings`. This
+preserves pre-C2 checkpoint behavior; paper semantics must be requested
+explicitly. The wrap boundary is not a hard supported-position limit and is
+separate from the MiPE threshold and learned screening support.
+
+Stable paper/oracle correctness uses fp32 auxiliary MiPE and Softmask math.
+The `reference` auxiliary-compute mode follows the incoming low
+precision to match the unofficial implementation. At long positions, bf16 can
+collapse distinct integer positions and fp16 can become non-finite, so the
+low-precision reference lane is compatibility evidence rather than proof of
+long-position causal correctness.
+
+These C2 semantics remain pending focused pull-request review and merge; this
+section does not mark C2 or Level 1 accepted.
+
 ## P0-2 padding masks
 
 The P0-2 three-way comparison does not test padding masks because the vendored unofficial reference implementation has no attention-mask API. Padding behavior is tested in P0-1 against the paper oracle.

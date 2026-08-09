@@ -17,9 +17,9 @@ Notes:
     The paper oracle parameterizes Trim with r = sigmoid(s_r).
     copy_from_hf_model(..., hf_uses_inverse_sr=True) maps s_r_paper = -sr_hf.
   * For this HF comparison only, the oracle uses
-    position_rule="hf_mod_after_max_position" so that the HF port's long-position
-    modulo branch is also tested.  Literal paper checks should use
-    position_rule="paper".
+    position_rule="reference_mod_after_wrap_boundary" with an explicit wrap
+    boundary so that the HF port's long-position modulo branch is also tested.
+    Literal paper checks should use position_rule="paper_absolute".
   * The position/cache contract is intentionally strict: cached suffix calls must
     use start_pos == past_len, and no-cache full-context calls must start at 0.
 """
@@ -164,6 +164,8 @@ def build_hf_config(case: ShapeCase, *, dtype: torch.dtype) -> MultiscreenConfig
         strict_position_ids=True,
         mipe_compute_dtype=compute_mode,
         softmask_compute_dtype=compute_mode,
+        mipe_position_mode="reference_mod_after_wrap_boundary",
+        mipe_reference_wrap_boundary=case.max_position_embeddings,
     )
 
 
@@ -178,8 +180,9 @@ def build_oracle_config(hf_cfg: MultiscreenConfig) -> PaperMultiscreenConfig:
         max_position_embeddings=hf_cfg.max_position_embeddings,
         mipe_threshold=hf_cfg.mipe_threshold,
         # This test targets exact HF-port equivalence, including the HF long-
-        # position modulo branch.  Use "paper" for literal paper-only tests.
-        position_rule="hf_mod_after_max_position",
+        # position modulo branch.  Use "paper_absolute" for paper-only tests.
+        position_rule="reference_mod_after_wrap_boundary",
+        mipe_reference_wrap_boundary=hf_cfg.mipe_reference_wrap_boundary,
     )
 
 

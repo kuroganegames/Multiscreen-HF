@@ -20,8 +20,19 @@ locally. Durable exact/private retention is blocked because
 pending because no explicit reviewer was supplied; and no public asset exists.
 P0-4 remains complete and no P1 model/ecosystem capability is validated.
 
+The current staged Level 1 Core state is:
+
+```text
+P0.5-C1: accepted; focused PR #9 merged
+P0.5-C2: local gate passed; REVIEW_REQUIRED; not yet accepted
+Stage 3: not started
+```
+
 Start with:
 
+- C2 semantic decision: [ADR-0001](adr/ADR-0001-mipe-position-semantics.md)
+- C2 plan: [P0_5_C2_PLAN.md](P0_5_C2_PLAN.md)
+- C2 local result: [P0_5_C2_SUMMARY.md](validation_results/P0_5_C2_SUMMARY.md)
 - repository instructions: [`AGENTS.md`](../AGENTS.md)
 - gate design: [P1_PREFLIGHT_A_PLAN.md](P1_PREFLIGHT_A_PLAN.md)
 - Codex Goal handoff: [CODEX_P1_PREFLIGHT_A_HANDOFF.md](CODEX_P1_PREFLIGHT_A_HANDOFF.md)
@@ -43,14 +54,18 @@ Use [CODEX_P0_4_HANDOFF.md](CODEX_P0_4_HANDOFF.md) only for an intentional P0-4 
 | P0-3 | Complete | Psi=8/16 TinyStories bf16 smoke training passed, including finite loss/gradients, save/load, cache split, and greedy generation. |
 | P0-4 | Complete | Psi=8/16 GPT-2-vocabulary, context-4096 CUDA bf16 qualification passed and compact reviewed evidence was committed. |
 | P1-preflight A | Partial/blocked | Tooling, schema, policy, source-hash audit, and sanitized verification are complete; explicit review and external exact/private retention remain blocked. |
+| P0.5-C1 | Complete | Architecture, initialization, all-scale meta shapes, config, tied embeddings, and packed-text contracts were reviewed and merged as PR #9. |
+| P0.5-C2 | Review required | Dual MiPE modes, legacy migration, long-boundary math/cache tests, and strong P0 regressions passed locally; merge review is pending. |
 | P1-preflight B | Not started | Gradient-checkpointing API modernization remains separate. |
-| P0.5-C1/C2/C3 | Not started | Core-completion checks remain separate from evidence infrastructure. |
+| P0.5-C3 | Not started | Paper-training-contract smoke remains a later separate stage. |
 | P1 ecosystem capabilities | None validated | PEFT/LoRA, QLoRA, Unsloth, generation matrix, compile, and serving remain future gates. |
 
 ### Baseline identity
 
 ```text
 Current baseline: P0-qualified research implementation through P0-4
+P0.5-C1 merge / C2 base: ec805c1ba60c55ea4beb3ad68e0a00c0d718e909
+Current staged gate: P0.5-C2 — local pass, REVIEW_REQUIRED
 P1-preflight A implementation base (origin/main at branch creation): 34cbecd25bb38a6f92125071b1c08e42d71008f9
 Primary implementation: multiscreen_transformers/modeling_multiscreen.py
 Primary config: multiscreen_transformers/configuration_multiscreen.py
@@ -435,7 +450,11 @@ The oracle and current HF screening path are correctness implementations, not ev
 
 ### DynamicCache and tied embedding
 
-Preserve current cache/position semantics and `tie_word_embeddings=True`. P1-preflight A must not touch these paths.
+Preserve `tie_word_embeddings=True`. C2 makes cache/position behavior explicit:
+paper-absolute and reference-compatible MiPE are separate serialized modes,
+legacy configs retain the reference rule, and cache calls require a complete
+zero-based contiguous prefix. See ADR-0001. Broad generation remains outside
+the validated boundary.
 
 ## 12. Accepted P0-4 record
 
@@ -458,15 +477,16 @@ P1-preflight A may add a separate evidence-archive descriptor. It must not chang
 ## 13. Planned sequence after this gate
 
 ```text
-P0.5-C1  architecture / initialization / all-scale contract
-P0.5-C2  long-position / MiPE / cache semantics
+P0.5-C1  architecture / initialization / all-scale contract — merged
+P0.5-C2  long-position / MiPE / cache semantics — REVIEW_REQUIRED
 P1-preflight B  gradient-checkpointing API modernization
 P0.5-C3  paper-training-contract smoke
 final P0 core requalification
 P1-1  PEFT/LoRA smoke
 ```
 
-No later gate is validated merely because P1-preflight A is complete.
+Do not begin P1-preflight B until C2 is reviewed and merged. No later gate is
+validated merely because an earlier implementation or infrastructure gate passes.
 
 ## 14. Final report format
 

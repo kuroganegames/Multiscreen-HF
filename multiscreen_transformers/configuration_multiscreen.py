@@ -3,12 +3,19 @@
 from __future__ import annotations
 
 import math
+import operator
 from typing import Any
 
 try:  # Transformers has historically used both spellings in examples.
     from transformers import PreTrainedConfig
 except ImportError:  # pragma: no cover - compatibility fallback for old releases.
     from transformers import PretrainedConfig as PreTrainedConfig  # type: ignore
+
+MIPE_POSITION_MODE_PAPER_ABSOLUTE = "paper_absolute"
+MIPE_POSITION_MODE_REFERENCE = "reference_mod_after_wrap_boundary"
+MIPE_POSITION_MODES = frozenset(
+    {MIPE_POSITION_MODE_PAPER_ABSOLUTE, MIPE_POSITION_MODE_REFERENCE}
+)
 
 
 class MultiscreenConfig(PreTrainedConfig):
@@ -36,6 +43,12 @@ class MultiscreenConfig(PreTrainedConfig):
     ``zero_pad_hidden_states`` can additionally zero padded
     query states after each residual layer; it defaults to ``False`` to keep
     original residual behavior.
+
+    ``mipe_position_mode="paper_absolute"`` uses the literal paper position
+    equation. ``"reference_mod_after_wrap_boundary"`` retains the historical
+    HF/vendored-reference rule, including wrapping at the boundary itself.
+    Missing fields resolve to the reference mode with a boundary equal to
+    ``max_position_embeddings`` so older serialized configs keep their logits.
     """
 
     model_type = "multiscreen"
@@ -66,6 +79,8 @@ class MultiscreenConfig(PreTrainedConfig):
         labels_are_shifted: bool = False,
         mipe_compute_dtype: str = "fp32",
         softmask_compute_dtype: str = "fp32",
+        mipe_position_mode: str | None = None,
+        mipe_reference_wrap_boundary: int | None = None,
         strict_position_ids: bool = True,
         strict_cache_positions: bool = True,
         zero_pad_hidden_states: bool = False,
@@ -139,6 +154,19 @@ class MultiscreenConfig(PreTrainedConfig):
         self.labels_are_shifted = bool(labels_are_shifted)
         self.mipe_compute_dtype = str(mipe_compute_dtype)
         self.softmask_compute_dtype = str(softmask_compute_dtype)
+        if mipe_position_mode is None:
+            mipe_position_mode = MIPE_POSITION_MODE_REFERENCE
+        self.mipe_position_mode = str(mipe_position_mode)
+        if mipe_reference_wrap_boundary is None:
+            mipe_reference_wrap_boundary = self.max_position_embeddings
+        if isinstance(mipe_reference_wrap_boundary, bool):
+            raise ValueError("mipe_reference_wrap_boundary must be a positive integer")
+        try:
+            self.mipe_reference_wrap_boundary = operator.index(
+                mipe_reference_wrap_boundary
+            )
+        except TypeError as exc:
+            raise ValueError("mipe_reference_wrap_boundary must be a positive integer") from exc
         self.strict_position_ids = bool(strict_position_ids)
         self.strict_cache_positions = bool(strict_cache_positions)
         self.zero_pad_hidden_states = bool(zero_pad_hidden_states)
@@ -198,10 +226,12 @@ class MultiscreenConfig(PreTrainedConfig):
         max_seq_len: int = 256,
         **overrides: Any,
     ) -> "MultiscreenConfig":
-        """Build a paper-style config from the supraparameter Psi.
+        """Build a paper-scaling config from the supraparameter Psi.
 
         The scaling rule used in the reference repo is ``N_L = N_H = Psi`` and
-        ``d_E = Psi²``.
+        ``d_E = Psi²``. This helper does not infer a MiPE position policy;
+        request ``mipe_position_mode="paper_absolute"`` explicitly when the
+        literal paper position equation is desired.
         """
 
         return cls(
@@ -230,6 +260,14 @@ class MultiscreenConfig(PreTrainedConfig):
             raise ValueError("max_position_embeddings/max_seq_len must be positive")
         if self.mipe_threshold <= 0:
             raise ValueError("mipe_threshold must be positive")
+        if self.mipe_position_mode not in MIPE_POSITION_MODES:
+            allowed = ", ".join(sorted(MIPE_POSITION_MODES))
+            raise ValueError(
+                f"mipe_position_mode must be one of {{{allowed}}}, "
+                f"got {self.mipe_position_mode!r}"
+            )
+        if self.mipe_reference_wrap_boundary <= 0:
+            raise ValueError("mipe_reference_wrap_boundary must be a positive integer")
         allowed_compute_dtypes = {"fp32", "reference"}
         if self.mipe_compute_dtype not in allowed_compute_dtypes:
             raise ValueError(
@@ -298,6 +336,8 @@ class MultiscreenConfig(PreTrainedConfig):
             "labels_are_shifted": self.labels_are_shifted,
             "mipe_compute_dtype": self.mipe_compute_dtype,
             "softmask_compute_dtype": self.softmask_compute_dtype,
+            "mipe_position_mode": self.mipe_position_mode,
+            "mipe_reference_wrap_boundary": self.mipe_reference_wrap_boundary,
             "strict_position_ids": self.strict_position_ids,
             "strict_cache_positions": self.strict_cache_positions,
             "zero_pad_hidden_states": self.zero_pad_hidden_states,

@@ -22,6 +22,12 @@ P0-3: Psi=8/16 TinyStories smoke training
 
 P0-4: GPT-2 vocab + context 4096 short pretraining smoke
   Status: complete; reviewed qualifying CUDA bf16 Psi=8/Psi=16 execution passed
+
+P0.5-C1: architecture / initialization / all-scale contract
+  Status: complete; focused PR #9 reviewed and merged
+
+P0.5-C2: long-position / MiPE / cache semantics
+  Status: local gate passed; REVIEW_REQUIRED; not yet accepted
 ```
 
 The current implementation can be considered a **P0-qualified research implementation through P0-4**. P0-4 was accepted only from reviewed qualifying Psi=8/Psi=16 CUDA bf16 artifacts; static config validation and reduced diagnostics remain non-qualifying substitutes.
@@ -369,6 +375,37 @@ complete summary, metrics, and qualifying marker artifacts
 
 A reduced-context, CPU, other-dtype, or shorter run can pass diagnostic checks but remains non-qualifying. The accepted runtime and memory values are feasibility diagnostics only, not evidence of long-context efficiency.
 
+## Staged Level 1 Core
+
+P0.5-C1 is accepted from merged PR #9. Its meta-only all-scale architecture,
+initialization, tied-embedding, config, and packed-text contracts are recorded
+in [P0_5_C1_SUMMARY.md](validation_results/P0_5_C1_SUMMARY.md).
+
+The focused P0.5-C2 local gate has passed but remains `REVIEW_REQUIRED` until
+its separate draft pull request is reviewed and merged. C2 adds explicit
+serialized MiPE modes:
+
+```text
+paper_absolute
+reference_mod_after_wrap_boundary
+```
+
+Legacy configs resolve to the reference rule with an inclusive boundary from
+their existing `max_position_embeddings`; paper behavior is explicit. Stable
+long-boundary correctness and incoming-dtype vendored compatibility are tested
+as separate numerical lanes. Strict scalar contiguous position/cache schemas,
+Transformers 4.x/5.x DynamicCache normalization, full/cache/chunk agreement,
+and greedy boundary-crossing generation are covered by the focused suite.
+
+See [ADR-0001](adr/ADR-0001-mipe-position-semantics.md),
+[P0_5_C2_PLAN.md](P0_5_C2_PLAN.md), and
+[P0_5_C2_SUMMARY.md](validation_results/P0_5_C2_SUMMARY.md). These results do
+not demonstrate dense 131K feasibility, retrieval quality, efficiency, or a
+P1 model/ecosystem capability.
+
 ## Next validation boundary
 
-P0-4 is complete. No P1 ecosystem capability is validated yet. A future task should select one focused gate—such as PEFT/LoRA, QLoRA, Unsloth, a broader generation matrix, or `torch.compile`—and record it independently without expanding P0-4's claims.
+P0-4 and P0.5-C1 are complete. C2 is locally passed but unaccepted. The next
+action is review and merge of the focused C2 draft PR. P1-preflight B must not
+begin until that review gate is complete. No P1 ecosystem capability is
+validated yet.

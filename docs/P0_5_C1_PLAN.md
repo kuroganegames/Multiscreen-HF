@@ -2,9 +2,9 @@
 
 ## Status
 
-Implementation and local validation are complete on the focused C1 branch.
-Acceptance remains **REVIEW_REQUIRED** until the draft pull request is reviewed
-and merged. C2 must not start from this branch.
+Implementation and local validation completed on the focused C1 branch. The
+focused draft PR #9 was merged on 2026-08-07, so C1 is accepted. C2 proceeds
+only on its separate branch and remains independently review-gated.
 
 P0.5-C1 is the first of five separately reviewed Level 1 Core stages:
 
@@ -238,9 +238,9 @@ C1 is locally ready for review only when:
 - no production numerical behavior changed to fit the expected table.
 ```
 
-Merge review is a separate acceptance act. Until the draft PR is reviewed and
-merged, the stage remains `REVIEW_REQUIRED`, C2 remains unstarted, and no Level
-1 completion claim is permitted.
+Merge review was a separate acceptance act. Focused draft PR #9 was merged on
+2026-08-07, so C1 is accepted. That acceptance does not validate C2 or any
+later Level 1 stage.
 
 ## Explicit exclusions
 

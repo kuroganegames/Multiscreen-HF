@@ -4,14 +4,15 @@
 
 ```text
 Local gate result: passed
-Acceptance state: REVIEW_REQUIRED
-Next stage: not started
+Acceptance state: accepted; focused PR #9 merged 2026-08-07
+Next stage: P0.5-C2 local gate passed; REVIEW_REQUIRED
 ```
 
 The focused C1 implementation and local validation passed on 2026-08-06. The
-stage is not accepted until its draft pull request is reviewed and merged. This
-record does not validate C2, P1-preflight B, C3, final Level 1 requalification,
-or any P1 ecosystem capability.
+focused draft PR #9 was subsequently merged on 2026-08-07, so C1 is accepted.
+That acceptance does not validate C2, P1-preflight B, C3, final Level 1
+requalification, or any P1 ecosystem capability. C2 remains separately
+review-gated.
 
 ## Provenance
 
