@@ -8,6 +8,8 @@ For compact validation run summaries, see [validation_results/VALIDATION_LOG_IND
 
 For future validation logging rules, see [LOGGING_POLICY.md](LOGGING_POLICY.md).
 
+For the current Stage 5 gate, see [LEVEL1_CORE_REQUALIFICATION_PLAN.md](LEVEL1_CORE_REQUALIFICATION_PLAN.md).
+
 ## Status summary
 
 ```text
@@ -33,7 +35,10 @@ P1-preflight B: gradient-checkpointing API modernization
   Status: complete; focused PR #12 reviewed and merged
 
 P0.5-C3: paper-training-contract smoke
-  Status: local validation passed; focused draft PR REVIEW_REQUIRED
+  Status: complete; focused PR #13 reviewed and merged
+
+final Level 1 requalification and evidence
+  Status: current Stage 5; pending and not validated
 ```
 
 The current implementation can be considered a **P0-qualified research implementation through P0-4**. P0-4 was accepted only from reviewed qualifying Psi=8/Psi=16 CUDA bf16 artifacts; static config validation and reduced diagnostics remain non-qualifying substitutes.
@@ -239,6 +244,7 @@ Verify that the implementation can run short TinyStories training in bf16 for bo
 python scripts/p0_3_tinystories_stability.py \
   --tokenizer-path tokenizers/tinystories_spm768 \
   --cache-dir /path/to/hf_cache \
+  --revision f54c09fd23315a6f9c86f9dc80f725de7d8f9c64 \
   --device cuda:0 \
   --amp-dtype bf16 \
   --seq-len 128 \
@@ -425,7 +431,7 @@ non-qualifying and does not replace the accepted historical P0-4 result. See
 [P1_PREFLIGHT_B_SUMMARY.md](validation_results/P1_PREFLIGHT_B_SUMMARY.md).
 This Stage 3 result was accepted by merged PR #12.
 
-P0.5-C3 is the current focused Stage 4. It encodes the paper's tokenizer,
+P0.5-C3 was the focused Stage 4. It encodes the paper's tokenizer,
 data-stream, optimizer, scheduler, weight-decay, and no-gradient-clipping
 recipe as executable contracts; see [P0_5_C3_PLAN.md](P0_5_C3_PLAN.md).
 
@@ -442,13 +448,17 @@ present, and failure artifacts were absent. See
 [P0_5_C3_SUMMARY.md](validation_results/P0_5_C3_SUMMARY.md) and
 [P0_5_C3_EVIDENCE_ARCHIVE.json](validation_results/P0_5_C3_EVIDENCE_ARCHIVE.json).
 
-This is a local pass, not acceptance. Exact/private retention is blocked,
-sanitized evidence is verified but unpublished, and explicit review is pending.
+The focused Stage 4 implementation and result were reviewed and accepted by
+merged PR #13. Its existing evidence descriptor still truthfully records that
+exact/private retention is blocked, sanitized evidence is verified but
+unpublished, and an explicit evidence reviewer was not supplied; the merge does
+not rewrite those historical retention facts.
 
 ## Next validation boundary
 
-P0-4, P0.5-C1, P0.5-C2, and P1-preflight B are complete. The next action is
-review of the focused P0.5-C3 draft PR. The local Stage 4 gate passed but
-remains acceptance-pending; final Level 1 core requalification must not begin
-until that PR is reviewed and merged. No P1 ecosystem capability is validated
-yet.
+P0-4, P0.5-C1, P0.5-C2, P1-preflight B, and P0.5-C3 are complete. Final Level
+1 core requalification is the current Stage 5 under
+[LEVEL1_CORE_REQUALIFICATION_PLAN.md](LEVEL1_CORE_REQUALIFICATION_PLAN.md).
+It remains pending and has no accepted qualifying Stage 5 evidence; therefore
+the five-stage Level 1 Core program is not complete. No P1 ecosystem capability
+is validated yet.

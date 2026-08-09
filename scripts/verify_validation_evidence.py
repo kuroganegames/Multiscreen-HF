@@ -1057,6 +1057,10 @@ def verify_archive(
         sanitization, sanitization_descriptor_values = _verify_sanitized_archive(
             member_data, manifest_entries
         )
+        sanitization = {
+            **sanitization,
+            "descriptor_values": sanitization_descriptor_values,
+        }
     else:
         sanitization = {"status": "not_applicable"}
         sanitization_descriptor_values = None

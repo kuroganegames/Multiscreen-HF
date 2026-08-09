@@ -4,8 +4,8 @@
 
 ```text
 Gate: P0.5-C3
-State: local validation passed; focused draft PR REVIEW_REQUIRED
-Acceptance: pending; REVIEW_REQUIRED after the local gate until focused PR merge
+State: accepted; focused PR #13 reviewed and merged
+Acceptance: complete for P0.5-C3 via merged PR #13
 Accepted P0 boundary: unchanged through P0-4
 P1 model/ecosystem capabilities validated by this gate: none
 ```
@@ -22,11 +22,12 @@ final Level 1 requalification and evidence
 
 C1 was accepted by merged PR #9. C2 was accepted by merged PR #10 and its
 separate CUDA-autocast cache-dtype correction by merged PR #11. P1-preflight B
-was accepted by merged PR #12. Stage 4 begins from that merged base and remains
-independently review-gated.
+was accepted by merged PR #12. Stage 4 began from that merged base and was
+independently reviewed and accepted by merged PR #13.
 
 ```text
 Stage 4 base / PR #12 merge: a2d43517c45dc39855db81b9286c4abf190a2c14
+Stage 4 merge / Stage 5 base: 3282eae7cb97ecfe01753460f6bce63d03e3cf88
 branch: agent/p0-5-c3-paper-training-contract
 base relation at branch creation: HEAD == origin/main
 base worktree: clean
@@ -37,8 +38,10 @@ source audit date: 2026-08-09
 
 This plan remains the design record. The executed Stage 4 result, CUDA metrics,
 dataset fingerprint, and evidence-retention state are recorded in
-[P0_5_C3_SUMMARY.md](validation_results/P0_5_C3_SUMMARY.md). The local gate
-remains `REVIEW_REQUIRED` until its focused draft PR is reviewed and merged.
+[P0_5_C3_SUMMARY.md](validation_results/P0_5_C3_SUMMARY.md). The focused PR was
+reviewed and merged as PR #13. Its evidence descriptor remains historically
+accurate about partial exact/private retention and the absence of an explicitly
+supplied evidence reviewer.
 
 ## Objective
 
@@ -414,8 +417,11 @@ P0.5-C3 is locally ready for draft-PR review only when:
 - one focused draft PR is opened and the stage stops at REVIEW_REQUIRED.
 ```
 
-Merge review remains a separate acceptance act. Until the focused Stage 4 PR
-is reviewed and merged, final Level 1 requalification must not begin.
+Merge review was the separate acceptance act, completed by merged PR #13.
+Final Level 1 requalification is now the separate current Stage 5 under
+[LEVEL1_CORE_REQUALIFICATION_PLAN.md](LEVEL1_CORE_REQUALIFICATION_PLAN.md); it
+remains pending and is not validated or complete merely because Stage 4 was
+accepted.
 
 ## Explicit exclusions
 

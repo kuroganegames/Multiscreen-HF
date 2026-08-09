@@ -4,6 +4,8 @@ This repository is a P0-qualified research implementation, not a full production
 
 ## Not yet validated
 
+- final Level 1 core requalification and completion of the five-stage program
+- qualifying Stage 5 evidence
 - paper-scale pretraining
 - 28M/286M/1.3B reproduction
 - long-context retrieval benchmarks at paper settings
@@ -96,9 +98,16 @@ hashes; a fingerprint alone is not treated as a content checksum.
 
 Peak-LR exposure checks only finite values and a real bounded update. It does
 not establish a loss decrease, convergence, training quality, paper-global
-batch behavior, or paper training precision. Until the focused Stage 4 PR is
-reviewed and merged, the C3 result remains `REVIEW_REQUIRED` and final Level 1
-requalification has not begun.
+batch behavior, or paper training precision. The focused Stage 4 result was
+reviewed and accepted by merged PR #13; acceptance does not broaden this
+bounded scope.
+
+The historical C3 evidence descriptor remains partial: exact/private retention
+and an explicitly supplied evidence reviewer are still pending. Final Level 1
+requalification is the current Stage 5 under
+[LEVEL1_CORE_REQUALIFICATION_PLAN.md](LEVEL1_CORE_REQUALIFICATION_PLAN.md), but
+it has no accepted qualifying evidence and the five-stage program is not
+complete.
 
 ## P0-2 padding masks
 

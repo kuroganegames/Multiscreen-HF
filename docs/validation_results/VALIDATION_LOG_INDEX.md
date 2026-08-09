@@ -20,7 +20,8 @@ records with explicit gate-specific acceptance states.
 | P0.5-C1 | [P0_5_C1_PLAN.md](../P0_5_C1_PLAN.md) | [P0_5_C1_SUMMARY.md](P0_5_C1_SUMMARY.md) | [P0_5_C1_ARCHITECTURE_MANIFEST.json](P0_5_C1_ARCHITECTURE_MANIFEST.json) | accepted; PR #9 merged |
 | P0.5-C2 | [P0_5_C2_PLAN.md](../P0_5_C2_PLAN.md) | [P0_5_C2_SUMMARY.md](P0_5_C2_SUMMARY.md) | focused deterministic tests | accepted; PR #10 and correction PR #11 merged |
 | P1-preflight B | [P1_PREFLIGHT_B_PLAN.md](../P1_PREFLIGHT_B_PLAN.md) | [P1_PREFLIGHT_B_SUMMARY.md](P1_PREFLIGHT_B_SUMMARY.md) | exact 4.57.6/5.14.1 focused tests and CUDA smokes | accepted; PR #12 merged |
-| P0.5-C3 | [plan][c3-plan] | [summary][c3-summary] | [JSON][c3-json] | local passed; REVIEW_REQUIRED |
+| P0.5-C3 | [plan][c3-plan] | [summary][c3-summary] | [JSON][c3-json] | accepted; PR #13 merged |
+| Final Level 1 requalification | [plan](../LEVEL1_CORE_REQUALIFICATION_PLAN.md) | not yet recorded | not yet recorded | current Stage 5; pending and not validated |
 
 [c3-plan]: ../P0_5_C3_PLAN.md
 [c3-summary]: P0_5_C3_SUMMARY.md
@@ -28,8 +29,9 @@ records with explicit gate-specific acceptance states.
 
 C1 was reviewed and merged as focused PR #9. C2 was merged as PR #10 and its
 CUDA-autocast cache-dtype correction as PR #11. Stage 3 was reviewed and merged
-as PR #12. Stage 4 passed locally on its own branch and remains
-`REVIEW_REQUIRED` until its focused draft PR is reviewed and merged. These
+as PR #12. Stage 4 passed locally and was reviewed and accepted by merged PR
+#13. Final Level 1 requalification is the current pending Stage 5; it has no
+accepted qualifying evidence and the five-stage program is not complete. These
 staged records do not change the accepted P0 boundary or P0-4 retention status.
 
 ## Evidence retention
@@ -51,7 +53,9 @@ sanitized archive. Its archive, manifest, member hashes, `SHA256SUMS`, and
 independent sanitization rescan verified with zero replacements or unresolved
 findings. Exact/private retention is blocked because the external archive
 directory was not configured. The sanitized archive is unpublished local
-staging and acceptance review is pending.
+staging and explicit evidence review is pending. These historical descriptor
+facts remain partial and are separate from the implementation/result acceptance
+recorded by merged PR #13.
 
 This retention status does not reopen the accepted P0-4 result and does not
 validate a P1 model/ecosystem capability. See the

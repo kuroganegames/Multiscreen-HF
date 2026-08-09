@@ -41,12 +41,17 @@ P1-preflight B: gradient-checkpointing API modernization
   accepted and merged in PR #12
 
 P0.5-C3: paper-training-contract smoke
-  current focused Stage 4
+  accepted and merged in PR #13
   local contract, pinned-data, CUDA, regression, and evidence checks passed
   tested source: 8fa5dbf13530c942b2c9e5f03a572bd0cd5ca74f
-  sanitized archive verified; exact/private retention blocked
-  focused draft PR is REVIEW_REQUIRED; acceptance pending
-  do not start final Level 1 requalification before merge
+  sanitized archive verified; exact/private retention and explicit evidence
+  review remain pending in the historical descriptor
+
+final Level 1 requalification and evidence
+  current focused Stage 5
+  plan: docs/LEVEL1_CORE_REQUALIFICATION_PLAN.md
+  pending; no Stage 5 qualifying evidence has been accepted
+  five-stage Level 1 Core program not complete
 
 P1 model/ecosystem capabilities
   none validated
@@ -65,6 +70,7 @@ docs/VALIDATION_STATUS.md
 docs/TESTING.md
 docs/KNOWN_LIMITATIONS.md
 docs/P0_5_C2_PLAN.md
+docs/LEVEL1_CORE_REQUALIFICATION_PLAN.md
 docs/adr/ADR-0001-mipe-position-semantics.md
 docs/P0_5_C3_PLAN.md
 docs/P1_PREFLIGHT_B_PLAN.md
@@ -339,15 +345,16 @@ P0.5-C1       accepted and merged in PR #9
 P0.5-C2       accepted and merged in PR #10
 C2 correction accepted and merged in PR #11
 P1-preflight B accepted and merged in PR #12
-P0.5-C3       local validation passed; focused draft PR REVIEW_REQUIRED
-final P0 core requalification not started
+P0.5-C3       accepted and merged in PR #13
+final P0 core requalification current Stage 5; pending and not validated
 P1-1 PEFT/LoRA smoke remains outside the Level 1 core program
 ```
 
-Do not begin final P0 core requalification until the focused P0.5-C3 draft PR
-has been reviewed and merged. Keep the local C3 pass distinct from acceptance;
-do not describe P0.5-C3 or any later gate as accepted until its focused
-implementation, test contract, evidence, and status update are reviewed.
+P0.5-C3 was accepted by reviewed and merged PR #13. Proceed with final P0 core
+requalification only as the separate Stage 5 defined in
+`docs/LEVEL1_CORE_REQUALIFICATION_PLAN.md`. Do not describe Stage 5 or the full
+Level 1 Core program as validated or complete until its focused implementation,
+test contract, evidence, and status update are reviewed.
 
 ## Validation records
 

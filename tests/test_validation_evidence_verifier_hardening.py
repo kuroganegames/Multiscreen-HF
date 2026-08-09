@@ -215,6 +215,10 @@ class VerifierHardeningTests(unittest.TestCase):
             report["checks"]["sanitization"]["independent_members_scanned"],
             len(self.members),
         )
+        self.assertEqual(
+            report["checks"]["sanitization"]["descriptor_values"],
+            self.descriptor["sanitization"],
+        )
 
     def test_matching_hash_does_not_allow_raw_or_concatenated_gzip_trailers(self) -> None:
         cases = {

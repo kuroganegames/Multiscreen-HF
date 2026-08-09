@@ -5,10 +5,10 @@ This checklist is for tagging, handing off, or resuming work from the P0-qualifi
 ## Current staged gate
 
 ```text
-P0.5-C3: paper-training-contract smoke — local validation passed; REVIEW_REQUIRED
+final Level 1 requalification: current Stage 5 — pending; not validated
 ```
 
-The current focused Stage 4 plan and checked recipe are:
+The accepted Stage 4 plan and checked recipe are:
 
 ```text
 docs/P0_5_C3_PLAN.md
@@ -21,9 +21,16 @@ C1 was reviewed and merged as PR #9. C2 was merged as PR #10, and its separate
 CUDA-autocast cache-dtype correction was merged as PR #11. Stage 3 was reviewed
 and merged as PR #12. Stage 4 unit, pinned-data, CUDA bf16 operational,
 peak-exposure, full regression, and evidence checks passed on tested commit
-`8fa5dbf13530c942b2c9e5f03a572bd0cd5ca74f`. Its focused draft PR is
-`REVIEW_REQUIRED`; acceptance and final Level 1 requalification remain
-pending.
+`8fa5dbf13530c942b2c9e5f03a572bd0cd5ca74f`; the focused Stage 4 result was
+reviewed and accepted by merged PR #13. The existing C3 evidence descriptor
+still records partial retention: exact/private retention and an explicitly
+supplied evidence reviewer remain pending. Those facts are not rewritten by PR
+acceptance.
+
+Final Level 1 requalification is the current Stage 5 under
+[LEVEL1_CORE_REQUALIFICATION_PLAN.md](LEVEL1_CORE_REQUALIFICATION_PLAN.md).
+No qualifying Stage 5 evidence has been accepted, and the five-stage program
+must not be described as validated or complete.
 
 The separate evidence-infrastructure design and historical Codex handoff are:
 
@@ -123,6 +130,11 @@ and the Psi=8-before-Psi=16 CUDA bf16 operational and exact-peak exposure
 commands documented in [TESTING.md](TESTING.md). Do not substitute a local text
 fallback, shortened context, clipping, or a lower learning rate and still call
 the corresponding Stage 4 lane passed.
+
+For final Level 1 requalification, follow the complete matrix, provenance,
+review, and evidence-retention boundary in
+[LEVEL1_CORE_REQUALIFICATION_PLAN.md](LEVEL1_CORE_REQUALIFICATION_PLAN.md).
+Stage 4 acceptance alone is not Stage 5 evidence or Level 1 completion.
 
 For P1-preflight A, also run:
 
