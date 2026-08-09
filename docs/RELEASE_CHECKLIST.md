@@ -5,19 +5,20 @@ This checklist is for tagging, handing off, or resuming work from the P0-qualifi
 ## Current staged gate
 
 ```text
-P0.5-C2: long-position / MiPE / cache semantics — local pass, REVIEW_REQUIRED
+P1-preflight B: gradient-checkpointing API modernization — local pass, REVIEW_REQUIRED
 ```
 
-The focused C2 records are:
+The current focused Stage 3 records are:
 
 ```text
-docs/adr/ADR-0001-mipe-position-semantics.md
-docs/P0_5_C2_PLAN.md
-docs/validation_results/P0_5_C2_SUMMARY.md
+docs/P1_PREFLIGHT_B_PLAN.md
+docs/validation_results/P1_PREFLIGHT_B_SUMMARY.md
 ```
 
-C1 was reviewed and merged as PR #9. C2 remains unaccepted until its separate
-draft PR is reviewed and merged; Stage 3 must not begin first.
+C1 was reviewed and merged as PR #9. C2 was merged as PR #10, and its separate
+CUDA-autocast cache-dtype correction was merged as PR #11. Stage 3 remains
+unaccepted until its focused draft PR is reviewed and merged; P0.5-C3 must not
+begin first.
 
 The separate evidence-infrastructure design and historical Codex handoff are:
 
@@ -26,8 +27,8 @@ docs/P1_PREFLIGHT_A_PLAN.md
 docs/CODEX_P1_PREFLIGHT_A_HANDOFF.md
 ```
 
-P1-preflight A remains evidence infrastructure and remains partial/blocked. C2
-does not complete its private retention or acceptance-review requirements.
+P1-preflight A remains evidence infrastructure and remains partial/blocked.
+Neither C2 nor Stage 3 completes its retention or acceptance-review requirements.
 
 P1-preflight A infrastructure is implemented and tested, but the gate remains
 `PARTIAL/BLOCKED WITH EVIDENCE`. All four retained Psi=8/Psi=16 summary and
@@ -99,6 +100,16 @@ python scripts/p0_4_gpt2_context4096_smoke.py \
 python scripts/p0_4_gpt2_context4096_smoke.py \
   --config-dir configs/p0_4_multiscreen_psi16_gpt2_ctx4096 \
   --validate-config-only
+```
+
+For P1-preflight B, also run the focused contract under both exact compatibility
+lanes described in [TESTING.md](TESTING.md):
+
+```bash
+python -m unittest discover \
+  -s tests \
+  -p 'test_gradient_checkpointing_contract.py' \
+  -v
 ```
 
 For P1-preflight A, also run:

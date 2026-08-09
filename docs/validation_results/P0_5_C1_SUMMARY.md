@@ -5,14 +5,17 @@
 ```text
 Local gate result: passed
 Acceptance state: accepted; focused PR #9 merged 2026-08-07
-Next stage: P0.5-C2 local gate passed; REVIEW_REQUIRED
+Later status: P0.5-C2 accepted; PR #10 and correction PR #11 merged
+Current staged gate: P1-preflight B local pass; REVIEW_REQUIRED
 ```
 
 The focused C1 implementation and local validation passed on 2026-08-06. The
 focused draft PR #9 was subsequently merged on 2026-08-07, so C1 is accepted.
-That acceptance does not validate C2, P1-preflight B, C3, final Level 1
-requalification, or any P1 ecosystem capability. C2 remains separately
-review-gated.
+At that review boundary, C1 acceptance did not validate C2, P1-preflight B,
+C3, final Level 1 requalification, or any P1 ecosystem capability. C2 was
+later accepted independently by merged PR #10, with the separate CUDA-autocast
+correction merged as PR #11. P1-preflight B is the current local-pass,
+`REVIEW_REQUIRED` gate.
 
 ## Provenance
 

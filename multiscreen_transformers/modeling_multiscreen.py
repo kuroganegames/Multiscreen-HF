@@ -15,7 +15,6 @@ from typing import Any, Optional
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.utils.checkpoint import checkpoint as grad_checkpoint
 from transformers import PreTrainedModel
 try:  # Transformers >=4.50 separates generation helpers from PreTrainedModel.
     from transformers.generation import GenerationMixin
@@ -373,25 +372,23 @@ class MultiscreenPreTrainedModel(PreTrainedModel):
 
         return None
 
-    def _set_gradient_checkpointing(
+    def gradient_checkpointing_enable(
         self,
-        module: nn.Module | None = None,
-        value: bool = False,
-        enable: bool | None = None,
-        gradient_checkpointing_func: Any | None = None,
+        gradient_checkpointing_kwargs: dict[str, Any] | None = None,
     ) -> None:
-        # Accept both the older Transformers hook signature
-        #   _set_gradient_checkpointing(module, value=False)
-        # and the newer one
-        #   _set_gradient_checkpointing(enable=True, gradient_checkpointing_func=...).
-        flag = value if enable is None else enable
-        if module is None:
-            for child in self.modules():
-                if isinstance(child, MultiscreenModel):
-                    child.gradient_checkpointing = bool(flag)
-            return
-        if isinstance(module, MultiscreenModel):
-            module.gradient_checkpointing = bool(flag)
+        """Enable the supported Transformers checkpointing path non-reentrantly.
+
+        Transformers 4.57 defaults to reentrant checkpointing while newer
+        releases default to non-reentrant checkpointing. Multiscreen's validated
+        training path is non-reentrant, so make that cross-version default
+        explicit while still honoring caller-supplied checkpoint kwargs.
+        """
+
+        checkpointing_kwargs = dict(gradient_checkpointing_kwargs or {})
+        checkpointing_kwargs.setdefault("use_reentrant", False)
+        super().gradient_checkpointing_enable(
+            gradient_checkpointing_kwargs=checkpointing_kwargs
+        )
 
 
 class MultiscreenModel(MultiscreenPreTrainedModel):
@@ -404,7 +401,11 @@ class MultiscreenModel(MultiscreenPreTrainedModel):
     def __init__(self, config: MultiscreenConfig) -> None:
         super().__init__(config)
         self.config = config
-        self.gradient_checkpointing = bool(config.gradient_checkpointing)
+        # Runtime checkpointing is installed by PreTrainedModel.post_init() for
+        # legacy config opt-in, or by gradient_checkpointing_enable(). Keeping
+        # this false until then guarantees that a true flag has an installed
+        # `_gradient_checkpointing_func` alongside it.
+        self.gradient_checkpointing = False
         self.zero_pad_hidden_states = bool(config.zero_pad_hidden_states)
 
         d_e = config.hidden_size
@@ -613,7 +614,7 @@ class MultiscreenModel(MultiscreenPreTrainedModel):
                     )
                     return y
 
-                hidden_states = grad_checkpoint(custom_forward, hidden_states, use_reentrant=False)
+                hidden_states = self._gradient_checkpointing_func(custom_forward, hidden_states)
                 new_kv = None
             else:
                 hidden_states, new_kv = layer(

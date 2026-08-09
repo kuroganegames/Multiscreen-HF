@@ -3,10 +3,14 @@
 ## Status
 
 ```text
-Decision: proposed for P0.5-C2
+Decision: accepted for P0.5-C2 by merged PR #10
 Source audit completed: 2026-08-07
-Acceptance: pending focused draft-PR review and merge
+Acceptance: accepted; PR #10 merged 2026-08-08
 ```
+
+PR #11, merged 2026-08-09, separately corrected CUDA-autocast cache-dtype
+prediction to follow the runtime post-normalization dtype. It did not change
+this ADR's MiPE position modes, wrap-boundary decision, or migration policy.
 
 ## Context
 

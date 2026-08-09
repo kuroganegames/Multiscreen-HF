@@ -27,6 +27,9 @@ P0.5-C1: architecture / initialization / all-scale contract
   Status: complete; focused PR #9 reviewed and merged
 
 P0.5-C2: long-position / MiPE / cache semantics
+  Status: complete; focused PR #10 merged; corrective PR #11 merged
+
+P1-preflight B: gradient-checkpointing API modernization
   Status: local gate passed; REVIEW_REQUIRED; not yet accepted
 ```
 
@@ -381,8 +384,8 @@ P0.5-C1 is accepted from merged PR #9. Its meta-only all-scale architecture,
 initialization, tied-embedding, config, and packed-text contracts are recorded
 in [P0_5_C1_SUMMARY.md](validation_results/P0_5_C1_SUMMARY.md).
 
-The focused P0.5-C2 local gate has passed but remains `REVIEW_REQUIRED` until
-its separate draft pull request is reviewed and merged. C2 adds explicit
+P0.5-C2 was accepted from merged PR #10, and its separate CUDA-autocast
+cache-dtype prediction correction was merged as PR #11. C2 adds explicit
 serialized MiPE modes:
 
 ```text
@@ -403,9 +406,25 @@ See [ADR-0001](adr/ADR-0001-mipe-position-semantics.md),
 not demonstrate dense 131K feasibility, retrieval quality, efficiency, or a
 P1 model/ecosystem capability.
 
+P1-preflight B replaces the deprecated checkpointing hook with the supported
+Transformers runtime API, preserves an explicit non-reentrant default, and
+invokes the function installed by Transformers. Its focused tests passed under
+exact Transformers 4.57.6 and 5.14.1 lanes without the old-format or
+missing-input-gradient warnings. Deterministic logits/loss/gradient agreement,
+custom function injection, finite optimization, transient serialization,
+save/reload, and greedy generation contracts passed.
+
+Full P0-1/P0-2 CPU fp32 and CUDA bf16 regressions also passed. A checkpointed
+CUDA bf16 TinyStories Psi=8/Psi=16 smoke and a reduced Psi=8 context-1024 P0-4
+checkpointed diagnostic completed all postchecks. The latter is explicitly
+non-qualifying and does not replace the accepted historical P0-4 result. See
+[P1_PREFLIGHT_B_PLAN.md](P1_PREFLIGHT_B_PLAN.md) and
+[P1_PREFLIGHT_B_SUMMARY.md](validation_results/P1_PREFLIGHT_B_SUMMARY.md).
+This Stage 3 result remains `REVIEW_REQUIRED` until merge.
+
 ## Next validation boundary
 
-P0-4 and P0.5-C1 are complete. C2 is locally passed but unaccepted. The next
-action is review and merge of the focused C2 draft PR. P1-preflight B must not
-begin until that review gate is complete. No P1 ecosystem capability is
-validated yet.
+P0-4, P0.5-C1, and P0.5-C2 are complete. P1-preflight B passed its local gate
+but remains unaccepted. The next action is review and merge of its focused
+draft PR; P0.5-C3 must not begin first. No P1 ecosystem capability is validated
+yet.

@@ -30,6 +30,17 @@ P1-preflight A: validation provenance / evidence retention v1
   acceptance review pending: no explicit reviewer supplied
   no public asset
 
+P0.5-C1: architecture / initialization / all-scale contract
+  accepted and merged in PR #9
+
+P0.5-C2: long-position / MiPE / cache semantics
+  accepted and merged in PR #10
+  CUDA-autocast cache-dtype correction merged in PR #11
+
+P1-preflight B: gradient-checkpointing API modernization
+  implementation and local validation complete
+  acceptance review pending; do not start P0.5-C3 before merge
+
 P1 model/ecosystem capabilities
   none validated
 ```
@@ -46,6 +57,9 @@ docs/HANDOFF.md
 docs/VALIDATION_STATUS.md
 docs/TESTING.md
 docs/KNOWN_LIMITATIONS.md
+docs/P0_5_C2_PLAN.md
+docs/adr/ADR-0001-mipe-position-semantics.md
+docs/P1_PREFLIGHT_B_PLAN.md
 docs/P1_PREFLIGHT_A_PLAN.md
 docs/CODEX_P1_PREFLIGHT_A_HANDOFF.md
 docs/LOGGING_POLICY.md
@@ -53,6 +67,8 @@ docs/EVIDENCE_ARCHIVE_POLICY.md
 docs/REPOSITORY_AUDIT.md
 docs/RELEASE_CHECKLIST.md
 docs/validation_results/VALIDATION_LOG_INDEX.md
+docs/validation_results/P0_5_C2_SUMMARY.md
+docs/validation_results/P1_PREFLIGHT_B_SUMMARY.md
 docs/validation_results/P0_4_SUMMARY.md
 docs/validation_results/P0_4_SUMMARY.json
 docs/validation_results/P0_4_EVIDENCE_ARCHIVE.json
@@ -202,7 +218,7 @@ position or mask behavior
 
 P1-preflight A must not change those files. A model-core diff is a scope violation, not a reason to expand the gate.
 
-## P1-preflight A scope
+## P1-preflight A scope (historical gate-specific contract)
 
 The implemented infrastructure follows [docs/P1_PREFLIGHT_A_PLAN.md](docs/P1_PREFLIGHT_A_PLAN.md), and the Codex Goal is in [docs/CODEX_P1_PREFLIGHT_A_HANDOFF.md](docs/CODEX_P1_PREFLIGHT_A_HANDOFF.md).
 
@@ -306,18 +322,21 @@ A CPU, shorter-context, different-dtype, or fewer-step run is diagnostic only. S
 
 ## Future validation strategy
 
-After P1-preflight A is completed, reviewed, and merged, the planned sequence is:
+The staged Level 1 core sequence currently stands at:
 
 ```text
-P0.5-C1  architecture / initialization / all-scale contract
-P0.5-C2  long-position / MiPE / cache semantics
-P1-preflight B  gradient-checkpointing API modernization
-P0.5-C3  paper-training-contract smoke
-final P0 core requalification
-P1-1  PEFT/LoRA smoke
+P0.5-C1       accepted and merged in PR #9
+P0.5-C2       accepted and merged in PR #10
+C2 correction accepted and merged in PR #11
+P1-preflight B implementation and local validation complete; review required
+P0.5-C3       not started
+final P0 core requalification not started
+P1-1 PEFT/LoRA smoke remains outside the Level 1 core program
 ```
 
-Do not describe any later gate as validated until it has a focused implementation, test contract, reviewed evidence, and status update.
+Do not begin P0.5-C3 until the focused P1-preflight B draft PR has been
+reviewed and merged. Do not describe any later gate as validated until it has a
+focused implementation, test contract, reviewed evidence, and status update.
 
 ## Validation records
 

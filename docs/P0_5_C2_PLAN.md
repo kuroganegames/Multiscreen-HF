@@ -5,7 +5,7 @@
 ```text
 Gate: P0.5-C2
 State: implementation and focused local validation passed
-Acceptance: REVIEW_REQUIRED; pending focused draft-PR review and merge
+Acceptance: accepted; focused PR #10 merged on 2026-08-08
 Accepted P0 boundary: unchanged through P0-4
 P1 model/ecosystem capabilities validated by this gate: none
 ```
@@ -20,10 +20,11 @@ P0.5-C3        paper-training-contract smoke
 final Level 1 requalification and evidence
 ```
 
-This plan does not record an accepted C2 result. The stage remains unaccepted
-until its focused draft pull request is reviewed and merged. It does not reopen
-the accepted P0-1 through P0-4 results, complete the historical P0-4 retention
-descriptor, or authorize work from a later Level 1 stage.
+The focused C2 implementation was reviewed and merged as PR #10. A separate
+post-merge CUDA-autocast cache-dtype prediction correction was reviewed and
+merged as PR #11 on 2026-08-09. Neither PR reopens the accepted P0-1 through
+P0-4 results, completes the historical P0-4 retention descriptor, or validates
+a P1 model/ecosystem capability.
 
 ## Objective
 
@@ -34,8 +35,8 @@ reference wrap boundary from the configured context length, and verify the
 scalar contiguous cache contract across the historical 4096 boundary.
 
 The source decision and its alternatives are recorded in
-[ADR-0001](adr/ADR-0001-mipe-position-semantics.md). The ADR remains proposed
-until the focused C2 pull request is reviewed and merged.
+[ADR-0001](adr/ADR-0001-mipe-position-semantics.md). The decision was accepted
+with PR #10; PR #11 did not change the position semantics.
 
 ## Source audit
 
@@ -356,8 +357,9 @@ C2 is locally ready for draft-PR review only when:
 - no dense 131K, retrieval-quality, efficiency, or later-stage claim is made.
 ```
 
-Merge review is a separate acceptance act. Until the focused draft PR is
-reviewed and merged, C2 remains unaccepted and Stage 3 must not begin.
+Merge review was a separate acceptance act and was completed by merged PR #10.
+The later PR #11 correction was also separately reviewed and merged before
+Stage 3 resumed.
 
 ## Explicit exclusions
 
