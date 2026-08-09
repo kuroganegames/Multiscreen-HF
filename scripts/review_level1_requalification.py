@@ -2490,10 +2490,16 @@ def _review_c3_lane(
         0.0006 if mode == "operational" else 0.0625,
         label=f"{logical}.executed_peak_learning_rate",
     )
+    diagnostic_reduced_from_paper = (
+        _at(scheduler, "executed_warmup_steps")
+        != _at(scheduler, "paper_warmup_steps")
+        or _at(scheduler, "executed_peak_learning_rate")
+        != _at(scheduler, "paper_peak_learning_rate")
+    )
     _exact_bool(
         _at(scheduler, "diagnostic_reduced_from_paper"),
         label=f"{logical}.diagnostic_reduced_from_paper",
-        expected=mode == "operational",
+        expected=diagnostic_reduced_from_paper,
     )
     betas = _list(_at(optimizer, "betas"), label=f"{logical}.optimizer.betas")
     if len(betas) != 2:

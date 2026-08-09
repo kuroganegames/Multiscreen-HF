@@ -293,7 +293,10 @@ The separate peak lane performs one bounded context-4096 update at the exact
 paper peak LR 0.0625. Both use CUDA bf16, paper-absolute MiPE, fp32 auxiliary
 MiPE/Softmask math, AdamW betas `(0.9, 0.95)`, zero weight decay, the explicitly
 labeled repository epsilon `1e-8`, non-fused AdamW, supported non-reentrant
-checkpointing, and no clipping. Neither lane reproduces the paper global batch,
+checkpointing, and no clipping. Both summaries therefore record
+`diagnostic_reduced_from_paper=true`: the operational lane reduces warmup and
+LR, while peak exposure reduces warmup even though its exposed peak LR is exact.
+Neither lane reproduces the paper global batch,
 duration, corpus selection, training precision, quality, or efficiency.
 
 The inspected result is recorded in

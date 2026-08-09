@@ -185,6 +185,10 @@ class ManifestContractTests(unittest.TestCase):
             self.manifest["paper_recipe"]["scheduler"]["peak_learning_rate"],
         )
         self.assertEqual(exposure["peak_learning_rate"], 0.0625)
+        self.assertNotEqual(
+            exposure["warmup_steps"],
+            self.manifest["paper_recipe"]["scheduler"]["warmup_steps"],
+        )
         self.assertFalse(exposure["require_loss_decrease"])
         self.assertFalse(operational["gradient_clipping"])
         self.assertFalse(exposure["gradient_clipping"])

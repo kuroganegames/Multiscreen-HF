@@ -598,7 +598,7 @@ class EvidenceFixture:
                 "executed_warmup_steps": 2 if operational else 1,
                 "executed_peak_learning_rate": 0.0006 if operational else 0.0625,
                 "observed_learning_rates": lrs,
-                "diagnostic_reduced_from_paper": operational,
+                "diagnostic_reduced_from_paper": True,
             },
             "training": {
                 "optimizer_steps": len(lrs),
@@ -2010,6 +2010,22 @@ class Level1EvidenceReviewTests(unittest.TestCase):
                 mutate(summary)
                 write_json(path, summary)
                 self.assert_rejected(expected)
+
+    def test_c3_peak_exposure_truthfully_records_reduced_warmup(self) -> None:
+        root = self.fixture.c3_roots["c3_psi8_peak_exposure"]
+        path = root / "summary.json"
+        summary = json.loads(path.read_text(encoding="utf-8"))
+        scheduler = summary["scheduler"]
+
+        self.assertEqual(scheduler["paper_warmup_steps"], 4096)
+        self.assertEqual(scheduler["executed_warmup_steps"], 1)
+        self.assertEqual(scheduler["paper_peak_learning_rate"], 0.0625)
+        self.assertEqual(scheduler["executed_peak_learning_rate"], 0.0625)
+        self.assertTrue(scheduler["diagnostic_reduced_from_paper"])
+
+        scheduler["diagnostic_reduced_from_paper"] = False
+        write_json(path, summary)
+        self.assert_rejected("diagnostic_reduced_from_paper")
 
     def test_c3_event_schema_tracked_parameter_and_peaks_are_bound(self) -> None:
         cases = (
