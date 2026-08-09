@@ -63,7 +63,7 @@ def _tanh_norm(x: torch.Tensor, *, eps: float = 1e-8) -> torch.Tensor:
 
 
 def _multiscreen_expected_cache_dtype(x: torch.Tensor) -> torch.dtype:
-    """Return the projection/cache dtype under the active autocast context."""
+    """Return the post-normalization cache dtype under active autocast."""
 
     device_type = x.device.type
     try:
@@ -73,17 +73,24 @@ def _multiscreen_expected_cache_dtype(x: torch.Tensor) -> torch.dtype:
     if not autocast_enabled:
         return x.dtype
     # Autocast leaves float64 (and other non-eligible dtypes) unchanged. Cache
-    # validation must follow the projection result rather than the target dtype.
+    # validation must preserve those dtypes instead of applying its target dtype.
     if x.dtype not in {torch.float16, torch.bfloat16, torch.float32}:
         return x.dtype
     try:
-        return torch.get_autocast_dtype(device_type)
+        target_dtype = torch.get_autocast_dtype(device_type)
     except (AttributeError, TypeError):  # pragma: no cover - older torch fallback.
         if device_type == "cuda":
-            return torch.get_autocast_gpu_dtype()
-        if device_type == "cpu":
-            return torch.get_autocast_cpu_dtype()
-        return x.dtype
+            target_dtype = torch.get_autocast_gpu_dtype()
+        elif device_type == "cpu":
+            target_dtype = torch.get_autocast_cpu_dtype()
+        else:
+            return x.dtype
+    # Cache tensors are unit-normalized projections. Autocast policies for
+    # normalization differ by backend: CUDA promotes bf16/fp16 normalization to
+    # fp32, while CPU bf16 normalization remains bf16. Probe the exact operator
+    # with zero elements instead of assuming the GEMM target dtype.
+    normalization_probe = torch.empty((0, 1), device=x.device, dtype=target_dtype)
+    return F.normalize(normalization_probe, dim=-1).dtype
 
 
 def convert_original_state_dict_for_causal_lm(
