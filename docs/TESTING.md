@@ -215,6 +215,10 @@ python -m unittest discover \
 python scripts/p0_5_c3_paper_training_contract.py --mode contract
 ```
 
+Run the focused suite in separate exact Transformers 4.57.6 and 5.14.1
+environments. The `gradient-checkpointing-compat` CI matrix installs and
+verifies both exact versions, then runs this same C3 focused suite in each lane.
+
 For the pinned data and CUDA bf16 lanes, set an existing Hugging Face cache and
 an absolute output root outside every Git worktree. Every leaf output directory
 must be new: the harness refuses to overwrite a previous success or failure.
@@ -281,8 +285,10 @@ labeled repository epsilon `1e-8`, non-fused AdamW, supported non-reentrant
 checkpointing, and no clipping. Neither lane reproduces the paper global batch,
 duration, corpus selection, training precision, quality, or efficiency.
 
-See [P0_5_C3_PLAN.md](P0_5_C3_PLAN.md). A compact result and evidence descriptor
-are added only after the actual outputs are inspected, sanitized, and verified.
+The inspected result is recorded in
+[P0_5_C3_SUMMARY.md](validation_results/P0_5_C3_SUMMARY.md), with archive
+identity and retention state in
+[P0_5_C3_EVIDENCE_ARCHIVE.json](validation_results/P0_5_C3_EVIDENCE_ARCHIVE.json).
 Stage 4 remains `REVIEW_REQUIRED` until its focused PR is reviewed and merged.
 
 ## P0-1

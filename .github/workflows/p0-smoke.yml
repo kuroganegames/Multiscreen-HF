@@ -197,6 +197,18 @@ jobs:
             -s tests \
             -p 'test_gradient_checkpointing_contract.py' \
             -v
+
+      - name: Run focused paper training contract
+        env:
+          PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/oracle
+        run: |
+          python -m py_compile \
+            scripts/p0_5_c3_paper_training_contract.py \
+            tests/test_paper_training_contract.py
+          python -m unittest discover \
+            -s tests \
+            -p 'test_paper_training_contract.py' \
+            -v
   p0-smoke:
     name: P0 CPU smoke
     runs-on: ubuntu-latest

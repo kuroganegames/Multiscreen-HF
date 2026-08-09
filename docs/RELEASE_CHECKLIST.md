@@ -5,7 +5,7 @@ This checklist is for tagging, handing off, or resuming work from the P0-qualifi
 ## Current staged gate
 
 ```text
-P0.5-C3: paper-training-contract smoke — implementation/validation in progress
+P0.5-C3: paper-training-contract smoke — local validation passed; REVIEW_REQUIRED
 ```
 
 The current focused Stage 4 plan and checked recipe are:
@@ -13,13 +13,17 @@ The current focused Stage 4 plan and checked recipe are:
 ```text
 docs/P0_5_C3_PLAN.md
 configs/p0_5_c3_paper_training_contract.json
+docs/validation_results/P0_5_C3_SUMMARY.{md,json}
+docs/validation_results/P0_5_C3_EVIDENCE_ARCHIVE.json
 ```
 
 C1 was reviewed and merged as PR #9. C2 was merged as PR #10, and its separate
 CUDA-autocast cache-dtype correction was merged as PR #11. Stage 3 was reviewed
-and merged as PR #12. Stage 4 must pass its separate unit, pinned-data, CUDA
-bf16 operational, peak-exposure, regression, and evidence checks before its own
-focused draft PR is reviewable.
+and merged as PR #12. Stage 4 unit, pinned-data, CUDA bf16 operational,
+peak-exposure, full regression, and evidence checks passed on tested commit
+`8fa5dbf13530c942b2c9e5f03a572bd0cd5ca74f`. Its focused draft PR is
+`REVIEW_REQUIRED`; acceptance and final Level 1 requalification remain
+pending.
 
 The separate evidence-infrastructure design and historical Codex handoff are:
 

@@ -13,10 +13,10 @@ Current evidence-infrastructure gate:
 > **P1-preflight A: validation provenance and evidence retention v1 — partial.** The schema, standard-library provenance/packaging/verification tools, synthetic tests, and policy are implemented. All four retained P0-4 summary/metrics files matched their committed hashes; both completion markers were found and hashed for the new descriptor; and a sanitized archive verified locally. Durable exact/private retention is blocked because `MULTISCREEN_EVIDENCE_ARCHIVE_DIR` was not configured, and acceptance review remains pending because no explicit reviewer was supplied. P0-4 remains complete; no P1 model/ecosystem capability is validated.
 
 Staged Level 1 Core status: **P0.5-C1, P0.5-C2, and P1-preflight B are
-accepted; P0.5-C3 is the current focused stage.** C1 was merged as PR #9, C2
-as PR #10, the separate C2 CUDA-autocast cache-dtype correction as PR #11, and
-Stage 3 as PR #12. Stage 4 implementation and validation are in progress; no
-Stage 4 result has been accepted.
+accepted; P0.5-C3 passed locally and is REVIEW_REQUIRED.** C1 was merged as
+PR #9, C2 as PR #10, the separate C2 CUDA-autocast cache-dtype correction as
+PR #11, and Stage 3 as PR #12. Stage 4 contract, data, CUDA, regression, and
+evidence checks passed; acceptance remains pending.
 
 ## Start here
 
@@ -41,6 +41,8 @@ Stage 4 result has been accepted.
 - Stage 3 plan: [docs/P1_PREFLIGHT_B_PLAN.md](docs/P1_PREFLIGHT_B_PLAN.md)
 - Stage 3 accepted result: [docs/validation_results/P1_PREFLIGHT_B_SUMMARY.md](docs/validation_results/P1_PREFLIGHT_B_SUMMARY.md)
 - Stage 4 plan: [docs/P0_5_C3_PLAN.md](docs/P0_5_C3_PLAN.md)
+- Stage 4 local result: [docs/validation_results/P0_5_C3_SUMMARY.md](docs/validation_results/P0_5_C3_SUMMARY.md)
+- [Stage 4 evidence descriptor](docs/validation_results/P0_5_C3_EVIDENCE_ARCHIVE.json)
 
 ## Current Level 1 stage
 
@@ -50,13 +52,17 @@ no-gradient-clipping recipe as executable contracts. The paper contract and
 the repository's operational choices are recorded separately in the
 [Stage 4 plan](docs/P0_5_C3_PLAN.md).
 
-Stage 4 implementation and validation are in progress. Its unit checks,
-data-contract checks, local CUDA bf16 operational smoke, and bounded
-peak-learning-rate exposure must be executed and reviewed before acceptance.
-Any workstation run uses reduced batch or duration settings and is a project
-diagnostic, not a paper-scale reproduction or quality claim. Final Level 1
-requalification remains a separate Stage 5 after the focused Stage 4 PR is
-reviewed and merged.
+The exact contract, pinned-data lane, two-version focused tests, full P0
+regressions, and Psi=8/Psi=16 CUDA bf16 operational and peak-exposure
+diagnostics passed on tested commit
+`8fa5dbf13530c942b2c9e5f03a572bd0cd5ca74f`; see the
+[Stage 4 local result](docs/validation_results/P0_5_C3_SUMMARY.md).
+
+Stage 4 remains `REVIEW_REQUIRED` and is not accepted until its focused draft
+PR is reviewed and merged. The CUDA runs use reduced batch or duration settings
+and are project diagnostics, not paper-scale reproduction, quality, or
+efficiency claims. Final Level 1 requalification remains a separate Stage 5
+after that merge.
 
 ## What is included
 
@@ -305,7 +311,7 @@ codex
 Not yet validated:
 
 - P1-preflight A acceptance review and durable exact/private retention
-- P0.5-C3 paper-training-contract implementation, validation, and acceptance
+- P0.5-C3 acceptance; local validation passed and focused review is pending
 - final Level 1 core requalification
 - paper-scale pretraining or paper-quality reproduction
 - long-context retrieval at paper settings

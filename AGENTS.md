@@ -42,8 +42,11 @@ P1-preflight B: gradient-checkpointing API modernization
 
 P0.5-C3: paper-training-contract smoke
   current focused Stage 4
-  implementation and validation in progress
-  acceptance pending; do not start final Level 1 requalification before merge
+  local contract, pinned-data, CUDA, regression, and evidence checks passed
+  tested source: 8fa5dbf13530c942b2c9e5f03a572bd0cd5ca74f
+  sanitized archive verified; exact/private retention blocked
+  focused draft PR is REVIEW_REQUIRED; acceptance pending
+  do not start final Level 1 requalification before merge
 
 P1 model/ecosystem capabilities
   none validated
@@ -77,6 +80,8 @@ docs/validation_results/P1_PREFLIGHT_B_SUMMARY.md
 docs/validation_results/P0_4_SUMMARY.md
 docs/validation_results/P0_4_SUMMARY.json
 docs/validation_results/P0_4_EVIDENCE_ARCHIVE.json
+docs/validation_results/P0_5_C3_SUMMARY.md
+docs/validation_results/P0_5_C3_EVIDENCE_ARCHIVE.json
 ```
 
 The P0-4 plan and Codex handoff are retained reproduction/history documents; they do not mean P0-4 is pending:
@@ -334,15 +339,15 @@ P0.5-C1       accepted and merged in PR #9
 P0.5-C2       accepted and merged in PR #10
 C2 correction accepted and merged in PR #11
 P1-preflight B accepted and merged in PR #12
-P0.5-C3       implementation and validation in progress; acceptance pending
+P0.5-C3       local validation passed; focused draft PR REVIEW_REQUIRED
 final P0 core requalification not started
 P1-1 PEFT/LoRA smoke remains outside the Level 1 core program
 ```
 
 Do not begin final P0 core requalification until the focused P0.5-C3 draft PR
-has been reviewed and merged. Do not describe P0.5-C3 or any later gate as
-validated until it has a focused implementation, test contract, reviewed
-evidence, and status update.
+has been reviewed and merged. Keep the local C3 pass distinct from acceptance;
+do not describe P0.5-C3 or any later gate as accepted until its focused
+implementation, test contract, evidence, and status update are reviewed.
 
 ## Validation records
 

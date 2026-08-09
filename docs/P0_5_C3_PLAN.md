@@ -4,7 +4,7 @@
 
 ```text
 Gate: P0.5-C3
-State: implementation and validation in progress
+State: local validation passed; focused draft PR REVIEW_REQUIRED
 Acceptance: pending; REVIEW_REQUIRED after the local gate until focused PR merge
 Accepted P0 boundary: unchanged through P0-4
 P1 model/ecosystem capabilities validated by this gate: none
@@ -35,9 +35,10 @@ base porcelain SHA-256: e3b0c44298fc1c149afbf4f8996fb92427ae41e4649b934ca495991b
 source audit date: 2026-08-09
 ```
 
-This plan is not a result record. No Stage 4 local pass, CUDA result, dataset
-fingerprint, or peak-learning-rate exposure is claimed until the corresponding
-artifacts have been executed, inspected, and summarized.
+This plan remains the design record. The executed Stage 4 result, CUDA metrics,
+dataset fingerprint, and evidence-retention state are recorded in
+[P0_5_C3_SUMMARY.md](validation_results/P0_5_C3_SUMMARY.md). The local gate
+remains `REVIEW_REQUIRED` until its focused draft PR is reviewed and merged.
 
 ## Objective
 

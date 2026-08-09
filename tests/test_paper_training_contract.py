@@ -135,12 +135,24 @@ class ManifestContractTests(unittest.TestCase):
             ("paper beta", lambda value: value["paper_recipe"]["optimizer"]["betas"].__setitem__(1, 0.999)),
             ("weight decay", lambda value: value["paper_recipe"]["optimizer"].__setitem__("weight_decay", 0.1)),
             (
+                "weight decay JSON type",
+                lambda value: value["paper_recipe"]["optimizer"].__setitem__(
+                    "weight_decay", False
+                ),
+            ),
+            (
                 "gradient clipping",
                 lambda value: value["paper_recipe"]["gradient_clipping"].__setitem__(
                     "enabled", True
                 ),
             ),
             ("paper peak", lambda value: value["paper_recipe"]["scheduler"].__setitem__("peak_learning_rate", 0.01)),
+            (
+                "gradient clipping JSON type",
+                lambda value: value["paper_recipe"]["gradient_clipping"].__setitem__(
+                    "enabled", 0
+                ),
+            ),
             ("warmup", lambda value: value["paper_recipe"]["scheduler"].__setitem__("warmup_steps", 4095)),
             ("sequence", lambda value: value["model"].__setitem__("sequence_length", 2048)),
             ("dataset revision", lambda value: value["dataset"].__setitem__("revision", "0" * 40)),

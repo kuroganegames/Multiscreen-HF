@@ -373,7 +373,9 @@ def validate_manifest(manifest: Mapping[str, Any]) -> dict[str, Any]:
 
     for path, expected in EXPECTED_VALUES.items():
         actual = _value_at(manifest, path)
-        if actual != expected:
+        actual_canonical = canonical_json_bytes(actual)
+        expected_canonical = canonical_json_bytes(expected)
+        if actual_canonical != expected_canonical:
             raise ValueError(
                 f"checked manifest value {path} changed: expected {expected!r}, got {actual!r}"
             )

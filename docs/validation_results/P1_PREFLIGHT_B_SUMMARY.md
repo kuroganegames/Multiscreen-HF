@@ -5,14 +5,16 @@
 ```text
 Local gate result: passed
 Acceptance state: accepted; PR #12 merged
-Next stage: P0.5-C3 in progress on a separate branch
+Next stage: P0.5-C3 passed locally; REVIEW_REQUIRED
 ```
 
 The supported Transformers gradient-checkpointing contract, exact two-release
 compatibility matrix, strong P0 regressions, and checkpointed CUDA smokes
 passed on 2026-08-09 and were accepted when focused PR #12 was reviewed and
-merged. That acceptance does not validate P0.5-C3, final Level 1
-requalification, PEFT, or any P1 model/ecosystem capability.
+merged. That acceptance did not validate P0.5-C3. The later local C3 pass is
+recorded separately and remains `REVIEW_REQUIRED`; final Level 1
+requalification, PEFT, and all P1 model/ecosystem capabilities remain
+unvalidated.
 
 ## Provenance
 

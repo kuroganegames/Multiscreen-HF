@@ -33,7 +33,7 @@ P1-preflight B: gradient-checkpointing API modernization
   Status: complete; focused PR #12 reviewed and merged
 
 P0.5-C3: paper-training-contract smoke
-  Status: implementation and validation in progress; acceptance pending
+  Status: local validation passed; focused draft PR REVIEW_REQUIRED
 ```
 
 The current implementation can be considered a **P0-qualified research implementation through P0-4**. P0-4 was accepted only from reviewed qualifying Psi=8/Psi=16 CUDA bf16 artifacts; static config validation and reduced diagnostics remain non-qualifying substitutes.
@@ -429,21 +429,26 @@ P0.5-C3 is the current focused Stage 4. It encodes the paper's tokenizer,
 data-stream, optimizer, scheduler, weight-decay, and no-gradient-clipping
 recipe as executable contracts; see [P0_5_C3_PLAN.md](P0_5_C3_PLAN.md).
 
-The plan labels paper statements, derived arithmetic, and repository
-operational choices separately. In particular, the paper does not fix the
-scheduler step-zero formula or call order, AdamW epsilon, exact dataset
-revision and ordering, tokenizer revision, or microbatch/accumulation layout.
-These remain explicit project choices rather than paper claims.
+The exact contract and scheduler boundaries passed. The pinned GPT-2 tokenizer
+and third-party SlimPajama-family reupload test shard reproduced the recorded
+asset, row, token-stream, accounting, and chunk identities. Focused tests passed
+under Transformers 4.57.6 and 5.14.1. Full P0-1/P0-2 CPU fp32 and CUDA bf16
+regressions also passed.
 
-No Stage 4 local pass, CUDA result, dataset fingerprint, or peak-learning-rate
-exposure is accepted yet. Exact-contract checks, bounded workstation
-diagnostics, and their compact evidence remain pending before a focused draft
-PR can become `REVIEW_REQUIRED`.
+Psi=8 and Psi=16 context-4096 CUDA bf16 operational diagnostics passed, as did
+one bounded exact-0.0625 peak-learning-rate update for each order. All values
+and updates were finite, clipping remained disabled, completion markers were
+present, and failure artifacts were absent. See
+[P0_5_C3_SUMMARY.md](validation_results/P0_5_C3_SUMMARY.md) and
+[P0_5_C3_EVIDENCE_ARCHIVE.json](validation_results/P0_5_C3_EVIDENCE_ARCHIVE.json).
+
+This is a local pass, not acceptance. Exact/private retention is blocked,
+sanitized evidence is verified but unpublished, and explicit review is pending.
 
 ## Next validation boundary
 
 P0-4, P0.5-C1, P0.5-C2, and P1-preflight B are complete. The next action is
-Stage 4 implementation and validation followed by a focused draft PR. P0.5-C3
-remains acceptance-pending, and final Level 1 core requalification must not
-begin until its focused PR is reviewed and merged. No P1 ecosystem capability
-is validated yet.
+review of the focused P0.5-C3 draft PR. The local Stage 4 gate passed but
+remains acceptance-pending; final Level 1 core requalification must not begin
+until that PR is reviewed and merged. No P1 ecosystem capability is validated
+yet.
