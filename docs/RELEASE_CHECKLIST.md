@@ -5,20 +5,21 @@ This checklist is for tagging, handing off, or resuming work from the P0-qualifi
 ## Current staged gate
 
 ```text
-P1-preflight B: gradient-checkpointing API modernization — local pass, REVIEW_REQUIRED
+P0.5-C3: paper-training-contract smoke — implementation/validation in progress
 ```
 
-The current focused Stage 3 records are:
+The current focused Stage 4 plan and checked recipe are:
 
 ```text
-docs/P1_PREFLIGHT_B_PLAN.md
-docs/validation_results/P1_PREFLIGHT_B_SUMMARY.md
+docs/P0_5_C3_PLAN.md
+configs/p0_5_c3_paper_training_contract.json
 ```
 
 C1 was reviewed and merged as PR #9. C2 was merged as PR #10, and its separate
-CUDA-autocast cache-dtype correction was merged as PR #11. Stage 3 remains
-unaccepted until its focused draft PR is reviewed and merged; P0.5-C3 must not
-begin first.
+CUDA-autocast cache-dtype correction was merged as PR #11. Stage 3 was reviewed
+and merged as PR #12. Stage 4 must pass its separate unit, pinned-data, CUDA
+bf16 operational, peak-exposure, regression, and evidence checks before its own
+focused draft PR is reviewable.
 
 The separate evidence-infrastructure design and historical Codex handoff are:
 
@@ -28,7 +29,8 @@ docs/CODEX_P1_PREFLIGHT_A_HANDOFF.md
 ```
 
 P1-preflight A remains evidence infrastructure and remains partial/blocked.
-Neither C2 nor Stage 3 completes its retention or acceptance-review requirements.
+Neither the merged staged contracts nor Stage 4 complete historical P0-4
+retention or its evidence-archive acceptance-review requirements.
 
 P1-preflight A infrastructure is implemented and tested, but the gate remains
 `PARTIAL/BLOCKED WITH EVIDENCE`. All four retained Psi=8/Psi=16 summary and
@@ -111,6 +113,12 @@ python -m unittest discover \
   -p 'test_gradient_checkpointing_contract.py' \
   -v
 ```
+
+For P0.5-C3, also run the offline focused contract, then the pinned data lane
+and the Psi=8-before-Psi=16 CUDA bf16 operational and exact-peak exposure
+commands documented in [TESTING.md](TESTING.md). Do not substitute a local text
+fallback, shortened context, clipping, or a lower learning rate and still call
+the corresponding Stage 4 lane passed.
 
 For P1-preflight A, also run:
 

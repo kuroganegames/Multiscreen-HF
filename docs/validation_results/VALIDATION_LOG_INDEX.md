@@ -19,13 +19,14 @@ records with explicit gate-specific acceptance states.
 |---|---|---|---|---|
 | P0.5-C1 | [P0_5_C1_PLAN.md](../P0_5_C1_PLAN.md) | [P0_5_C1_SUMMARY.md](P0_5_C1_SUMMARY.md) | [P0_5_C1_ARCHITECTURE_MANIFEST.json](P0_5_C1_ARCHITECTURE_MANIFEST.json) | accepted; PR #9 merged |
 | P0.5-C2 | [P0_5_C2_PLAN.md](../P0_5_C2_PLAN.md) | [P0_5_C2_SUMMARY.md](P0_5_C2_SUMMARY.md) | focused deterministic tests | accepted; PR #10 and correction PR #11 merged |
-| P1-preflight B | [P1_PREFLIGHT_B_PLAN.md](../P1_PREFLIGHT_B_PLAN.md) | [P1_PREFLIGHT_B_SUMMARY.md](P1_PREFLIGHT_B_SUMMARY.md) | exact 4.57.6/5.14.1 focused tests and CUDA smokes | REVIEW_REQUIRED |
+| P1-preflight B | [P1_PREFLIGHT_B_PLAN.md](../P1_PREFLIGHT_B_PLAN.md) | [P1_PREFLIGHT_B_SUMMARY.md](P1_PREFLIGHT_B_SUMMARY.md) | exact 4.57.6/5.14.1 focused tests and CUDA smokes | accepted; PR #12 merged |
+| P0.5-C3 | [P0_5_C3_PLAN.md](../P0_5_C3_PLAN.md) | pending execution | checked recipe manifest and focused deterministic tests | implementation/validation in progress |
 
 C1 was reviewed and merged as focused PR #9. C2 was merged as PR #10 and its
-CUDA-autocast cache-dtype correction as PR #11. Stage 3 passed locally but is
-not accepted until its focused draft PR is reviewed and merged; Stage 4 remains
-unstarted. These staged records do not change the accepted P0 boundary or the
-P0-4 evidence-retention status below.
+CUDA-autocast cache-dtype correction as PR #11. Stage 3 was reviewed and merged
+as PR #12. Stage 4 is being implemented and validated on its own branch; it is
+not accepted until its focused draft PR is reviewed and merged. These staged
+records do not change the accepted P0 boundary or P0-4 retention status below.
 
 ## Evidence retention
 

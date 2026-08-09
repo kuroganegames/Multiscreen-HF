@@ -191,8 +191,99 @@ mkdir -p "$STAGE3_OUTPUT_ROOT"
 
 The second command must produce `P0-4_DIAGNOSTIC_COMPLETE.md`, not a qualifying
 completion marker. See [P1_PREFLIGHT_B_PLAN.md](P1_PREFLIGHT_B_PLAN.md) and the
-[Stage 3 local result](validation_results/P1_PREFLIGHT_B_SUMMARY.md). Stage 3
-remains `REVIEW_REQUIRED` until its focused PR is reviewed and merged.
+[Stage 3 result](validation_results/P1_PREFLIGHT_B_SUMMARY.md). Focused PR #12
+was reviewed and merged; the commands remain the accepted regression recipe.
+
+## P0.5-C3
+
+P0.5-C3 separates the exact paper recipe, pinned data identity, reduced CUDA
+operation, and exact-peak exposure into four evidence lanes. The offline unit
+suite mocks Hub access; the data and CUDA commands require the exact pinned
+assets and fail closed on a revision, shard hash, library version, fingerprint,
+token count, or contract mismatch.
+
+```bash
+python -m py_compile \
+  scripts/p0_5_c3_paper_training_contract.py \
+  tests/test_paper_training_contract.py
+
+python -m unittest discover \
+  -s tests \
+  -p 'test_paper_training_contract.py' \
+  -v
+
+python scripts/p0_5_c3_paper_training_contract.py --mode contract
+```
+
+For the pinned data and CUDA bf16 lanes, set an existing Hugging Face cache and
+an absolute output root outside every Git worktree. Every leaf output directory
+must be new: the harness refuses to overwrite a previous success or failure.
+
+```bash
+set -euo pipefail
+: "${HF_CACHE_DIR:?set HF_CACHE_DIR to an existing Hugging Face cache}"
+: "${STAGE4_OUTPUT_ROOT:?set STAGE4_OUTPUT_ROOT outside every Git worktree}"
+test -d "$HF_CACHE_DIR"
+case "$STAGE4_OUTPUT_ROOT" in
+  /*) ;;
+  *) echo "STAGE4_OUTPUT_ROOT must be absolute" >&2; exit 2 ;;
+esac
+case "$STAGE4_OUTPUT_ROOT/" in
+  "$PWD/"*) echo "STAGE4_OUTPUT_ROOT must be outside the repository" >&2; exit 2 ;;
+esac
+
+python scripts/p0_5_c3_paper_training_contract.py \
+  --mode data \
+  --cache-dir "$HF_CACHE_DIR" \
+  --output-dir "$STAGE4_OUTPUT_ROOT/data"
+
+CUDA_VISIBLE_DEVICES=0 python scripts/p0_5_c3_paper_training_contract.py \
+  --mode operational \
+  --psi 8 \
+  --device cuda:0 \
+  --cache-dir "$HF_CACHE_DIR" \
+  --output-dir "$STAGE4_OUTPUT_ROOT/cuda/psi8/operational"
+
+CUDA_VISIBLE_DEVICES=0 python scripts/p0_5_c3_paper_training_contract.py \
+  --mode peak-exposure \
+  --psi 8 \
+  --device cuda:0 \
+  --cache-dir "$HF_CACHE_DIR" \
+  --output-dir "$STAGE4_OUTPUT_ROOT/cuda/psi8/peak_exposure"
+```
+
+Inspect every Psi=8 metric, completion marker, memory value, and any preserved
+`failure.json` before proceeding. Only after Psi=8 passes and memory headroom
+is understood, run the corresponding Psi=16 lanes:
+
+```bash
+CUDA_VISIBLE_DEVICES=0 python scripts/p0_5_c3_paper_training_contract.py \
+  --mode operational \
+  --psi 16 \
+  --device cuda:0 \
+  --cache-dir "$HF_CACHE_DIR" \
+  --output-dir "$STAGE4_OUTPUT_ROOT/cuda/psi16/operational"
+
+CUDA_VISIBLE_DEVICES=0 python scripts/p0_5_c3_paper_training_contract.py \
+  --mode peak-exposure \
+  --psi 16 \
+  --device cuda:0 \
+  --cache-dir "$HF_CACHE_DIR" \
+  --output-dir "$STAGE4_OUTPUT_ROOT/cuda/psi16/peak_exposure"
+```
+
+The operational lane is fixed at context 4096, microbatch 1, accumulation 2,
+three optimizer updates, reduced two-update warmup, and diagnostic LR 0.0006.
+The separate peak lane performs one bounded context-4096 update at the exact
+paper peak LR 0.0625. Both use CUDA bf16, paper-absolute MiPE, fp32 auxiliary
+MiPE/Softmask math, AdamW betas `(0.9, 0.95)`, zero weight decay, the explicitly
+labeled repository epsilon `1e-8`, non-fused AdamW, supported non-reentrant
+checkpointing, and no clipping. Neither lane reproduces the paper global batch,
+duration, corpus selection, training precision, quality, or efficiency.
+
+See [P0_5_C3_PLAN.md](P0_5_C3_PLAN.md). A compact result and evidence descriptor
+are added only after the actual outputs are inspected, sanitized, and verified.
+Stage 4 remains `REVIEW_REQUIRED` until its focused PR is reviewed and merged.
 
 ## P0-1
 

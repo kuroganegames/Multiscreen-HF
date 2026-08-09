@@ -38,8 +38,12 @@ P0.5-C2: long-position / MiPE / cache semantics
   CUDA-autocast cache-dtype correction merged in PR #11
 
 P1-preflight B: gradient-checkpointing API modernization
-  implementation and local validation complete
-  acceptance review pending; do not start P0.5-C3 before merge
+  accepted and merged in PR #12
+
+P0.5-C3: paper-training-contract smoke
+  current focused Stage 4
+  implementation and validation in progress
+  acceptance pending; do not start final Level 1 requalification before merge
 
 P1 model/ecosystem capabilities
   none validated
@@ -59,6 +63,7 @@ docs/TESTING.md
 docs/KNOWN_LIMITATIONS.md
 docs/P0_5_C2_PLAN.md
 docs/adr/ADR-0001-mipe-position-semantics.md
+docs/P0_5_C3_PLAN.md
 docs/P1_PREFLIGHT_B_PLAN.md
 docs/P1_PREFLIGHT_A_PLAN.md
 docs/CODEX_P1_PREFLIGHT_A_HANDOFF.md
@@ -328,15 +333,16 @@ The staged Level 1 core sequence currently stands at:
 P0.5-C1       accepted and merged in PR #9
 P0.5-C2       accepted and merged in PR #10
 C2 correction accepted and merged in PR #11
-P1-preflight B implementation and local validation complete; review required
-P0.5-C3       not started
+P1-preflight B accepted and merged in PR #12
+P0.5-C3       implementation and validation in progress; acceptance pending
 final P0 core requalification not started
 P1-1 PEFT/LoRA smoke remains outside the Level 1 core program
 ```
 
-Do not begin P0.5-C3 until the focused P1-preflight B draft PR has been
-reviewed and merged. Do not describe any later gate as validated until it has a
-focused implementation, test contract, reviewed evidence, and status update.
+Do not begin final P0 core requalification until the focused P0.5-C3 draft PR
+has been reviewed and merged. Do not describe P0.5-C3 or any later gate as
+validated until it has a focused implementation, test contract, reviewed
+evidence, and status update.
 
 ## Validation records
 

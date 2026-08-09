@@ -25,8 +25,8 @@ The current staged Level 1 Core state is:
 ```text
 P0.5-C1: accepted; focused PR #9 merged
 P0.5-C2: accepted; focused PR #10 merged; correction PR #11 merged
-P1-preflight B: local gate passed; REVIEW_REQUIRED; not yet accepted
-Stage 4: not started
+P1-preflight B: accepted; focused PR #12 merged
+P0.5-C3 / Stage 4: implementation and validation in progress; acceptance pending
 ```
 
 Start with:
@@ -35,7 +35,8 @@ Start with:
 - C2 plan: [P0_5_C2_PLAN.md](P0_5_C2_PLAN.md)
 - C2 accepted result: [P0_5_C2_SUMMARY.md](validation_results/P0_5_C2_SUMMARY.md)
 - Stage 3 plan: [P1_PREFLIGHT_B_PLAN.md](P1_PREFLIGHT_B_PLAN.md)
-- Stage 3 local result: [P1_PREFLIGHT_B_SUMMARY.md](validation_results/P1_PREFLIGHT_B_SUMMARY.md)
+- Stage 3 accepted result: [P1_PREFLIGHT_B_SUMMARY.md](validation_results/P1_PREFLIGHT_B_SUMMARY.md)
+- Stage 4 plan: [P0_5_C3_PLAN.md](P0_5_C3_PLAN.md)
 - repository instructions: [`AGENTS.md`](../AGENTS.md)
 - gate design: [P1_PREFLIGHT_A_PLAN.md](P1_PREFLIGHT_A_PLAN.md)
 - Codex Goal handoff: [CODEX_P1_PREFLIGHT_A_HANDOFF.md](CODEX_P1_PREFLIGHT_A_HANDOFF.md)
@@ -59,8 +60,8 @@ Use [CODEX_P0_4_HANDOFF.md](CODEX_P0_4_HANDOFF.md) only for an intentional P0-4 
 | P1-preflight A | Partial/blocked | Tooling, schema, policy, source-hash audit, and sanitized verification are complete; explicit review and external exact/private retention remain blocked. |
 | P0.5-C1 | Complete | Architecture, initialization, all-scale meta shapes, config, tied embeddings, and packed-text contracts were reviewed and merged as PR #9. |
 | P0.5-C2 | Complete | Dual MiPE modes and long-boundary contracts were merged as PR #10; the CUDA-autocast cache-dtype correction was merged as PR #11. |
-| P1-preflight B | Review required | Supported non-reentrant API, exact 4.57.6/5.14.1 matrix, strong P0 regressions, and checkpointed CUDA smokes passed locally. |
-| P0.5-C3 | Not started | Paper-training-contract smoke remains a later separate stage. |
+| P1-preflight B | Complete | Supported non-reentrant API, exact 4.57.6/5.14.1 matrix, strong P0 regressions, and checkpointed CUDA smokes were accepted by merged PR #12. |
+| P0.5-C3 | In progress | Paper-training-contract implementation and validation are underway; no Stage 4 result is accepted yet. |
 | P1 ecosystem capabilities | None validated | PEFT/LoRA, QLoRA, Unsloth, generation matrix, compile, and serving remain future gates. |
 
 ### Baseline identity
@@ -70,14 +71,15 @@ Current baseline: P0-qualified research implementation through P0-4
 P0.5-C1 merge / C2 base: ec805c1ba60c55ea4beb3ad68e0a00c0d718e909
 P0.5-C2 merge: 54aa96ee914e9f8ac7b58e6d176d4e3fbeb0ae27
 C2 correction / Stage 3 base: 0c83be6b4b043f4b965df4528534f24e9d5ab4f1
-Current staged gate: P1-preflight B — local pass, REVIEW_REQUIRED
+Stage 3 merge / Stage 4 base: a2d43517c45dc39855db81b9286c4abf190a2c14
+Current staged gate: P0.5-C3 — implementation and validation in progress
 P1-preflight A implementation base (origin/main at branch creation): 34cbecd25bb38a6f92125071b1c08e42d71008f9
 Primary implementation: multiscreen_transformers/modeling_multiscreen.py
 Primary config: multiscreen_transformers/configuration_multiscreen.py
 Primary equation oracle: oracle/paper_math_oracle.py
 Canonical validation status: docs/VALIDATION_STATUS.md
 Accepted P0-4 summary: docs/validation_results/P0_4_SUMMARY.{md,json}
-Selected gate design: docs/P1_PREFLIGHT_B_PLAN.md
+Selected gate design: docs/P0_5_C3_PLAN.md
 Selected Codex Goal: docs/CODEX_LEVEL1_CORE_HF_HANDOFF.md
 Evidence archive policy: docs/EVIDENCE_ARCHIVE_POLICY.md
 P0-4 retention descriptor: docs/validation_results/P0_4_EVIDENCE_ARCHIVE.json
@@ -90,6 +92,13 @@ and a sanitized archive verified locally. Exact/private retention is blocked,
 acceptance review is pending, and no public asset exists. P1-preflight A remains
 partial and must not rewrite the original metrics, imply a new model validation
 result, or validate any P1 capability.
+
+P0.5-C3 is the current focused Stage 4. Its plan distinguishes the paper's
+stated training recipe from derived arithmetic and repository operational
+choices, then separates exact contract checks from bounded workstation
+diagnostics. No Stage 4 local pass, CUDA result, dataset fingerprint, or
+peak-learning-rate exposure is claimed until the corresponding run is
+executed, inspected, and recorded.
 
 ## 2. First ten minutes after a fresh clone
 
@@ -484,14 +493,15 @@ P1-preflight A may add a separate evidence-archive descriptor. It must not chang
 ```text
 P0.5-C1  architecture / initialization / all-scale contract — merged
 P0.5-C2  long-position / MiPE / cache semantics — merged
-P1-preflight B  gradient-checkpointing API modernization — REVIEW_REQUIRED
-P0.5-C3  paper-training-contract smoke
+P1-preflight B  gradient-checkpointing API modernization — merged as PR #12
+P0.5-C3  paper-training-contract smoke — implementation/validation in progress
 final P0 core requalification
 P1-1  PEFT/LoRA smoke
 ```
 
-Do not begin P0.5-C3 until P1-preflight B is reviewed and merged. No later gate
-is validated merely because an earlier implementation or infrastructure gate passes.
+Do not begin final P0 core requalification until P0.5-C3 is reviewed and
+merged. No later gate is validated merely because an earlier implementation or
+infrastructure gate passes.
 
 ## 14. Final report format
 

@@ -30,7 +30,10 @@ P0.5-C2: long-position / MiPE / cache semantics
   Status: complete; focused PR #10 merged; corrective PR #11 merged
 
 P1-preflight B: gradient-checkpointing API modernization
-  Status: local gate passed; REVIEW_REQUIRED; not yet accepted
+  Status: complete; focused PR #12 reviewed and merged
+
+P0.5-C3: paper-training-contract smoke
+  Status: implementation and validation in progress; acceptance pending
 ```
 
 The current implementation can be considered a **P0-qualified research implementation through P0-4**. P0-4 was accepted only from reviewed qualifying Psi=8/Psi=16 CUDA bf16 artifacts; static config validation and reduced diagnostics remain non-qualifying substitutes.
@@ -420,11 +423,27 @@ checkpointed diagnostic completed all postchecks. The latter is explicitly
 non-qualifying and does not replace the accepted historical P0-4 result. See
 [P1_PREFLIGHT_B_PLAN.md](P1_PREFLIGHT_B_PLAN.md) and
 [P1_PREFLIGHT_B_SUMMARY.md](validation_results/P1_PREFLIGHT_B_SUMMARY.md).
-This Stage 3 result remains `REVIEW_REQUIRED` until merge.
+This Stage 3 result was accepted by merged PR #12.
+
+P0.5-C3 is the current focused Stage 4. It encodes the paper's tokenizer,
+data-stream, optimizer, scheduler, weight-decay, and no-gradient-clipping
+recipe as executable contracts; see [P0_5_C3_PLAN.md](P0_5_C3_PLAN.md).
+
+The plan labels paper statements, derived arithmetic, and repository
+operational choices separately. In particular, the paper does not fix the
+scheduler step-zero formula or call order, AdamW epsilon, exact dataset
+revision and ordering, tokenizer revision, or microbatch/accumulation layout.
+These remain explicit project choices rather than paper claims.
+
+No Stage 4 local pass, CUDA result, dataset fingerprint, or peak-learning-rate
+exposure is accepted yet. Exact-contract checks, bounded workstation
+diagnostics, and their compact evidence remain pending before a focused draft
+PR can become `REVIEW_REQUIRED`.
 
 ## Next validation boundary
 
-P0-4, P0.5-C1, and P0.5-C2 are complete. P1-preflight B passed its local gate
-but remains unaccepted. The next action is review and merge of its focused
-draft PR; P0.5-C3 must not begin first. No P1 ecosystem capability is validated
-yet.
+P0-4, P0.5-C1, P0.5-C2, and P1-preflight B are complete. The next action is
+Stage 4 implementation and validation followed by a focused draft PR. P0.5-C3
+remains acceptance-pending, and final Level 1 core requalification must not
+begin until its focused PR is reviewed and merged. No P1 ecosystem capability
+is validated yet.

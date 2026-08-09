@@ -4,14 +4,14 @@
 
 ```text
 Local gate result: passed
-Acceptance state: REVIEW_REQUIRED
-Next stage: not started
+Acceptance state: accepted; PR #12 merged
+Next stage: P0.5-C3 in progress on a separate branch
 ```
 
 The supported Transformers gradient-checkpointing contract, exact two-release
 compatibility matrix, strong P0 regressions, and checkpointed CUDA smokes
-passed on 2026-08-09. This local result is not accepted until its focused draft
-pull request is reviewed and merged. It does not validate P0.5-C3, final Level 1
+passed on 2026-08-09 and were accepted when focused PR #12 was reviewed and
+merged. That acceptance does not validate P0.5-C3, final Level 1
 requalification, PEFT, or any P1 model/ecosystem capability.
 
 ## Provenance
@@ -28,6 +28,10 @@ base porcelain bytes: 0
 base porcelain SHA-256: e3b0c44298fc1c149afbf4f8996fb92427ae41e4649b934ca495991b7852b855
 source/API audit date: 2026-08-09
 final local validation date: 2026-08-09
+focused PR: #12
+PR head commit: 6033c223d90e649ef12da0081b58d29028ff95cd
+merged main commit: a2d43517c45dc39855db81b9286c4abf190a2c14
+acceptance recorded: 2026-08-09
 ```
 
 The dirty Stage 3 worktree held during PR #11 remained unchanged while a fresh
@@ -208,10 +212,11 @@ evidence only and does not replace the accepted historical P0-4 result.
 ## Evidence and limitations
 
 This compact summary and deterministic tests are the committed Stage 3
-evidence. Raw logs, failed-attempt diagnostics, smoke outputs, checkpoints,
-tokenizer copies, and model weights remain outside Git in ephemeral local
-storage. No public asset or durable archive was created, and no acceptance
-reviewer is inferred before the draft PR is reviewed.
+evidence accepted through merged PR #12. Raw logs, failed-attempt diagnostics,
+smoke outputs, checkpoints, tokenizer copies, and model weights remain outside
+Git in ephemeral local storage. No public asset or durable archive was created;
+the merge establishes review of the focused code/result PR but is not
+retroactively represented as a raw-event evidence-archive review.
 
 Historical P0-4 retention remains partial/blocked exactly as recorded. The
 accepted historical metrics and descriptor were not rewritten.

@@ -1,0 +1,138 @@
+{
+  "schema_version": "1.0.0",
+  "stage": "P0.5-C3",
+  "description": "Checked paper-training contract plus bounded workstation diagnostics",
+  "tokenizer": {
+    "repository": "gpt2",
+    "revision": "607a30d783dfa663caf39e06633721c8d4cfcd7e",
+    "expected_vocab_size": 50257,
+    "expected_eos_token_id": 50256,
+    "asset_manifest_sha256": "07c45937a89b33f30016aef5b3982f13f25bf2c6ba940c535d1b5daa90459a71",
+    "assets": {
+      "merges.txt": "1ce1664773c50f3e0cc8842619a93edc4624525b728b188a9e0be33b7726adc5",
+      "tokenizer.json": "8414cab924d8b9b33013f0d221c5862f365ee9be39c5c2bfae8a5a9e970478a6",
+      "tokenizer_config.json": "5e04eb606e3a1583530a42e36c2a6b6615c86f34fe77e44d9ddeb43ff940931f",
+      "vocab.json": "196139668be63f3b5d6574427317ae82f612a97c5d1cdaf36ed2256dbf636783"
+    },
+    "use_fast": true
+  },
+  "dataset": {
+    "family": "SlimPajama",
+    "repository": "gmongaras/SlimPajama-627B_Reupload",
+    "revision": "c34c22dbb10ae6b264a2f357a909d1a537141b36",
+    "data_files": {
+      "test": "data/test-00000-of-00030.parquet"
+    },
+    "split": "test",
+    "text_column": "text",
+    "verification_mode": "no_checks",
+    "expected_file_size_bytes": 43263929,
+    "expected_file_sha256": "d9a83d59b72f4c303f0c0e46d0e73a8446eabb56b9aa5fd992347c358ab65743",
+    "expected_full_fingerprint": "507a47fcec5cbfdc",
+    "selection": {
+      "kind": "contiguous_rows",
+      "start": 0,
+      "stop": 64,
+      "expected_fingerprint": "f1e6c1c09434a7e4"
+    },
+    "expected_data_contract": {
+      "selected_rows": 64,
+      "nonempty_documents": 64,
+      "text_tokens": 58645,
+      "eos_tokens": 64,
+      "concatenated_tokens": 58709,
+      "packed_chunks": 14,
+      "usable_tokens": 57358,
+      "discarded_tail_tokens": 1351,
+      "row_manifest_sha256": "942f9b3397ff7073342973082efa4cddf3ace16bc7e3d180c827df3203243831",
+      "token_stream_sha256": "3232bc3996272d563b6cc4e63a8d7a7d3769c7ec33e74d3d008d97cd290d7496",
+      "token_encoding": "uint32_little_endian"
+    },
+    "recorded_datasets_version": "5.0.1",
+    "source_scope": "third-party reupload test shard; not claimed byte-identical to the paper corpus or representative of its train split"
+  },
+  "model": {
+    "psi_values": [
+      8,
+      16
+    ],
+    "vocab_size": 50257,
+    "sequence_length": 4096,
+    "key_dim": 16,
+    "value_dim": 64,
+    "mipe_threshold": 256.0,
+    "initializer_range": 0.1,
+    "mipe_position_mode": "paper_absolute",
+    "mipe_compute_dtype": "fp32",
+    "softmask_compute_dtype": "fp32",
+    "tie_word_embeddings": true,
+    "gradient_checkpointing": {
+      "enabled": true,
+      "use_reentrant": false
+    }
+  },
+  "packing": {
+    "document_handling": "eos_concatenated_continuous_stream",
+    "sequence_length": 4096,
+    "stored_chunk_tokens": 4097,
+    "legacy_shifted_labels": true,
+    "return_labels_are_shifted": true,
+    "discard_incomplete_tail_only": true
+  },
+  "paper_recipe": {
+    "paper_global_batch_tokens": 4194304,
+    "optimizer": {
+      "name": "AdamW",
+      "betas": [
+        0.9,
+        0.95
+      ],
+      "weight_decay": 0.0,
+      "eps": 1e-8,
+      "eps_source": "repository_operationalization_paper_unspecified"
+    },
+    "scheduler": {
+      "name": "linear_warmup_then_constant",
+      "step_indexing": "zero_based_optimizer_update_set_before_update",
+      "warmup_steps": 4096,
+      "peak_learning_rate": 0.0625,
+      "post_warmup": "constant"
+    },
+    "gradient_clipping": {
+      "enabled": false,
+      "max_norm": null
+    }
+  },
+  "diagnostics": {
+    "operational": {
+      "qualification": "diagnostic_only_reduced_warmup_and_learning_rate",
+      "optimizer_steps": 3,
+      "microbatch_size": 1,
+      "gradient_accumulation_steps": 2,
+      "sequence_length": 4096,
+      "warmup_steps": 2,
+      "peak_learning_rate": 0.0006,
+      "amp_dtype": "bf16",
+      "gradient_clipping": false
+    },
+    "peak_exposure": {
+      "qualification": "diagnostic_only_bounded_exact_peak_exposure",
+      "optimizer_steps": 1,
+      "microbatch_size": 1,
+      "gradient_accumulation_steps": 1,
+      "sequence_length": 4096,
+      "warmup_steps": 1,
+      "peak_learning_rate": 0.0625,
+      "amp_dtype": "bf16",
+      "gradient_clipping": false,
+      "require_loss_decrease": false
+    }
+  },
+  "runtime": {
+    "seed": 42,
+    "device": "cuda:0",
+    "num_workers": 0,
+    "fused_adamw": false,
+    "raw_output_policy": "explicit absolute path outside repository; refuse overwrite; never include source text"
+  }
+}
