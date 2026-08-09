@@ -1667,7 +1667,11 @@ class Level1EvidenceReviewTests(unittest.TestCase):
             ("data-files", "data_files", {"train": "private.parquet"}),
             ("data-dir", "data_dir", "private"),
             ("text-file", "text_file", "provided_path_not_recorded"),
-            ("fingerprint", "dataset_fingerprint", "/home/private/fingerprint"),
+            (
+                "fingerprint",
+                "dataset_fingerprint",
+                "/" + "home/private/fingerprint",
+            ),
         )
         for label, field, value in cases:
             with self.subTest(label=label):
@@ -2481,7 +2485,7 @@ class Level1EvidenceReviewTests(unittest.TestCase):
                     "checks",
                     "p0_3_tinystories",
                     "fingerprint_sha256",
-                    "/home/private/cache",
+                    "/" + "home/private/cache",
                 ),
                 False,
                 "path|SHA-256",

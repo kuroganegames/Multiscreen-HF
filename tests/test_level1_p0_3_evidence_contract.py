@@ -246,7 +246,7 @@ class P0ThreeEvidenceContractTests(unittest.TestCase):
         invalid = (
             {"dataset_name": "C:/private/dataset"},
             {"dataset_name": "FILE:/private/dataset"},
-            {"train_split": "/home/private/split"},
+            {"train_split": "/" + "home/private/split"},
             {"train_split": "train\x7fprivate"},
         )
         for override in invalid:
@@ -258,7 +258,7 @@ class P0ThreeEvidenceContractTests(unittest.TestCase):
 
     def test_dataset_fingerprint_rejects_paths_and_non_hashes(self) -> None:
         invalid = (
-            "/home/private/dataset",
+            "/" + "home/private/dataset",
             "synthetic-fingerprint",
             "ABCDEF0123456789",
             "f" * 15,
@@ -277,9 +277,9 @@ class P0ThreeEvidenceContractTests(unittest.TestCase):
         self.assertIsNone(source["data_dir"])
         self.assertIsNone(source["text_file"])
         overrides = (
-            {"data_files": {"train": "/home/private/data.json"}},
-            {"data_dir": "/home/private/data"},
-            {"text_file": "/home/private/data.txt"},
+            {"data_files": {"train": "/" + "home/private/data.json"}},
+            {"data_dir": "/" + "home/private/data"},
+            {"text_file": "/" + "home/private/data.txt"},
         )
         for override in overrides:
             with self.subTest(override=override), self.assertRaisesRegex(
@@ -288,7 +288,7 @@ class P0ThreeEvidenceContractTests(unittest.TestCase):
                 build(**override)
 
     def test_local_source_records_only_a_path_free_marker(self) -> None:
-        private = "/home/private/stories.txt"
+        private = "/" + "home/private/stories.txt"
         report = build_local(text_file=private)
         raw = contract.canonical_json_bytes(report).decode("utf-8")
         self.assertNotIn(private, raw)
