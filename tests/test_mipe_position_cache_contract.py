@@ -869,6 +869,96 @@ class StrictPositionAndCacheSchemaTests(unittest.TestCase):
             atol=2e-2,
         )
 
+    @unittest.skipUnless(torch.cuda.is_available(), "CUDA is required")
+    def test_cuda_bfloat16_autocast_uses_normalization_cache_dtype(self) -> None:
+        device = torch.device("cuda:0")
+        try:
+            with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
+                projection_probe = torch.mm(
+                    torch.ones(2, 2, device=device),
+                    torch.ones(2, 2, device=device),
+                )
+                normalization_probe = F.normalize(projection_probe, dim=-1)
+        except (RuntimeError, TypeError, NotImplementedError) as exc:
+            self.skipTest(f"CUDA bfloat16 autocast is unsupported: {exc}")
+        if projection_probe.dtype != torch.bfloat16:
+            self.skipTest(
+                "CUDA bfloat16 autocast did not select bfloat16 for matrix multiplication: "
+                f"got {projection_probe.dtype}"
+            )
+
+        expected_cache_dtype = normalization_probe.dtype
+        model = make_model(
+            position_mode=REFERENCE_MOD,
+            wrap_boundary=4,
+            max_position_embeddings=7,
+            mipe_threshold=8.0,
+        ).to(device)
+        oracle = make_oracle_from_hf_model(model).to(device)
+        input_ids = torch.tensor(
+            [[1, 2, 3, 4, 5, 6, 7, 8, 9]],
+            dtype=torch.long,
+            device=device,
+        )
+        with torch.no_grad(), torch.autocast(device_type="cuda", dtype=torch.bfloat16):
+            hf_full = model(input_ids=input_ids, use_cache=False, return_dict=True)
+            hf_prefix = model(
+                input_ids=input_ids[:, :4],
+                use_cache=True,
+                return_dict=True,
+            )
+            hf_suffix = model(
+                input_ids=input_ids[:, 4:],
+                past_key_values=hf_prefix.past_key_values,
+                use_cache=True,
+                return_dict=True,
+            )
+            oracle_full = oracle(input_ids, use_cache=False)
+            oracle_prefix = oracle(input_ids[:, :4], use_cache=True)
+            oracle_suffix = oracle(
+                input_ids[:, 4:],
+                past_key_values=oracle_prefix.past_key_values,
+                use_cache=True,
+            )
+            generated = model.generate(
+                input_ids[:, :4],
+                do_sample=False,
+                max_new_tokens=2,
+                pad_token_id=0,
+                use_cache=True,
+                return_dict_in_generate=True,
+            )
+
+        for cache_name, cache in (
+            ("hf_prefix", hf_prefix.past_key_values),
+            ("hf_suffix", hf_suffix.past_key_values),
+            ("hf_generate", generated.past_key_values),
+            ("oracle_prefix", oracle_prefix.past_key_values),
+            ("oracle_suffix", oracle_suffix.past_key_values),
+        ):
+            for layer_idx, (key, value) in enumerate(cache):
+                with self.subTest(cache=cache_name, layer=layer_idx):
+                    self.assertEqual(key.dtype, expected_cache_dtype)
+                    self.assertEqual(value.dtype, expected_cache_dtype)
+        self.assertEqual(tuple(generated.sequences.shape), (1, 6))
+        torch.testing.assert_close(
+            hf_suffix.logits.float(),
+            hf_full.logits[:, 4:].float(),
+            rtol=3e-2,
+            atol=3e-2,
+        )
+        torch.testing.assert_close(
+            oracle_suffix.logits.float(),
+            oracle_full.logits[:, 4:].float(),
+            rtol=3e-2,
+            atol=3e-2,
+        )
+        torch.testing.assert_close(
+            hf_suffix.logits.float(),
+            oracle_suffix.logits.float(),
+            rtol=3e-2,
+            atol=3e-2,
+        )
 
     def test_cpu_bfloat16_autocast_preserves_float64_cache_for_double_models(self) -> None:
         try:

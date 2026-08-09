@@ -256,7 +256,7 @@ def _validate_oracle_legacy_cache(
 
 
 def _expected_cache_dtype(x: torch.Tensor) -> torch.dtype:
-    """Return the projection/cache dtype under the active autocast context."""
+    """Return the post-normalization cache dtype under active autocast."""
 
     device_type = x.device.type
     try:
@@ -270,13 +270,18 @@ def _expected_cache_dtype(x: torch.Tensor) -> torch.dtype:
     if x.dtype not in {torch.float16, torch.bfloat16, torch.float32}:
         return x.dtype
     try:
-        return torch.get_autocast_dtype(device_type)
+        target_dtype = torch.get_autocast_dtype(device_type)
     except (AttributeError, TypeError):  # pragma: no cover - older torch fallback.
         if device_type == "cuda":
-            return torch.get_autocast_gpu_dtype()
-        if device_type == "cpu":
-            return torch.get_autocast_cpu_dtype()
-        return x.dtype
+            target_dtype = torch.get_autocast_gpu_dtype()
+        elif device_type == "cpu":
+            target_dtype = torch.get_autocast_cpu_dtype()
+        else:
+            return x.dtype
+    # Oracle caches also store unit-normalized projections. Follow the runtime
+    # normalization policy rather than assuming the GEMM target dtype survives.
+    normalization_probe = torch.empty((0, 1), device=x.device, dtype=target_dtype)
+    return F.normalize(normalization_probe, dim=-1).dtype
 
 
 def dtype_safe_eps(x: torch.Tensor, eps: float) -> float:
