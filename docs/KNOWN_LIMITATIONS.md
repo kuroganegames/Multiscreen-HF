@@ -67,10 +67,9 @@ This does not mark the full five-stage Level 1 program complete.
 
 ## Gradient-checkpointing boundary
 
-P1-preflight B locally validates the supported non-reentrant full-model
-training path under exact Transformers 4.57.6 and 5.14.1. The result remains
-`REVIEW_REQUIRED` until its focused PR is reviewed and merged. Compatibility
-with later untested Transformers releases is not inferred.
+P1-preflight B validates the supported non-reentrant full-model training path
+under exact Transformers 4.57.6 and 5.14.1; focused PR #12 was reviewed and
+merged. Compatibility with later untested Transformers releases is not inferred.
 
 Transformers 5.14.1 installs an input-embedding gradient hook for checkpointed
 `input_ids`, while Multiscreen uses normalized `F.embedding` lookup. A focused
@@ -78,6 +77,28 @@ test proves finite layer gradients when the first non-reentrant checkpoint
 input itself does not require gradients. This does not validate frozen-base
 PEFT/LoRA behavior, which remains a separate future gate. Broad Trainer,
 distributed, compile, and serving integration are also unvalidated.
+
+## Paper-training-contract boundary
+
+P0.5-C3 is a bounded workstation smoke, not a paper-scale reproduction. Its
+checked contract may represent the paper's GPT-2 vocabulary, SlimPajama family,
+EOS-concatenated stream, sequence length, AdamW settings, warmup, constant
+schedule, peak learning rate, and omitted clipping exactly, while the executed
+CUDA bf16 diagnostics use a much smaller local batch and reduced warmup.
+
+The pinned executable data lane uses a specifically identified third-party
+SlimPajama reupload test shard because the historically resolved Cerebras Hub
+repository could not be re-resolved during the dated audit. It is not claimed
+to be byte-identical to the paper corpus or representative of its training
+split. Hugging Face dataset fingerprints are recorded as library-state
+provenance alongside revision, shard SHA-256, row hashes, and token-stream
+hashes; a fingerprint alone is not treated as a content checksum.
+
+Peak-LR exposure checks only finite values and a real bounded update. It does
+not establish a loss decrease, convergence, training quality, paper-global
+batch behavior, or paper training precision. Until the focused Stage 4 PR is
+reviewed and merged, the C3 result remains `REVIEW_REQUIRED` and final Level 1
+requalification has not begun.
 
 ## P0-2 padding masks
 
