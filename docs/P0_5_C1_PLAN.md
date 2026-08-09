@@ -216,11 +216,12 @@ python -m json.tool \
 ```
 
 The accepted P0 quick baseline and P1-preflight A evidence-tooling suite must
-also pass. CI runs the focused C1 contracts in both the regular resolved CPU
-lane and a declared-lower-bound lane pinned to Python 3.10, Torch 2.4.0 CPU,
-and Transformers 4.57.0. This avoids inferring declared support from either the
-local Transformers 4.55 diagnostic environment or only the latest resolver
-result.
+also pass. At C1 acceptance, CI ran the focused contracts in both the regular
+resolved CPU lane and the then-declared lower-bound lane pinned to Python 3.10,
+Torch 2.4.0 CPU, and Transformers 4.57.0. Stage 3 later superseded that active
+Transformers floor with non-yanked 4.57.6 after PyPI marked 4.57.0 yanked for
+setup/installation problems. This historical C1 record is not rewritten as if
+its original CI lane used the later patch release.
 
 ## Acceptance boundary
 

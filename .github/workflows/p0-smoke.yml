@@ -65,7 +65,7 @@ jobs:
       - name: Install declared lower bounds
         run: |
           python -m pip install --extra-index-url https://download.pytorch.org/whl/cpu "torch==2.4.0+cpu"
-          python -m pip install "transformers==4.57.0"
+          python -m pip install "transformers==4.57.6"
           python -m pip install -e . --no-deps
 
       - name: Verify pinned environment
@@ -77,7 +77,7 @@ jobs:
           import transformers
 
           assert version("torch").startswith("2.4.0")
-          assert version("transformers") == "4.57.0"
+          assert version("transformers") == "4.57.6"
           print("torch:", torch.__version__)
           print("transformers:", transformers.__version__)
           PY
@@ -113,6 +113,77 @@ jobs:
             -p 'test_mipe_position_cache_contract.py' \
             -v
 
+      - name: Run P1-preflight B gradient-checkpointing contract
+        env:
+          CUDA_VISIBLE_DEVICES: ""
+          HF_HUB_OFFLINE: "1"
+          TRANSFORMERS_OFFLINE: "1"
+          PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/oracle:${{ github.workspace }}/third_party/multiscreen-pytorch
+        run: |
+          python -m py_compile tests/test_gradient_checkpointing_contract.py
+          python -m unittest discover \
+            -s tests \
+            -p 'test_gradient_checkpointing_contract.py' \
+            -v
+
+  gradient-checkpointing-compat:
+    name: P1-preflight B (Transformers ${{ matrix.transformers }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        transformers: ["4.57.6", "5.14.1"]
+    env:
+      CUDA_VISIBLE_DEVICES: ""
+      HF_HUB_OFFLINE: "1"
+      TRANSFORMERS_OFFLINE: "1"
+      PYTHONDONTWRITEBYTECODE: "1"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install exact compatibility lane
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install \
+            --extra-index-url https://download.pytorch.org/whl/cpu \
+            "torch==2.4.0+cpu"
+          python -m pip install \
+            "transformers==${{ matrix.transformers }}" \
+            "safetensors>=0.4.5"
+          python -m pip install -e . --no-deps
+
+      - name: Verify exact lane
+        run: |
+          python - <<'PY'
+          import torch
+          import transformers
+
+          assert torch.__version__.startswith("2.4.0")
+          assert transformers.__version__ == "${{ matrix.transformers }}"
+          print("torch:", torch.__version__)
+          print("transformers:", transformers.__version__)
+          PY
+
+      - name: Run focused checkpointing contract
+        env:
+          PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/oracle:${{ github.workspace }}/third_party/multiscreen-pytorch
+        run: |
+          python -m py_compile \
+            multiscreen_transformers/modeling_multiscreen.py \
+            tests/test_gradient_checkpointing_contract.py
+          python -m unittest discover \
+            -s tests \
+            -p 'test_gradient_checkpointing_contract.py' \
+            -v
   p0-smoke:
     name: P0 CPU smoke
     runs-on: ubuntu-latest
@@ -203,7 +274,7 @@ jobs:
             --config-dir configs/p0_4_multiscreen_psi16_gpt2_ctx4096 \
             --validate-config-only
 
-      - name: P0-4 tiny CPU diagnostic
+      - name: P0-4 tiny CPU checkpointed diagnostic
         env:
           PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/oracle:${{ github.workspace }}/third_party/multiscreen-pytorch
           HF_HUB_DISABLE_XET: "1"
@@ -224,13 +295,13 @@ jobs:
             --steps 8 \
             --gradient-accumulation-steps 1 \
             --microbatch-size 1 \
-            --gradient-checkpointing false \
+            --gradient-checkpointing true \
             --fused-adamw false \
             --max-train-tokens 17 \
             --text-file /tmp/p0_4_smoke.txt \
-            --output-dir /tmp/p0_4_cpu_diagnostic
-          test -f /tmp/p0_4_cpu_diagnostic/P0-4_DIAGNOSTIC_COMPLETE.md
-          test ! -f /tmp/p0_4_cpu_diagnostic/P0-4_COMPLETE.md
+            --output-dir /tmp/p0_4_checkpointed_cpu_diagnostic
+          test -f /tmp/p0_4_checkpointed_cpu_diagnostic/P0-4_DIAGNOSTIC_COMPLETE.md
+          test ! -f /tmp/p0_4_checkpointed_cpu_diagnostic/P0-4_COMPLETE.md
 
       - name: P0-1 oracle unit tests
         env:

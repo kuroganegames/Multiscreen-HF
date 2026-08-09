@@ -4,17 +4,16 @@
 
 ```text
 Local gate result: passed
-Acceptance state: REVIEW_REQUIRED
-Next stage: not started
+Acceptance state: accepted; focused PR #10 merged
+Post-merge correction: CUDA-autocast cache dtype; PR #11 merged
 ```
 
 Initial focused C2 implementation and local validation passed on 2026-08-07.
 Independent adversarial review then identified and corrected strict cache,
 position, autocast, and evidence gaps; final post-review validation passed on
-2026-08-08. The stage is not accepted until its draft pull request is reviewed
-and merged. This record does not validate P1-preflight B, C3, final Level 1
-requalification, dense 131K execution, retrieval quality, efficiency, or any
-P1 ecosystem capability.
+2026-08-08, and PR #10 was reviewed and merged. This record does not validate
+P1-preflight B, C3, final Level 1 requalification, dense 131K execution,
+retrieval quality, efficiency, or any P1 ecosystem capability.
 
 ## Provenance
 
@@ -37,6 +36,21 @@ authority for literal paper behavior; the pinned unofficial dieOD reference is
 the compatibility authority for the historical modulo rule. No public
 author/official model implementation was identified during the bounded dated
 audit, so unpublished implementation behavior remains unknown.
+
+## Post-merge CUDA-autocast correction
+
+PR #11 was reviewed and merged on 2026-08-09. It corrected one cache-validation
+prediction exposed by CUDA bf16 autocast: projection output was bf16, but CUDA
+normalization returned fp32 cache tensors. Validation now derives the expected
+cache dtype from a zero-element normalization probe on the same device. This
+does not cast or alter cache values and does not change the C2 position modes.
+
+The focused correction reran the C2 suite on CPU and CUDA bf16, all repository
+unit tests, formula/oracle checks, full P0-1/P0-2 CPU fp32 and CUDA bf16, and
+the evidence-tooling suite under Transformers 4.57.6; the CUDA focused suite
+also passed under Transformers 5.14.1. Exact commands and counts are recorded
+in PR #11. Raw logs remained local and no acceptance reviewer is inferred for
+the separate historical P0-4 evidence handoff.
 
 ## Semantic result
 
@@ -86,7 +100,7 @@ range. Conflicting scalar/vector positions and inconsistent generation suffix
 lengths fail explicitly. All-empty preallocated DynamicCache forms are accepted;
 partially populated layers are rejected. Populated Transformers 4.x and 5.x
 DynamicCache forms are normalized to the validated legacy representation.
-Autocast cache validation follows eligible projection dtype while preserving
+Autocast cache validation follows runtime post-normalization dtype while preserving
 float64. Unsupported cache layouts remain out of scope.
 
 Independent one-layer oracle full-context-suffix rows, HF one-shot cached
@@ -135,9 +149,11 @@ Python 3.12.10 / PyTorch 2.8.0+cu128 / Transformers 5.14.0
 ```
 
 The 5.9.0 and 5.14.0 lanes each emitted the non-failing Transformers warning
-that `use_return_dict` is deprecated in favor of `return_dict`. The exact CI
-lower-bound lane (Python 3.10, Torch 2.4.0 CPU, Transformers 4.57.0) remains a
-draft-PR check rather than a locally reproduced result.
+that `use_return_dict` is deprecated in favor of `return_dict`.
+At C2 review, the exact CI lower-bound lane (Python 3.10, Torch 2.4.0 CPU,
+Transformers 4.57.0) was a draft-PR check rather than a locally reproduced
+result. Stage 3 later superseded the active floor with non-yanked 4.57.6; this
+historical C2 environment record is not rewritten as if it ran that CI lane.
 
 ## Tests recorded locally
 
@@ -202,5 +218,5 @@ or model quality.
 
 Historical P0-4 evidence retention remains partial/blocked exactly as
 recorded. Its accepted metrics, configs, descriptor, and raw-retention status
-were not rewritten. C2 acceptance requires focused draft-PR review and merge;
-Stage 3 must not begin before that review gate is complete.
+were not rewritten. C2 acceptance was completed by merged PR #10, and the
+post-merge dtype correction was separately reviewed and merged as PR #11.

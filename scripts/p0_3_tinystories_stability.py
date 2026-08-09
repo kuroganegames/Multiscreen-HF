@@ -43,7 +43,7 @@ except Exception as exc:  # pragma: no cover - environment dependent
 else:
     _DATASETS_IMPORT_ERROR = None
 
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, PreTrainedTokenizerFast
 
 
 def _default_repo_root() -> Path:
@@ -230,6 +230,50 @@ def create_model(config):
     return MultiscreenForCausalLM(config)
 
 
+def load_tokenizer_compat(tokenizer_path: Path, *, cache_dir: str | None):
+    """Load the committed fast tokenizer across Transformers 4.57 and 5.x.
+
+    Transformers 5 serializes the generic Rust backend class as
+    ``TokenizersBackend``. Transformers 4.57 cannot resolve that newer class
+    name through AutoTokenizer, but it can load the exact same tokenizer JSON
+    through PreTrainedTokenizerFast. Only that specific compatibility failure
+    takes the fallback; all other loader errors remain visible.
+    """
+
+    try:
+        return AutoTokenizer.from_pretrained(
+            str(tokenizer_path),
+            use_fast=True,
+            cache_dir=cache_dir,
+        )
+    except ValueError as exc:
+        config_path = tokenizer_path / "tokenizer_config.json"
+        tokenizer_file = tokenizer_path / "tokenizer.json"
+        if "Tokenizer class TokenizersBackend does not exist" not in str(exc):
+            raise
+        if not config_path.is_file() or not tokenizer_file.is_file():
+            raise
+        tokenizer_config = json.loads(config_path.read_text(encoding="utf-8"))
+        if tokenizer_config.get("tokenizer_class") != "TokenizersBackend":
+            raise
+        forwarded = {
+            name: tokenizer_config[name]
+            for name in (
+                "bos_token", "eos_token", "unk_token", "pad_token",
+                "model_max_length", "padding_side", "truncation_side",
+            )
+            if name in tokenizer_config
+        }
+        # Match the Transformers 5 TokenizersBackend contract for this causal
+        # tokenizer. The generic 4.57 fast-tokenizer default also emits
+        # token_type_ids, which MultiscreenForCausalLM does not consume.
+        forwarded["model_input_names"] = ["input_ids", "attention_mask"]
+        return PreTrainedTokenizerFast(
+            tokenizer_file=str(tokenizer_file),
+            **forwarded,
+        )
+
+
 def make_optimizer(model: torch.nn.Module, *, lr: float, weight_decay: float, fused: bool) -> torch.optim.Optimizer:
     kwargs: dict[str, Any] = {"lr": lr, "weight_decay": weight_decay}
     if fused:
@@ -390,6 +434,10 @@ def train_one_psi(
     )
     model = create_model(cfg).to(device)
     model.train()
+    if args.gradient_checkpointing:
+        model.gradient_checkpointing_enable(
+            gradient_checkpointing_kwargs={"use_reentrant": False}
+        )
 
     param_count = sum(p.numel() for p in model.parameters())
     print(f"\n[P0-3] Psi={psi} params={param_count:,} steps={steps} device={device} amp={args.amp_dtype}")
@@ -496,6 +544,10 @@ def train_one_psi(
         "params": param_count,
         "device": str(device),
         "amp_dtype": args.amp_dtype,
+        "gradient_checkpointing": args.gradient_checkpointing,
+        "gradient_checkpointing_kwargs": {"use_reentrant": False}
+        if args.gradient_checkpointing
+        else None,
         "seq_len": args.seq_len,
         "batch_size": args.batch_size,
         "learning_rate": args.learning_rate,
@@ -551,6 +603,8 @@ def write_complete_note(output_dir: Path, all_metrics: list[dict[str, Any]]) -> 
             f"- batch_size: {m['batch_size']}",
             f"- amp_dtype: {m['amp_dtype']}",
             f"- initial_probe_loss: {m['initial_probe_loss']:.6f}",
+            f"- gradient_checkpointing: {m['gradient_checkpointing']}",
+            f"- gradient_checkpointing_kwargs: {m['gradient_checkpointing_kwargs']}",
             f"- final_probe_loss: {m['final_probe_loss']:.6f}",
             f"- abs_loss_drop: {m['abs_loss_drop']:.6f}",
             f"- rel_loss_drop: {m['rel_loss_drop']:.4%}",
@@ -594,6 +648,12 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--model-compute-dtype", choices=["fp32", "reference"], default="fp32", help="MiPE/Softmask auxiliary compute dtype in model config.")
     p.add_argument("--key-dim", type=int, default=16)
     p.add_argument("--value-dim", type=int, default=64)
+    p.add_argument(
+        "--gradient-checkpointing",
+        type=bool_arg,
+        default=False,
+        help="Enable the supported non-reentrant Transformers checkpointing path.",
+    )
     p.add_argument("--mipe-threshold", type=float, default=256.0)
     p.add_argument("--initializer-range", type=float, default=0.1)
     p.add_argument("--learning-rate", type=float, default=6e-4)
@@ -639,7 +699,7 @@ def main() -> None:
         raise FileNotFoundError(
             f"Tokenizer path not found: {tokenizer_path}. Train/create the 768 TinyStories tokenizer first."
         )
-    tokenizer = AutoTokenizer.from_pretrained(str(tokenizer_path), use_fast=True, cache_dir=args.cache_dir)
+    tokenizer = load_tokenizer_compat(tokenizer_path, cache_dir=args.cache_dir)
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
     if tokenizer.eos_token_id is None:

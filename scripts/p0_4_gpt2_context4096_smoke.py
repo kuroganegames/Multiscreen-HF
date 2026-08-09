@@ -319,10 +319,14 @@ def build_model(s: argparse.Namespace, tokenizer):
     config.eos_token_id = int(tokenizer.eos_token_id)
     config.bos_token_id = int(tokenizer.bos_token_id or tokenizer.eos_token_id)
     config.use_cache = False
-    config.gradient_checkpointing = s.gradient_checkpointing
+    # Keep checkpointing runtime-only so it is installed exactly once with
+    # explicit kwargs instead of config auto-enable plus a second enable call.
+    config.gradient_checkpointing = False
     model = MultiscreenForCausalLM(config)
     if s.gradient_checkpointing:
-        model.gradient_checkpointing_enable()
+        model.gradient_checkpointing_enable(
+            gradient_checkpointing_kwargs={"use_reentrant": False}
+        )
     return model
 
 
@@ -623,6 +627,9 @@ def run(s: argparse.Namespace) -> dict[str, Any]:
         "num_attention_heads": int(model.config.num_attention_heads), "key_dim": int(model.config.key_dim),
         "value_dim": int(model.config.value_dim), "max_position_embeddings": int(model.config.max_position_embeddings),
         "gradient_checkpointing": s.gradient_checkpointing,
+        "gradient_checkpointing_kwargs": {"use_reentrant": False}
+        if s.gradient_checkpointing
+        else None,
         "dense_similarity_one_layer_lower_bound_bytes": dense_lower_bound,
     }
     data_info = {

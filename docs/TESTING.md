@@ -103,10 +103,96 @@ become non-finite. A direct test at position 131,071 does not allocate a dense
 131K forward and must not be reported as long-context feasibility or
 efficiency.
 
-See [P0_5_C2_PLAN.md](P0_5_C2_PLAN.md) and the proposed
-[MiPE position ADR](adr/ADR-0001-mipe-position-semantics.md), plus the compact
-[C2 result](validation_results/P0_5_C2_SUMMARY.md). The local gate has passed,
-but C2 remains `REVIEW_REQUIRED` and unaccepted until review and merge.
+See [P0_5_C2_PLAN.md](P0_5_C2_PLAN.md), the accepted
+[MiPE position ADR](adr/ADR-0001-mipe-position-semantics.md), and the compact
+[C2 result](validation_results/P0_5_C2_SUMMARY.md). C2 was merged as PR #10;
+its separate CUDA-autocast cache-dtype correction was merged as PR #11.
+
+## P1-preflight B
+
+P1-preflight B tests the supported non-reentrant Transformers
+gradient-checkpointing API. Run the focused suite under exact isolated 4.57.6
+and 5.14.1 lanes; do not substitute a floating resolver result.
+Set `TF4576_PYTHON` and `TF5141_PYTHON` to the corresponding exact-lane
+Python executables. The commands fail early if either variable is unset or the
+executable does not exist.
+
+```bash
+set -euo pipefail
+: "${TF4576_PYTHON:?set TF4576_PYTHON to the exact 4.57.6 lane executable}"
+: "${TF5141_PYTHON:?set TF5141_PYTHON to the exact 5.14.1 lane executable}"
+test -x "$TF4576_PYTHON"
+test -x "$TF5141_PYTHON"
+
+export PYTHONPATH=$PWD:$PWD/oracle:$PWD/third_party/multiscreen-pytorch
+
+"$TF4576_PYTHON" -m unittest discover \
+  -s tests \
+  -p 'test_gradient_checkpointing_contract.py' \
+  -v
+
+"$TF5141_PYTHON" -m unittest discover \
+  -s tests \
+  -p 'test_gradient_checkpointing_contract.py' \
+  -v
+```
+
+Then run the full P0-1/P0-2 CPU fp32 and CUDA bf16 commands below. The
+Stage 3 CUDA training-path checks use the recorded 4.57.6 lane.
+Before running them, set `HF_CACHE_DIR` to an existing local Hugging Face
+cache and `STAGE3_OUTPUT_ROOT` to an absolute writable path outside the
+repository. The commands fail early if either variable is unset.
+
+```bash
+set -euo pipefail
+: "${TF4576_PYTHON:?set TF4576_PYTHON to the exact 4.57.6 lane executable}"
+test -x "$TF4576_PYTHON"
+: "${HF_CACHE_DIR:?set HF_CACHE_DIR to an existing local cache}"
+: "${STAGE3_OUTPUT_ROOT:?set STAGE3_OUTPUT_ROOT outside the repository}"
+test -d "$HF_CACHE_DIR"
+case "$STAGE3_OUTPUT_ROOT" in
+  /*) ;;
+  *) echo "STAGE3_OUTPUT_ROOT must be absolute" >&2; exit 2 ;;
+esac
+case "$STAGE3_OUTPUT_ROOT/" in
+  "$PWD/"*) echo "STAGE3_OUTPUT_ROOT must be outside the repository" >&2; exit 2 ;;
+esac
+mkdir -p "$STAGE3_OUTPUT_ROOT"
+
+"$TF4576_PYTHON" scripts/p0_3_tinystories_stability.py \
+  --cache-dir "$HF_CACHE_DIR" \
+  --psi 8 16 \
+  --steps-per-psi 8:40,16:25 \
+  --seq-len 128 \
+  --batch-size 4 \
+  --max-texts 20000 \
+  --max-train-tokens 262144 \
+  --device cuda:0 \
+  --amp-dtype bf16 \
+  --model-compute-dtype fp32 \
+  --gradient-checkpointing true \
+  --output-dir "$STAGE3_OUTPUT_ROOT/p0-3-checkpointed"
+
+"$TF4576_PYTHON" scripts/p0_4_gpt2_context4096_smoke.py \
+  --config-dir configs/p0_4_multiscreen_psi8_gpt2_ctx4096 \
+  --cache-dir "$HF_CACHE_DIR" \
+  --device cuda:0 \
+  --amp-dtype bf16 \
+  --seq-len 1024 \
+  --steps 4 \
+  --gradient-accumulation-steps 1 \
+  --microbatch-size 1 \
+  --gradient-checkpointing true \
+  --fused-adamw false \
+  --max-texts 20000 \
+  --max-train-tokens 32769 \
+  --output-dir "$STAGE3_OUTPUT_ROOT/p0-4-checkpointed-diagnostic"
+```
+
+The second command must produce `P0-4_DIAGNOSTIC_COMPLETE.md`, not a qualifying
+completion marker. See [P1_PREFLIGHT_B_PLAN.md](P1_PREFLIGHT_B_PLAN.md) and the
+[Stage 3 local result](validation_results/P1_PREFLIGHT_B_SUMMARY.md). Stage 3
+remains `REVIEW_REQUIRED` until its focused PR is reviewed and merged.
 
 ## P0-1
 

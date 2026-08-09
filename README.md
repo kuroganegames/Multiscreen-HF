@@ -12,9 +12,11 @@ Current evidence-infrastructure gate:
 
 > **P1-preflight A: validation provenance and evidence retention v1 — partial.** The schema, standard-library provenance/packaging/verification tools, synthetic tests, and policy are implemented. All four retained P0-4 summary/metrics files matched their committed hashes; both completion markers were found and hashed for the new descriptor; and a sanitized archive verified locally. Durable exact/private retention is blocked because `MULTISCREEN_EVIDENCE_ARCHIVE_DIR` was not configured, and acceptance review remains pending because no explicit reviewer was supplied. P0-4 remains complete; no P1 model/ecosystem capability is validated.
 
-Staged Level 1 Core status: **P0.5-C1 is merged; P0.5-C2 passed locally and is
-`REVIEW_REQUIRED`.** C2 is not accepted until its focused draft PR is reviewed
-and merged; Stage 3 has not started.
+Staged Level 1 Core status: **P0.5-C1 and P0.5-C2 are accepted; P1-preflight B
+passed locally and is `REVIEW_REQUIRED`.** C1 was merged as PR #9, C2 as PR
+#10, and the separate C2 CUDA-autocast cache-dtype correction as PR #11. Stage
+3 is not accepted until its focused draft PR is reviewed and merged; Stage 4
+has not started.
 
 ## Start here
 
@@ -35,7 +37,9 @@ and merged; Stage 3 has not started.
 - Repository audit: [docs/REPOSITORY_AUDIT.md](docs/REPOSITORY_AUDIT.md)
 - C2 semantic decision: [docs/adr/ADR-0001-mipe-position-semantics.md](docs/adr/ADR-0001-mipe-position-semantics.md)
 - C2 plan: [docs/P0_5_C2_PLAN.md](docs/P0_5_C2_PLAN.md)
-- C2 local result: [docs/validation_results/P0_5_C2_SUMMARY.md](docs/validation_results/P0_5_C2_SUMMARY.md)
+- C2 accepted result: [docs/validation_results/P0_5_C2_SUMMARY.md](docs/validation_results/P0_5_C2_SUMMARY.md)
+- Stage 3 plan: [docs/P1_PREFLIGHT_B_PLAN.md](docs/P1_PREFLIGHT_B_PLAN.md)
+- Stage 3 local result: [docs/validation_results/P1_PREFLIGHT_B_SUMMARY.md](docs/validation_results/P1_PREFLIGHT_B_SUMMARY.md)
 
 ## What is included
 
@@ -284,9 +288,8 @@ codex
 Not yet validated:
 
 - P1-preflight A acceptance review and durable exact/private retention
-- P1-preflight B gradient-checkpointing modernization
-- P0.5-C2 merge acceptance (the focused local gate has passed)
-- paper-training-contract smoke
+- P1-preflight B merge acceptance (the focused local gate has passed)
+- P0.5-C3 paper-training-contract smoke
 - paper-scale pretraining or paper-quality reproduction
 - long-context retrieval at paper settings
 - long-context runtime or memory efficiency

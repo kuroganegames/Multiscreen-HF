@@ -36,7 +36,7 @@ runtime, retrieval quality, or the paper's optimized window-skipping claims.
 
 ## MiPE position and numerical modes
 
-P0.5-C2 proposes two explicit serialized position semantics:
+P0.5-C2 uses two accepted explicit serialized position semantics:
 
 ```text
 paper_absolute
@@ -61,8 +61,23 @@ collapse distinct integer positions and fp16 can become non-finite, so the
 low-precision reference lane is compatibility evidence rather than proof of
 long-position causal correctness.
 
-These C2 semantics remain pending focused pull-request review and merge; this
-section does not mark C2 or Level 1 accepted.
+These C2 semantics were accepted by merged PR #10. PR #11 separately corrected
+CUDA-autocast cache-dtype prediction and did not change the position decision.
+This does not mark the full five-stage Level 1 program complete.
+
+## Gradient-checkpointing boundary
+
+P1-preflight B locally validates the supported non-reentrant full-model
+training path under exact Transformers 4.57.6 and 5.14.1. The result remains
+`REVIEW_REQUIRED` until its focused PR is reviewed and merged. Compatibility
+with later untested Transformers releases is not inferred.
+
+Transformers 5.14.1 installs an input-embedding gradient hook for checkpointed
+`input_ids`, while Multiscreen uses normalized `F.embedding` lookup. A focused
+test proves finite layer gradients when the first non-reentrant checkpoint
+input itself does not require gradients. This does not validate frozen-base
+PEFT/LoRA behavior, which remains a separate future gate. Broad Trainer,
+distributed, compile, and serving integration are also unvalidated.
 
 ## P0-2 padding masks
 
