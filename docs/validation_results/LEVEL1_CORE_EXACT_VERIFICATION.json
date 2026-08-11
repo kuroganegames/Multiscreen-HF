@@ -1,0 +1,27 @@
+{
+  "archive": {
+    "archive_kind": "exact_private",
+    "filename": "level1-core-b224ca1a127ee18fc5fd4b00a5df639401d60679.exact.tar.gz",
+    "manifest_sha256": "4352034790db6ed2c761eebfd65c5eb1051e90d282f207de9b0d2abfbf868768",
+    "member_count": 135,
+    "sha256": "9c4aa9e2b2a9889caeb3e78bedf6409fc47fcbb93844592dba586c0b894163ee",
+    "size_bytes": 89041
+  },
+  "checks": {
+    "archive_sha256": "verified",
+    "canonical_gzip_and_tar": "verified",
+    "evidence_document": "verified",
+    "manifest": "verified",
+    "member_hashes": "verified",
+    "member_paths_and_types": "verified",
+    "sanitization": {
+      "status": "not_applicable"
+    },
+    "sha256sums": "verified"
+  },
+  "errors": [],
+  "format_version": "validation-evidence-verification-v1",
+  "status": "verified",
+  "verified_at_utc": "2026-08-11T22:15:14Z",
+  "verifier_version": "1.0.0"
+}

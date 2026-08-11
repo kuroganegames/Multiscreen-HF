@@ -1,0 +1,54 @@
+{
+  "acceptance_review": {
+    "reviewers": [
+      {
+        "identifier": "kuroganegames",
+        "raw_events_reviewed": true,
+        "review_commit": "b224ca1a127ee18fc5fd4b00a5df639401d60679",
+        "review_method": "全46 lossless command logs、2 environment records、48 runner records、187 raw events、focused/full reports、および130 logical artifactsを確認し、順序、有限性、完了条件、機能チェック、SHA-256 binding、failure不在を照合した",
+        "reviewed_at_utc": "2026-08-11T22:13:24Z",
+        "role": "evidence_reviewer"
+      }
+    ],
+    "status": "recorded"
+  },
+  "limitations": [
+    "This is an unofficial correctness-first Hugging Face implementation.",
+    "The dense quadratic screening path is not evidence of paper efficiency.",
+    "No paper-scale training, retrieval benchmark, distributed training, or P1 ecosystem capability is validated."
+  ],
+  "review": {
+    "artifact_count": 130,
+    "command_count": 46,
+    "environment_record_count": 2,
+    "ordering_checks": [
+      "runtime-environment-records-before-environment-commands",
+      "all-matrix-commands-inside-hygiene-bracket",
+      "c3-data-and-four-lanes-ordered",
+      "p0-3-run-and-tokenizer-reloads-ordered",
+      "p0-4-psi8-reviewed-before-psi16"
+    ],
+    "raw_event_counts": {
+      "c3_jsonl_events": 8,
+      "p0_3_stdout_step_events": 65,
+      "p0_4_jsonl_events": 114,
+      "total": 187
+    },
+    "review_material_sha256": "cf4efdd475c0d837e77a532fb6767fc2fc8e04f57e01fbaad6a36f068ecea22e",
+    "status": "passed"
+  },
+  "schema_version": "multiscreen-level1-core-summary-v1",
+  "tested_commit": "b224ca1a127ee18fc5fd4b00a5df639401d60679",
+  "validated_components": {
+    "c1_architecture_initialization_all_scale": "passed",
+    "c2_position_mipe_cache": "passed",
+    "c3_paper_training_contract_diagnostics": "passed",
+    "gradient_checkpointing_api_matrix": "passed",
+    "p0_1_formula_oracle": "passed",
+    "p0_2_three_way": "passed",
+    "p0_3_checkpointed_smoke": "passed",
+    "p0_4_psi8_psi16_qualification": "passed"
+  },
+  "validation_gate": "Level 1 Core",
+  "validation_status": "passed"
+}
