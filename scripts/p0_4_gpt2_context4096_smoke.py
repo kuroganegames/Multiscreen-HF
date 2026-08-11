@@ -21,6 +21,7 @@ import shutil
 import sys
 import time
 import traceback
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterator, Mapping
 
@@ -208,6 +209,31 @@ def write_json(path: Path, value: Mapping[str, Any]) -> None:
     temp.replace(path)
 
 
+def require_new_data_contract_path(output_dir: Path) -> Path:
+    path = output_dir / "data_contract.json"
+    if path.exists() or path.is_symlink():
+        raise RuntimeError("Refusing to replace existing data_contract.json")
+    return path
+
+
+def build_data_contract_reference(
+    sha256: str, *, schema_version: str
+) -> dict[str, str]:
+    if (
+        not isinstance(sha256, str)
+        or len(sha256) != 64
+        or any(character not in "0123456789abcdef" for character in sha256)
+    ):
+        raise ValueError("data-contract SHA-256 is invalid")
+    if not isinstance(schema_version, str) or not schema_version:
+        raise ValueError("data-contract schema version is invalid")
+    return {
+        "file": "data_contract.json",
+        "schema_version": schema_version,
+        "sha256": sha256,
+    }
+
+
 def seed_all(seed: int) -> None:
     random.seed(seed)
     torch.manual_seed(seed)
@@ -253,7 +279,15 @@ def move(batch: Mapping[str, Any], device: torch.device) -> dict[str, Any]:
     return {k: v.to(device, non_blocking=True) if isinstance(v, torch.Tensor) else v for k, v in batch.items()}
 
 
-def load_texts(s: argparse.Namespace) -> list[str]:
+@dataclass(frozen=True)
+class LoadedTexts:
+    texts: list[str]
+    dataset_fingerprint: str | None
+    text_column: str | None
+    source_kind: str
+
+
+def load_texts(s: argparse.Namespace) -> LoadedTexts:
     if s.text_file:
         raw = s.text_file.read_text(encoding="utf-8")
         texts = [x.strip() for x in raw.split("\n\n") if x.strip()]
@@ -261,7 +295,12 @@ def load_texts(s: argparse.Namespace) -> list[str]:
             texts = [x.strip() for x in raw.splitlines() if x.strip()]
         if not texts:
             raise RuntimeError(f"No text found in {s.text_file}")
-        return texts[: s.max_texts]
+        return LoadedTexts(
+            texts=texts[: s.max_texts],
+            dataset_fingerprint=None,
+            text_column=None,
+            source_kind="local_text_file",
+        )
     if load_dataset is None:
         raise RuntimeError(f"datasets unavailable and no --text-file supplied: {_DATASETS_IMPORT_ERROR!r}")
     kwargs = {
@@ -275,6 +314,9 @@ def load_texts(s: argparse.Namespace) -> list[str]:
         column = next((x for x in ("text", "story", "content", "document") if x in columns), "")
     if columns and column not in columns:
         raise ValueError(f"text column {column!r} not found; available: {columns}")
+    fingerprint = getattr(dataset, "_fingerprint", None)
+    if not isinstance(fingerprint, str) or not fingerprint:
+        raise RuntimeError("Loaded dataset does not expose a non-empty fingerprint")
     texts: list[str] = []
     for row in dataset:
         value = row.get(column) if isinstance(row, Mapping) else row[column]
@@ -284,7 +326,12 @@ def load_texts(s: argparse.Namespace) -> list[str]:
             break
     if not texts:
         raise RuntimeError("Dataset contains no non-empty text")
-    return texts
+    return LoadedTexts(
+        texts=texts,
+        dataset_fingerprint=fingerprint,
+        text_column=column,
+        source_kind="huggingface_dataset",
+    )
 
 
 def load_tokenizer(s: argparse.Namespace):
@@ -590,6 +637,7 @@ def write_failure(output: Path, exc: BaseException) -> None:
 
 def run(s: argparse.Namespace) -> dict[str, Any]:
     s.output_dir.mkdir(parents=True, exist_ok=True)
+    data_contract_path = require_new_data_contract_path(s.output_dir)
     for name in ("failure.json", "P0-4_FAILED.md", "P0-4_COMPLETE.md", "P0-4_DIAGNOSTIC_COMPLETE.md", "summary.json"):
         (s.output_dir / name).unlink(missing_ok=True)
     metrics = s.output_dir / "metrics.jsonl"
@@ -598,10 +646,10 @@ def run(s: argparse.Namespace) -> dict[str, Any]:
     torch.set_float32_matmul_precision("high")
     device = resolve_device(s)
     env = environment(device)
-    append_jsonl(metrics, {"event": "run_start", "stage": STAGE, "timestamp_utc": utc_now(), "settings": settings_json(s), "environment": env})
 
     tokenizer = load_tokenizer(s)
-    texts = load_texts(s)
+    loaded_texts = load_texts(s)
+    texts = loaded_texts.texts
     from multiscreen_transformers import PackedTextDataset
     dataset = PackedTextDataset(
         texts=texts, tokenizer=tokenizer, seq_len=s.seq_len, eos_token_id=tokenizer.eos_token_id,
@@ -609,6 +657,53 @@ def run(s: argparse.Namespace) -> dict[str, Any]:
     )
     if len(dataset) < s.batch_size:
         raise RuntimeError(f"Only {len(dataset)} packed chunks for batch_size={s.batch_size}")
+
+    from scripts.p0_4_evidence_contract import (
+        SCHEMA_VERSION as DATA_CONTRACT_SCHEMA_VERSION,
+        build_data_contract,
+        build_tokenizer_projection,
+        write_new_report,
+    )
+
+    tokenizer_projection = build_tokenizer_projection(tokenizer)
+    data_contract = build_data_contract(
+        source_kind=loaded_texts.source_kind,
+        dataset_name=s.dataset_name,
+        dataset_config=s.dataset_config,
+        train_split=s.train_split,
+        revision=s.revision,
+        text_column=loaded_texts.text_column,
+        dataset_fingerprint=loaded_texts.dataset_fingerprint,
+        data_files=s.data_files,
+        data_dir=s.data_dir,
+        text_file=str(s.text_file) if s.text_file else None,
+        streaming=s.streaming,
+        max_texts=s.max_texts,
+        max_train_tokens=s.max_train_tokens,
+        texts=texts,
+        packed_tokens=dataset.tokens,
+        seq_len=s.seq_len,
+        eos_token_id=int(tokenizer.eos_token_id),
+        tokenizer=tokenizer_projection,
+    )
+    data_contract_sha256 = write_new_report(data_contract_path, data_contract)
+    data_contract_ref = build_data_contract_reference(
+        data_contract_sha256,
+        schema_version=DATA_CONTRACT_SCHEMA_VERSION,
+    )
+    print(f"[P0-4] data_contract sha256={data_contract_sha256}")
+    append_jsonl(
+        metrics,
+        {
+            "event": "run_start",
+            "stage": STAGE,
+            "timestamp_utc": utc_now(),
+            "settings": settings_json(s),
+            "environment": env,
+            "data_contract": data_contract_ref,
+        },
+    )
+
     loader = DataLoader(dataset, batch_size=s.batch_size, shuffle=True, drop_last=True, num_workers=s.num_workers, pin_memory=device.type == "cuda")
     probe = move(next(iter(loader)), device)
     if int(probe["input_ids"].shape[1]) != s.seq_len:
@@ -636,7 +731,7 @@ def run(s: argparse.Namespace) -> dict[str, Any]:
         "source": str(s.text_file) if s.text_file else s.dataset_name, "train_split": s.train_split,
         "texts_loaded": len(texts), "packed_chunks": len(dataset), "seq_len": s.seq_len,
         "max_train_tokens": s.max_train_tokens, "tokenizer_class": tokenizer.__class__.__name__,
-        "tokenizer_vocab_size": len(tokenizer),
+        "tokenizer_vocab_size": len(tokenizer), "data_contract": data_contract_ref,
     }
     append_jsonl(metrics, {"event": "preflight_complete", "stage": STAGE, "timestamp_utc": utc_now(), "model": model_info, "data": data_info})
     print(f"[P0-4] psi={psi} params={parameters:,} vocab={len(tokenizer):,} seq_len={s.seq_len} chunks={len(dataset)} device={device} amp={s.amp_dtype}")
@@ -660,7 +755,7 @@ def run(s: argparse.Namespace) -> dict[str, Any]:
         "training": training, "checks": {"save_reload": reload_result, "cache": cache_result, "generation": generation_result},
     }
     write_json(s.output_dir / "summary.json", summary)
-    append_jsonl(metrics, {"event": "run_complete", "stage": STAGE, "status": status, "qualification": q, "timestamp_utc": summary["timestamp_utc"]})
+    append_jsonl(metrics, {"event": "run_complete", "stage": STAGE, "status": status, "qualification": q, "timestamp_utc": summary["timestamp_utc"], "data_contract": data_contract_ref})
     write_note(summary, s.output_dir)
     return summary
 

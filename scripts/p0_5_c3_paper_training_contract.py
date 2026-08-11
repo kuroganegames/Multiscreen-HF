@@ -12,10 +12,14 @@ import argparse
 import dataclasses
 import datetime as dt
 import hashlib
+import importlib
+import importlib.metadata
 import json
 import math
+import os
 import platform
 import random
+import stat
 import sys
 from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 from pathlib import Path
@@ -38,6 +42,24 @@ TOKENIZER_ASSETS = {
     "tokenizer_config.json": "5e04eb606e3a1583530a42e36c2a6b6615c86f34fe77e44d9ddeb43ff940931f",
     "vocab.json": "196139668be63f3b5d6574427317ae82f612a97c5d1cdaf36ed2256dbf636783",
 }
+
+OFFLINE_CACHE_DATASETS_VERSION = "5.0.1"
+OFFLINE_CACHE_REPOSITORY = "gmongaras/SlimPajama-627B_Reupload"
+OFFLINE_CACHE_DATASET_NAME = "slim_pajama-627_b_reupload"
+OFFLINE_CACHE_CONFIG_NAME = "default-8884724778247ab6"
+OFFLINE_CACHE_VERSION = "0.0.0"
+OFFLINE_CACHE_HASH = "c34c22dbb10ae6b264a2f357a909d1a537141b36"
+OFFLINE_CACHE_SPLIT = "test"
+OFFLINE_CACHE_RELATIVE_DIRECTORY = (
+    Path("gmongaras___slim_pajama-627_b_reupload")
+    / OFFLINE_CACHE_CONFIG_NAME
+    / OFFLINE_CACHE_VERSION
+    / OFFLINE_CACHE_HASH
+)
+OFFLINE_CACHE_REQUIRED_FILES = (
+    "dataset_info.json",
+    "slim_pajama-627_b_reupload-test.arrow",
+)
 
 EXPECTED_VALUES: dict[str, Any] = {
     "schema_version": "1.0.0",
@@ -576,6 +598,197 @@ def load_pinned_tokenizer(
     }
 
 
+def _offline_cache_rehydration_mode(
+    environment: Mapping[str, str],
+) -> bool:
+    """Select the narrow cache route or an unambiguously online route."""
+
+    datasets_offline = environment.get("HF_DATASETS_OFFLINE")
+    hub_offline = environment.get("HF_HUB_OFFLINE")
+    valid_values = {None, "", "0", "1"}
+    if datasets_offline not in valid_values or hub_offline not in valid_values:
+        raise RuntimeError(
+            "HF_DATASETS_OFFLINE and HF_HUB_OFFLINE must be exact 0/1 values"
+        )
+    if datasets_offline == "1" and hub_offline == "1":
+        return True
+    if datasets_offline == "1" or hub_offline == "1":
+        raise RuntimeError(
+            "canonical offline cache rehydration requires both "
+            "HF_DATASETS_OFFLINE=1 and HF_HUB_OFFLINE=1"
+        )
+    return False
+
+
+def _reject_symlink_components(path: Path, *, field: str) -> None:
+    current = Path(path.anchor)
+    for component in path.parts[1:]:
+        current /= component
+        try:
+            mode = os.lstat(current).st_mode
+        except OSError as exc:
+            raise ValueError(f"{field} cannot be inspected") from exc
+        if stat.S_ISLNK(mode):
+            raise ValueError(f"{field} must not contain symlink components")
+
+
+def _canonical_offline_cache_paths(cache_dir: str | None) -> tuple[Path, Path]:
+    """Validate the explicit cache root and exact prepared output directory."""
+
+    if not isinstance(cache_dir, str) or not cache_dir or "\x00" in cache_dir:
+        raise ValueError("offline canonical cache requires an explicit cache root")
+    candidate = Path(cache_dir)
+    if (
+        not candidate.is_absolute()
+        or os.fspath(candidate) != cache_dir
+        or candidate == Path(candidate.anchor)
+    ):
+        raise ValueError(
+            "offline canonical cache root must be absolute and lexical-canonical"
+        )
+    _reject_symlink_components(candidate, field="offline canonical cache root")
+    try:
+        root = candidate.resolve(strict=True)
+    except OSError as exc:
+        raise ValueError("offline canonical cache root does not exist") from exc
+    if os.fspath(root) != cache_dir or not root.is_dir():
+        raise ValueError(
+            "offline canonical cache root must be an existing canonical directory"
+        )
+
+    expected_output = root / OFFLINE_CACHE_RELATIVE_DIRECTORY
+    _reject_symlink_components(
+        expected_output,
+        field="offline canonical prepared cache",
+    )
+    try:
+        resolved_output = expected_output.resolve(strict=True)
+    except OSError as exc:
+        raise ValueError("offline canonical prepared cache is missing") from exc
+    if resolved_output != expected_output or not resolved_output.is_dir():
+        raise ValueError(
+            "offline canonical prepared cache must be the exact fixed directory"
+        )
+    return root, resolved_output
+
+
+def _validate_offline_cache_files(output: Path) -> None:
+    """Require the exact audited prepared-cache files as regular files."""
+
+    try:
+        entries = tuple(sorted(child.name for child in output.iterdir()))
+    except OSError as exc:
+        raise ValueError("offline canonical prepared cache cannot be listed") from exc
+    if entries != OFFLINE_CACHE_REQUIRED_FILES:
+        raise ValueError(
+            "offline canonical prepared cache has an unexpected file layout"
+        )
+    for name in OFFLINE_CACHE_REQUIRED_FILES:
+        candidate = output / name
+        try:
+            mode = os.lstat(candidate).st_mode
+        except OSError as exc:
+            raise ValueError(
+                "offline canonical prepared cache file cannot be inspected"
+            ) from exc
+        if not stat.S_ISREG(mode):
+            raise ValueError(
+                "offline canonical prepared cache files must be regular files"
+            )
+
+
+def _import_datasets_module() -> Any:
+    import datasets
+
+    return datasets
+
+
+def _bound_datasets_cache_class(datasets_module: Any) -> type[Any]:
+    """Bind Cache to the installed datasets distribution and package origin."""
+
+    try:
+        package_file = Path(datasets_module.__file__).resolve(strict=True)
+        package_root = package_file.parent
+        distribution_root = Path(
+            importlib.metadata.distribution("datasets").locate_file("datasets")
+        ).resolve(strict=True)
+        cache_module = importlib.import_module(
+            "datasets.packaged_modules.cache.cache"
+        )
+        cache_module_path = Path(cache_module.__file__).resolve(strict=True)
+        expected_module_path = (
+            package_root / "packaged_modules" / "cache" / "cache.py"
+        ).resolve(strict=True)
+        cache_class = cache_module.Cache
+    except Exception as exc:
+        raise RuntimeError(
+            "installed datasets Cache implementation cannot be bound"
+        ) from exc
+    if (
+        package_file.name != "__init__.py"
+        or package_root != distribution_root
+        or cache_module_path != expected_module_path
+        or getattr(cache_class, "__module__", None) != cache_module.__name__
+        or not isinstance(cache_class, type)
+    ):
+        raise RuntimeError(
+            "datasets Cache implementation is not from the installed package"
+        )
+    return cache_class
+
+
+def _validate_offline_cache_config(config: Mapping[str, Any]) -> None:
+    expected = {
+        "data_files": {"test": "data/test-00000-of-00030.parquet"},
+        "recorded_datasets_version": OFFLINE_CACHE_DATASETS_VERSION,
+        "repository": OFFLINE_CACHE_REPOSITORY,
+        "revision": OFFLINE_CACHE_HASH,
+        "split": OFFLINE_CACHE_SPLIT,
+    }
+    actual = {field: config.get(field) for field in expected}
+    if canonical_json_bytes(actual) != canonical_json_bytes(expected):
+        raise RuntimeError(
+            "offline canonical cache route only supports the fixed C3 dataset"
+        )
+
+
+def _load_offline_canonical_dataset(
+    config: Mapping[str, Any],
+    *,
+    cache_dir: str | None,
+    datasets_module: Any,
+) -> Any:
+    """Rehydrate the audited datasets 5.0.1 Arrow cache without Hub fallback."""
+
+    _validate_offline_cache_config(config)
+    if getattr(datasets_module, "__version__", None) != OFFLINE_CACHE_DATASETS_VERSION:
+        raise RuntimeError(
+            "offline canonical cache rehydration requires datasets==5.0.1"
+        )
+    cache_root, expected_output = _canonical_offline_cache_paths(cache_dir)
+    _validate_offline_cache_files(expected_output)
+    cache_class = _bound_datasets_cache_class(datasets_module)
+    builder = cache_class(
+        cache_dir=os.fspath(cache_root),
+        repo_id=OFFLINE_CACHE_REPOSITORY,
+        dataset_name=OFFLINE_CACHE_DATASET_NAME,
+        config_name=OFFLINE_CACHE_CONFIG_NAME,
+        version=OFFLINE_CACHE_VERSION,
+        hash=OFFLINE_CACHE_HASH,
+    )
+    try:
+        builder_output = Path(builder.cache_dir).resolve(strict=True)
+    except (AttributeError, OSError, TypeError) as exc:
+        raise RuntimeError(
+            "datasets Cache did not bind the fixed prepared output directory"
+        ) from exc
+    if builder_output != expected_output:
+        raise RuntimeError(
+            "datasets Cache resolved a noncanonical prepared output directory"
+        )
+    return builder.as_dataset(split=OFFLINE_CACHE_SPLIT)
+
+
 def load_pinned_rows(
     manifest: Mapping[str, Any],
     *,
@@ -583,6 +796,7 @@ def load_pinned_rows(
     load_dataset_fn: Callable[..., Any] | None = None,
     hub_download_fn: Callable[..., str] | None = None,
     datasets_version: str | None = None,
+    environment: Mapping[str, str] | None = None,
 ) -> SelectedRows:
     config = _value_at(manifest, "dataset")
     file_record = _verify_hub_file_identity(
@@ -596,11 +810,20 @@ def load_pinned_rows(
         hub_download_fn=hub_download_fn,
     )
 
+    full_dataset: Any | None = None
     if load_dataset_fn is None:
-        import datasets
-
-        load_dataset_fn = datasets.load_dataset
-        datasets_version = datasets.__version__
+        active_environment = os.environ if environment is None else environment
+        offline_cache_mode = _offline_cache_rehydration_mode(active_environment)
+        datasets_module = _import_datasets_module()
+        datasets_version = datasets_module.__version__
+        if offline_cache_mode:
+            full_dataset = _load_offline_canonical_dataset(
+                config,
+                cache_dir=cache_dir,
+                datasets_module=datasets_module,
+            )
+        else:
+            load_dataset_fn = datasets_module.load_dataset
     if datasets_version != config["recorded_datasets_version"]:
         raise RuntimeError(
             "dataset fingerprints are qualified only under datasets "
@@ -616,7 +839,10 @@ def load_pinned_rows(
     }
     if cache_dir is not None:
         kwargs["cache_dir"] = cache_dir
-    full_dataset = load_dataset_fn(config["repository"], **kwargs)
+    if full_dataset is None:
+        if load_dataset_fn is None:  # defensive invariant after dispatch
+            raise RuntimeError("dataset loader dispatch is incomplete")
+        full_dataset = load_dataset_fn(config["repository"], **kwargs)
     full_fingerprint = getattr(full_dataset, "_fingerprint", None)
     if full_fingerprint != config["expected_full_fingerprint"]:
         raise AssertionError(

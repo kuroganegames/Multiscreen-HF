@@ -1,29 +1,53 @@
-# P0 Release / Handoff Checklist
+# Level 1 Core / P0 Release and Handoff Checklist
 
-This checklist is for tagging, handing off, or resuming work from the P0-qualified baseline.
+This checklist is for tagging, handing off, or resuming work from the
+Level 1 Core and P0-qualified baselines.
 
 ## Current staged gate
 
 ```text
-P0.5-C3: paper-training-contract smoke — local validation passed; REVIEW_REQUIRED
+final Level 1 requalification: complete locally; draft PR REVIEW_REQUIRED
 ```
 
-The current focused Stage 4 plan and checked recipe are:
+This remains an unofficial correctness-first result; the dense quadratic path
+is not efficiency evidence, and it does not validate paper-scale reproduction,
+retrieval benchmarks, optimized long-context efficiency, distributed training,
+or any P1 model/ecosystem capability.
+
+The accepted Stage 4 records and locally complete Stage 5 records are:
 
 ```text
 docs/P0_5_C3_PLAN.md
 configs/p0_5_c3_paper_training_contract.json
 docs/validation_results/P0_5_C3_SUMMARY.{md,json}
 docs/validation_results/P0_5_C3_EVIDENCE_ARCHIVE.json
+docs/LEVEL1_CORE_REQUALIFICATION_PLAN.md
+docs/validation_results/LEVEL1_CORE_SUMMARY.{md,json}
+docs/validation_results/LEVEL1_CORE_EVIDENCE_ARCHIVE.json
+docs/validation_results/LEVEL1_CORE_{EXACT,SANITIZED}_VERIFICATION.json
 ```
 
 C1 was reviewed and merged as PR #9. C2 was merged as PR #10, and its separate
 CUDA-autocast cache-dtype correction was merged as PR #11. Stage 3 was reviewed
 and merged as PR #12. Stage 4 unit, pinned-data, CUDA bf16 operational,
 peak-exposure, full regression, and evidence checks passed on tested commit
-`8fa5dbf13530c942b2c9e5f03a572bd0cd5ca74f`. Its focused draft PR is
-`REVIEW_REQUIRED`; acceptance and final Level 1 requalification remain
-pending.
+`8fa5dbf13530c942b2c9e5f03a572bd0cd5ca74f`; the focused Stage 4 result was
+reviewed and accepted by merged PR #13. The existing C3 evidence descriptor
+still records partial retention: exact/private retention and an explicitly
+supplied evidence reviewer remain pending. Those facts are not rewritten by PR
+acceptance.
+
+Final Level 1 requalification passed locally under
+[LEVEL1_CORE_REQUALIFICATION_PLAN.md](LEVEL1_CORE_REQUALIFICATION_PLAN.md) on
+tested source `b224ca1a127ee18fc5fd4b00a5df639401d60679`. Acceptance review is
+recorded, the exact/private archive is retained externally and verified, and
+the sanitized archive is verified but unpublished. The focused draft PR
+remains `REVIEW_REQUIRED` and unmerged. No public asset exists, and no P1
+model/ecosystem capability is validated.
+This remains an unofficial correctness-first result; the dense quadratic path
+is not efficiency evidence, and it does not validate paper-scale reproduction,
+retrieval benchmarks, optimized long-context efficiency, distributed training,
+or any P1 model/ecosystem capability.
 
 The separate evidence-infrastructure design and historical Codex handoff are:
 
@@ -50,10 +74,11 @@ See [EVIDENCE_ARCHIVE_POLICY.md](EVIDENCE_ARCHIVE_POLICY.md) and the
 
 ## Before handoff or tagging
 
-- [ ] `README.md` links to `AGENTS.md`, `docs/HANDOFF.md`, the P1-preflight A plan and Goal handoff, validation/testing/limitation records, `docs/EVIDENCE_ARCHIVE_POLICY.md`, and `docs/validation_results/P0_4_EVIDENCE_ARCHIVE.json`.
+- [ ] `README.md` links to `AGENTS.md`, `docs/HANDOFF.md`, the historical P1-preflight A records, validation/testing/limitation records, `docs/EVIDENCE_ARCHIVE_POLICY.md`, and the P0-4 and Level 1 evidence descriptors.
 - [ ] Root `AGENTS.md` reflects the current development phase, Conda/uv environment-safety contract, evidence-integrity rules, and required test policy.
 - [ ] `docs/HANDOFF.md` identifies P1-preflight A as partial/blocked without claiming it is complete.
-- [ ] `docs/VALIDATION_STATUS.md` reflects the latest accepted P0-1/P0-2/P0-3/P0-4 evidence.
+- [ ] `docs/VALIDATION_STATUS.md` reflects the latest P0 and reviewed Level 1 Core evidence.
+- [ ] The Level 1 summary, complete descriptor, and both verification reports bind tested source `b224ca1a127ee18fc5fd4b00a5df639401d60679` without exposing private paths.
 - [ ] P0-4 remains complete from the reviewed qualifying evidence and is not reinterpreted from static validation or a diagnostic.
 - [ ] `docs/validation_results/` contains sanitized compact result files and descriptors only; no secrets, private absolute paths, or raw archives.
 - [ ] `docs/validation_results/VALIDATION_LOG_INDEX.md` links every accepted summary and archive descriptor.
@@ -123,6 +148,12 @@ and the Psi=8-before-Psi=16 CUDA bf16 operational and exact-peak exposure
 commands documented in [TESTING.md](TESTING.md). Do not substitute a local text
 fallback, shortened context, clipping, or a lower learning rate and still call
 the corresponding Stage 4 lane passed.
+
+For final Level 1 requalification, follow the complete matrix, provenance,
+review, and evidence-retention boundary in
+[LEVEL1_CORE_REQUALIFICATION_PLAN.md](LEVEL1_CORE_REQUALIFICATION_PLAN.md).
+The fresh reviewed Stage 5 record satisfied that boundary locally. Stage 4
+acceptance alone remains insufficient for a future Stage 5 reproduction.
 
 For P1-preflight A, also run:
 
@@ -210,20 +241,24 @@ If raw files, reviewer input, durable storage, sanitization, or verification are
 
 The completed P0-1 through P0-4 baseline should use a new immutable tag, such as `p0-4-qualified-v0`, only after the evidence PR is reviewed and merged. If an earlier tag exists, do not move it; verify remote tags before choosing a new immutable name. Do not create a tag from an evidence-infrastructure branch.
 
+Do not create a Level 1 tag before the focused Stage 5 PR is reviewed and
+merged, and never create one without explicit user instruction.
+
 A sanitized archive may be attached to an explicitly configured release. The exact raw archive must remain private and separately retained.
 
 ## Suggested current baseline release note
 
 ```text
-P0-qualified unofficial HF Multiscreen implementation through P0-4.
-Validated: paper-oracle equivalence, three-way reference equivalence,
-DynamicCache-compatible greedy generation smoke, TinyStories Psi=8/16 bf16
-smoke training, and qualifying GPT-2-vocabulary context-4096 CUDA bf16
-short-run training for Psi=8 and Psi=16.
-P0-4 runtime and memory are feasibility diagnostics only.
+Level 1 Core mathematical Hugging Face implementation complete locally.
+Reviewed validation covers paper-oracle and three-way reference equivalence,
+C1 architecture/initialization, C2 MiPE/cache semantics, supported
+non-reentrant gradient checkpointing, bounded C3 training-contract
+diagnostics, TinyStories Psi=8/16 bf16 smoke training, and fresh qualifying
+GPT-2-vocabulary context-4096 CUDA bf16 short runs for Psi=8 and Psi=16.
+The focused Stage 5 draft PR remains REVIEW_REQUIRED and unmerged.
 P1-preflight A evidence infrastructure is implemented; retention remains
 partial because explicit review and external exact/private retention are pending.
-Not validated: paper-scale reproduction, retrieval quality, long-context
-efficiency, Triton/windowed kernels, PEFT/LoRA/Unsloth, broad generation,
-or production serving.
+Not validated: paper-scale reproduction, retrieval quality, optimized
+long-context efficiency, distributed training, Triton/windowed kernels,
+PEFT/LoRA/Unsloth, broad generation, or production serving.
 ```

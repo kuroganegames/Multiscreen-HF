@@ -26,6 +26,7 @@ import json
 import math
 import os
 import random
+import re
 import sys
 import time
 from pathlib import Path
@@ -101,18 +102,33 @@ def read_text_file(path: Path, *, max_texts: int) -> list[str]:
     return parts[:max_texts]
 
 
-def load_texts(args: argparse.Namespace) -> list[str]:
+@dataclasses.dataclass(frozen=True)
+class LoadedTexts:
+    texts: list[str]
+    dataset_fingerprint: str | None
+    text_column: str | None
+    source_kind: str
+
+
+def load_texts(args: argparse.Namespace) -> LoadedTexts:
     if args.text_file:
         texts = read_text_file(Path(args.text_file).expanduser(), max_texts=args.max_texts)
         if not texts:
             raise RuntimeError(f"No texts loaded from --text-file={args.text_file}")
-        return texts
+        return LoadedTexts(
+            texts=texts,
+            dataset_fingerprint=None,
+            text_column=None,
+            source_kind="local_text_file",
+        )
 
     if load_dataset is None:
         raise RuntimeError(
             "datasets is not importable. Install datasets or pass --text-file. "
             f"Original import error: {_DATASETS_IMPORT_ERROR!r}"
         )
+    if not isinstance(args.revision, str) or re.fullmatch(r"[0-9a-f]{40}", args.revision) is None:
+        raise RuntimeError("Hub-backed P0-3 requires --revision as a full lowercase commit")
     ds = load_dataset(
         args.dataset_name,
         args.dataset_config,
@@ -124,13 +140,20 @@ def load_texts(args: argparse.Namespace) -> list[str]:
     )
     if args.max_texts and args.max_texts > 0 and len(ds) > args.max_texts:
         ds = ds.select(range(args.max_texts))
-    col = choose_text_column(ds, args.text_column)
-    texts = ["" if row[col] is None else str(row[col]) for row in ds]
-    texts = [t for t in texts if t.strip()]
+    fingerprint = getattr(ds, "_fingerprint", None)
+    if not isinstance(fingerprint, str) or not fingerprint:
+        raise RuntimeError("Loaded dataset does not expose a non-empty fingerprint")
+    column = choose_text_column(ds, args.text_column)
+    texts = ["" if row[column] is None else str(row[column]) for row in ds]
+    texts = [text for text in texts if text.strip()]
     if not texts:
         raise RuntimeError("Loaded dataset contains no non-empty texts")
-    return texts
-
+    return LoadedTexts(
+        texts=texts,
+        dataset_fingerprint=fingerprint,
+        text_column=column,
+        source_kind="huggingface_dataset",
+    )
 
 def cycle_loader(loader: DataLoader) -> Iterator[dict[str, torch.Tensor]]:
     while True:
@@ -408,6 +431,7 @@ def train_one_psi(
     dataset,
     device: torch.device,
     output_dir: Path,
+    data_contract_sha256: str,
 ) -> dict[str, Any]:
     from multiscreen_transformers import register_multiscreen_auto_classes
 
@@ -540,6 +564,7 @@ def train_one_psi(
 
     metrics = {
         "psi": psi,
+        "data_contract_sha256": data_contract_sha256,
         "steps": steps,
         "params": param_count,
         "device": str(device),
@@ -708,7 +733,8 @@ def main() -> None:
         raise RuntimeError("Tokenizer must have pad_token_id")
     print(f"[P0-3] tokenizer={tokenizer.__class__.__name__} len={len(tokenizer)} path={tokenizer_path}")
 
-    texts = load_texts(args)
+    loaded_texts = load_texts(args)
+    texts = loaded_texts.texts
     print(f"[P0-3] loaded texts={len(texts)} from {args.text_file or args.dataset_name}:{args.train_split}")
     dataset = PackedTextDataset(
         texts=texts,
@@ -729,6 +755,37 @@ def main() -> None:
         output_dir = repo_root / output_dir
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    from scripts.p0_3_evidence_contract import (
+        build_data_contract,
+        build_tokenizer_projection,
+        write_new_report,
+    )
+
+    tokenizer_projection = build_tokenizer_projection(tokenizer)
+    data_contract = build_data_contract(
+        source_kind=loaded_texts.source_kind,
+        dataset_name=args.dataset_name,
+        dataset_config=args.dataset_config,
+        train_split=args.train_split,
+        revision=args.revision,
+        text_column=loaded_texts.text_column,
+        dataset_fingerprint=loaded_texts.dataset_fingerprint,
+        data_files=args.data_files,
+        data_dir=args.data_dir,
+        text_file=args.text_file,
+        max_texts=args.max_texts,
+        max_train_tokens=args.max_train_tokens,
+        texts=texts,
+        packed_tokens=dataset.tokens,
+        seq_len=args.seq_len,
+        eos_token_id=tokenizer.eos_token_id,
+        tokenizer=tokenizer_projection,
+    )
+    data_contract_sha256 = write_new_report(
+        output_dir / "data_contract.json", data_contract
+    )
+    print(f"[P0-3] data_contract sha256={data_contract_sha256}")
+
     all_metrics: list[dict[str, Any]] = []
     for psi in args.psi:
         metrics = train_one_psi(
@@ -739,6 +796,7 @@ def main() -> None:
             dataset=dataset,
             device=device,
             output_dir=output_dir,
+            data_contract_sha256=data_contract_sha256,
         )
         all_metrics.append(metrics)
 

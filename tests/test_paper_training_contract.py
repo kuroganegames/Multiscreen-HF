@@ -10,7 +10,9 @@ import copy
 import hashlib
 import io
 import json
+import os
 import tempfile
+import types
 import unittest
 from contextlib import redirect_stdout
 from pathlib import Path
@@ -183,6 +185,10 @@ class ManifestContractTests(unittest.TestCase):
             self.manifest["paper_recipe"]["scheduler"]["peak_learning_rate"],
         )
         self.assertEqual(exposure["peak_learning_rate"], 0.0625)
+        self.assertNotEqual(
+            exposure["warmup_steps"],
+            self.manifest["paper_recipe"]["scheduler"]["warmup_steps"],
+        )
         self.assertFalse(exposure["require_loss_decrease"])
         self.assertFalse(operational["gradient_clipping"])
         self.assertFalse(exposure["gradient_clipping"])
@@ -290,6 +296,57 @@ class PinnedSourceTests(unittest.TestCase):
     def setUp(self) -> None:
         self.manifest = c3.read_json(c3.DEFAULT_MANIFEST)
 
+    def _verified_file_patch(self):
+        return mock.patch.object(
+            c3,
+            "_verify_hub_file_identity",
+            return_value={
+                "filename": "data/test-00000-of-00030.parquet",
+                "size_bytes": 43_263_929,
+                "sha256": self.manifest["dataset"]["expected_file_sha256"],
+                "revision": self.manifest["dataset"]["revision"],
+            },
+        )
+
+    def _canonical_cache_root(self, parent: Path) -> tuple[Path, Path]:
+        root = parent / "canonical-cache"
+        output = root / c3.OFFLINE_CACHE_RELATIVE_DIRECTORY
+        output.mkdir(parents=True)
+        (output / "dataset_info.json").write_text("{}\n", encoding="utf-8")
+        (output / "slim_pajama-627_b_reupload-test.arrow").write_bytes(
+            b"fixture-arrow"
+        )
+        return root.resolve(), output.resolve()
+
+    @staticmethod
+    def _canonical_rows(
+        *,
+        full_fingerprint: str = "507a47fcec5cbfdc",
+        selection_fingerprint: str = "f1e6c1c09434a7e4",
+    ) -> FakeMapDataset:
+        return FakeMapDataset(
+            [{"text": f"row-{index}"} for index in range(64)],
+            fingerprint=full_fingerprint,
+            selection_fingerprint=selection_fingerprint,
+        )
+
+    @staticmethod
+    def _fake_cache_class(
+        expected_output: Path,
+        dataset: FakeMapDataset,
+        calls: list[tuple[str, object]],
+    ) -> type:
+        class FakeCache:
+            def __init__(self, **kwargs):
+                calls.append(("init", kwargs))
+                self.cache_dir = str(expected_output)
+
+            def as_dataset(self, *, split):
+                calls.append(("as_dataset", {"split": split}))
+                return dataset
+
+        return FakeCache
+
     def test_hub_file_identity_checks_bytes_not_only_revision(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             path = Path(temporary) / "asset.bin"
@@ -395,6 +452,361 @@ class PinnedSourceTests(unittest.TestCase):
             0,
         )
         self.assertNotIn("text", selected.provenance["row_records"][0])
+
+    def test_offline_canonical_cache_uses_exact_factory_and_output(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root, expected_output = self._canonical_cache_root(Path(temporary))
+            dataset = self._canonical_rows()
+            calls: list[tuple[str, object]] = []
+            cache_class = self._fake_cache_class(
+                expected_output,
+                dataset,
+                calls,
+            )
+            online_loader = mock.Mock(
+                side_effect=AssertionError("online loader must not run")
+            )
+            datasets_module = types.SimpleNamespace(
+                __version__="5.0.1",
+                load_dataset=online_loader,
+            )
+            with (
+                self._verified_file_patch(),
+                mock.patch.object(
+                    c3,
+                    "_import_datasets_module",
+                    return_value=datasets_module,
+                ),
+                mock.patch.object(
+                    c3,
+                    "_bound_datasets_cache_class",
+                    return_value=cache_class,
+                ) as bound,
+            ):
+                selected = c3.load_pinned_rows(
+                    self.manifest,
+                    cache_dir=str(root),
+                    environment={
+                        "HF_DATASETS_OFFLINE": "1",
+                        "HF_HUB_OFFLINE": "1",
+                    },
+                )
+
+            bound.assert_called_once_with(datasets_module)
+            online_loader.assert_not_called()
+            self.assertEqual(
+                calls,
+                [
+                    (
+                        "init",
+                        {
+                            "cache_dir": str(root),
+                            "repo_id": "gmongaras/SlimPajama-627B_Reupload",
+                            "dataset_name": "slim_pajama-627_b_reupload",
+                            "config_name": "default-8884724778247ab6",
+                            "version": "0.0.0",
+                            "hash": "c34c22dbb10ae6b264a2f357a909d1a537141b36",
+                        },
+                    ),
+                    ("as_dataset", {"split": "test"}),
+                ],
+            )
+            self.assertEqual(len(selected.texts), 64)
+            self.assertEqual(
+                selected.provenance["full_fingerprint"],
+                "507a47fcec5cbfdc",
+            )
+            self.assertEqual(
+                selected.provenance["selection"]["fingerprint"],
+                "f1e6c1c09434a7e4",
+            )
+
+    def test_offline_canonical_cache_rejects_partial_or_invalid_environment(self) -> None:
+        cases = (
+            {"HF_DATASETS_OFFLINE": "1"},
+            {"HF_HUB_OFFLINE": "1"},
+            {"HF_DATASETS_OFFLINE": "true", "HF_HUB_OFFLINE": "1"},
+            {"HF_DATASETS_OFFLINE": "1", "HF_HUB_OFFLINE": "false"},
+        )
+        with self._verified_file_patch():
+            for environment in cases:
+                with self.subTest(environment=environment):
+                    with self.assertRaises(RuntimeError):
+                        c3.load_pinned_rows(
+                            self.manifest,
+                            cache_dir=None,
+                            environment=environment,
+                        )
+
+    def test_offline_canonical_cache_rejects_wrong_version_and_config(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root, _ = self._canonical_cache_root(Path(temporary))
+            wrong_version = types.SimpleNamespace(
+                __version__="5.0.0",
+                load_dataset=mock.Mock(),
+            )
+            with (
+                self._verified_file_patch(),
+                mock.patch.object(
+                    c3,
+                    "_import_datasets_module",
+                    return_value=wrong_version,
+                ),
+                mock.patch.object(c3, "_bound_datasets_cache_class") as bound,
+            ):
+                with self.assertRaises(RuntimeError):
+                    c3.load_pinned_rows(
+                        self.manifest,
+                        cache_dir=str(root),
+                        environment={
+                            "HF_DATASETS_OFFLINE": "1",
+                            "HF_HUB_OFFLINE": "1",
+                        },
+                    )
+            bound.assert_not_called()
+
+            changed = copy.deepcopy(self.manifest)
+            changed["dataset"]["repository"] = "other/repository"
+            with self.assertRaises(RuntimeError):
+                c3._load_offline_canonical_dataset(
+                    changed["dataset"],
+                    cache_dir=str(root),
+                    datasets_module=types.SimpleNamespace(__version__="5.0.1"),
+                )
+
+    def test_offline_canonical_cache_rejects_noncanonical_and_missing_paths(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            parent = Path(temporary).resolve()
+            file_path = parent / "file"
+            file_path.write_text("not a directory\n", encoding="utf-8")
+            missing = parent / "missing"
+            cases = (
+                None,
+                "relative-cache",
+                "/",
+                f"{parent}/.",
+                str(file_path),
+                str(missing),
+                str(parent),
+            )
+            for cache_dir in cases:
+                with self.subTest(cache_dir=cache_dir):
+                    with self.assertRaises(ValueError):
+                        c3._canonical_offline_cache_paths(cache_dir)
+
+    @unittest.skipUnless(hasattr(os, "symlink"), "symlinks are unavailable")
+    def test_offline_canonical_cache_rejects_root_and_output_symlinks(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            parent = Path(temporary).resolve()
+            root, _ = self._canonical_cache_root(parent)
+            alias = parent / "alias"
+            alias.symlink_to(root, target_is_directory=True)
+            with self.assertRaises(ValueError):
+                c3._canonical_offline_cache_paths(str(alias))
+
+        with tempfile.TemporaryDirectory() as temporary:
+            parent = Path(temporary).resolve()
+            root = parent / "cache"
+            config_parent = (
+                root / "gmongaras___slim_pajama-627_b_reupload"
+            )
+            config_parent.mkdir(parents=True)
+            real_config = parent / "real-config"
+            (real_config / c3.OFFLINE_CACHE_VERSION / c3.OFFLINE_CACHE_HASH).mkdir(
+                parents=True
+            )
+            (config_parent / c3.OFFLINE_CACHE_CONFIG_NAME).symlink_to(
+                real_config,
+                target_is_directory=True,
+            )
+            with self.assertRaises(ValueError):
+                c3._canonical_offline_cache_paths(str(root.resolve()))
+
+    @unittest.skipUnless(hasattr(os, "symlink"), "symlinks are unavailable")
+    def test_offline_canonical_cache_requires_exact_regular_files(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            _, output = self._canonical_cache_root(Path(temporary))
+            arrow = output / "slim_pajama-627_b_reupload-test.arrow"
+            arrow.unlink()
+            with self.assertRaises(ValueError):
+                c3._validate_offline_cache_files(output)
+
+            arrow.write_bytes(b"fixture-arrow")
+            extra = output / "unexpected"
+            extra.write_bytes(b"unexpected")
+            with self.assertRaises(ValueError):
+                c3._validate_offline_cache_files(output)
+
+            extra.unlink()
+            target = output.parent / "outside.arrow"
+            target.write_bytes(b"fixture-arrow")
+            arrow.unlink()
+            arrow.symlink_to(target)
+            with self.assertRaises(ValueError):
+                c3._validate_offline_cache_files(output)
+
+    def test_offline_canonical_cache_rejects_builder_output_and_fingerprints(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root, expected_output = self._canonical_cache_root(Path(temporary))
+            datasets_module = types.SimpleNamespace(
+                __version__="5.0.1",
+                load_dataset=mock.Mock(),
+            )
+
+            class WrongOutputCache:
+                def __init__(self, **_kwargs):
+                    self.cache_dir = str(root)
+
+            with mock.patch.object(
+                c3,
+                "_bound_datasets_cache_class",
+                return_value=WrongOutputCache,
+            ):
+                with self.assertRaises(RuntimeError):
+                    c3._load_offline_canonical_dataset(
+                        self.manifest["dataset"],
+                        cache_dir=str(root),
+                        datasets_module=datasets_module,
+                    )
+
+            for full, selected_fingerprint in (
+                ("wrong", "f1e6c1c09434a7e4"),
+                ("507a47fcec5cbfdc", "wrong"),
+            ):
+                calls: list[tuple[str, object]] = []
+                cache_class = self._fake_cache_class(
+                    expected_output,
+                    self._canonical_rows(
+                        full_fingerprint=full,
+                        selection_fingerprint=selected_fingerprint,
+                    ),
+                    calls,
+                )
+                with (
+                    self._verified_file_patch(),
+                    mock.patch.object(
+                        c3,
+                        "_import_datasets_module",
+                        return_value=datasets_module,
+                    ),
+                    mock.patch.object(
+                        c3,
+                        "_bound_datasets_cache_class",
+                        return_value=cache_class,
+                    ),
+                ):
+                    with self.subTest(
+                        full=full,
+                        selected=selected_fingerprint,
+                    ):
+                        with self.assertRaises(AssertionError):
+                            c3.load_pinned_rows(
+                                self.manifest,
+                                cache_dir=str(root),
+                                environment={
+                                    "HF_DATASETS_OFFLINE": "1",
+                                    "HF_HUB_OFFLINE": "1",
+                                },
+                            )
+
+    def test_online_and_injected_loaders_bypass_offline_cache_factory(self) -> None:
+        dataset = self._canonical_rows()
+        online_loader = mock.Mock(return_value=dataset)
+        datasets_module = types.SimpleNamespace(
+            __version__="5.0.1",
+            load_dataset=online_loader,
+        )
+        with (
+            self._verified_file_patch(),
+            mock.patch.object(
+                c3,
+                "_import_datasets_module",
+                return_value=datasets_module,
+            ),
+            mock.patch.object(c3, "_bound_datasets_cache_class") as bound,
+        ):
+            c3.load_pinned_rows(
+                self.manifest,
+                cache_dir="/public/cache",
+                environment={},
+            )
+        bound.assert_not_called()
+        online_loader.assert_called_once_with(
+            "gmongaras/SlimPajama-627B_Reupload",
+            data_files={"test": "data/test-00000-of-00030.parquet"},
+            split="test",
+            revision="c34c22dbb10ae6b264a2f357a909d1a537141b36",
+            streaming=False,
+            verification_mode="no_checks",
+            cache_dir="/public/cache",
+        )
+
+        injected_loader = mock.Mock(return_value=self._canonical_rows())
+        with (
+            self._verified_file_patch(),
+            mock.patch.object(
+                c3,
+                "_import_datasets_module",
+                side_effect=AssertionError("production import must not run"),
+            ),
+        ):
+            c3.load_pinned_rows(
+                self.manifest,
+                cache_dir="relative-value-preserved-for-injected-loader",
+                load_dataset_fn=injected_loader,
+                datasets_version="5.0.1",
+                environment={
+                    "HF_DATASETS_OFFLINE": "1",
+                    "HF_HUB_OFFLINE": "1",
+                },
+            )
+        self.assertEqual(
+            injected_loader.call_args.kwargs["cache_dir"],
+            "relative-value-preserved-for-injected-loader",
+        )
+
+    def test_cache_class_is_bound_to_installed_package_origin(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            site = Path(temporary).resolve()
+            package = site / "datasets"
+            module_path = package / "packaged_modules" / "cache" / "cache.py"
+            module_path.parent.mkdir(parents=True)
+            package_init = package / "__init__.py"
+            package_init.write_text("# fixture\n", encoding="utf-8")
+            module_path.write_text("# fixture\n", encoding="utf-8")
+
+            cache_class = type("Cache", (), {})
+            cache_class.__module__ = "datasets.packaged_modules.cache.cache"
+            cache_module = types.SimpleNamespace(
+                __file__=str(module_path),
+                __name__="datasets.packaged_modules.cache.cache",
+                Cache=cache_class,
+            )
+            datasets_module = types.SimpleNamespace(__file__=str(package_init))
+            distribution = types.SimpleNamespace(
+                locate_file=lambda name: package if name == "datasets" else site
+            )
+            with (
+                mock.patch.object(
+                    c3.importlib,
+                    "import_module",
+                    return_value=cache_module,
+                ),
+                mock.patch.object(
+                    c3.importlib.metadata,
+                    "distribution",
+                    return_value=distribution,
+                ),
+            ):
+                self.assertIs(
+                    c3._bound_datasets_cache_class(datasets_module),
+                    cache_class,
+                )
+
+                cache_module.__file__ = str(package / "wrong.py")
+                (package / "wrong.py").write_text("# wrong\n", encoding="utf-8")
+                with self.assertRaises(RuntimeError):
+                    c3._bound_datasets_cache_class(datasets_module)
 
     def test_dataset_version_and_fingerprint_mismatches_fail(self) -> None:
         rows = [{"text": f"row-{index}"} for index in range(64)]

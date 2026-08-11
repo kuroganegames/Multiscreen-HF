@@ -41,12 +41,22 @@ P1-preflight B: gradient-checkpointing API modernization
   accepted and merged in PR #12
 
 P0.5-C3: paper-training-contract smoke
-  current focused Stage 4
+  accepted and merged in PR #13
   local contract, pinned-data, CUDA, regression, and evidence checks passed
   tested source: 8fa5dbf13530c942b2c9e5f03a572bd0cd5ca74f
-  sanitized archive verified; exact/private retention blocked
-  focused draft PR is REVIEW_REQUIRED; acceptance pending
-  do not start final Level 1 requalification before merge
+  sanitized archive verified; exact/private retention and explicit evidence
+  review remain pending in the historical descriptor
+
+final Level 1 requalification and evidence
+  complete locally on tested source b224ca1a127ee18fc5fd4b00a5df639401d60679
+  evidence commit: 843d5ac7825a1b0892316b70fa5c81c8de8f2d79
+  plan: docs/LEVEL1_CORE_REQUALIFICATION_PLAN.md
+  46-command matrix, 187 raw events, human review, private retention,
+  sanitization, and offline verification passed
+  Level 1 — Core mathematical Hugging Face implementation: complete
+  focused draft PR remains REVIEW_REQUIRED and unmerged
+  this does not validate paper-scale training, retrieval, optimized
+  long-context efficiency, distributed training, or any P1 capability
 
 P1 model/ecosystem capabilities
   none validated
@@ -65,6 +75,8 @@ docs/VALIDATION_STATUS.md
 docs/TESTING.md
 docs/KNOWN_LIMITATIONS.md
 docs/P0_5_C2_PLAN.md
+docs/LEVEL1_CORE_REQUALIFICATION_PLAN.md
+docs/CODEX_LEVEL1_CORE_HF_HANDOFF.md
 docs/adr/ADR-0001-mipe-position-semantics.md
 docs/P0_5_C3_PLAN.md
 docs/P1_PREFLIGHT_B_PLAN.md
@@ -82,6 +94,11 @@ docs/validation_results/P0_4_SUMMARY.json
 docs/validation_results/P0_4_EVIDENCE_ARCHIVE.json
 docs/validation_results/P0_5_C3_SUMMARY.md
 docs/validation_results/P0_5_C3_EVIDENCE_ARCHIVE.json
+docs/validation_results/LEVEL1_CORE_SUMMARY.md
+docs/validation_results/LEVEL1_CORE_SUMMARY.json
+docs/validation_results/LEVEL1_CORE_EVIDENCE_ARCHIVE.json
+docs/validation_results/LEVEL1_CORE_EXACT_VERIFICATION.json
+docs/validation_results/LEVEL1_CORE_SANITIZED_VERIFICATION.json
 ```
 
 The P0-4 plan and Codex handoff are retained reproduction/history documents; they do not mean P0-4 is pending:
@@ -339,15 +356,16 @@ P0.5-C1       accepted and merged in PR #9
 P0.5-C2       accepted and merged in PR #10
 C2 correction accepted and merged in PR #11
 P1-preflight B accepted and merged in PR #12
-P0.5-C3       local validation passed; focused draft PR REVIEW_REQUIRED
-final P0 core requalification not started
+P0.5-C3       accepted and merged in PR #13
+final P0 core requalification complete locally; draft PR REVIEW_REQUIRED
 P1-1 PEFT/LoRA smoke remains outside the Level 1 core program
 ```
 
-Do not begin final P0 core requalification until the focused P0.5-C3 draft PR
-has been reviewed and merged. Keep the local C3 pass distinct from acceptance;
-do not describe P0.5-C3 or any later gate as accepted until its focused
-implementation, test contract, evidence, and status update are reviewed.
+P0.5-C3 was accepted by reviewed and merged PR #13. The separate Stage 5 in
+`docs/LEVEL1_CORE_REQUALIFICATION_PLAN.md` passed locally with reviewed,
+retained, and verified evidence. The focused final PR remains draft and must
+not be merged or tagged automatically. This completion does not validate a P1
+model/ecosystem capability or broaden the limitations recorded above.
 
 ## Validation records
 
