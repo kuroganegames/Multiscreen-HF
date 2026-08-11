@@ -6,7 +6,7 @@ Level 1 Core and P0-qualified baselines.
 ## Current staged gate
 
 ```text
-final Level 1 requalification: complete locally; draft PR REVIEW_REQUIRED
+final Level 1 requalification: complete; focused PR #14 reviewed and merged
 ```
 
 This remains an unofficial correctness-first result; the dense quadratic path
@@ -14,7 +14,7 @@ is not efficiency evidence, and it does not validate paper-scale reproduction,
 retrieval benchmarks, optimized long-context efficiency, distributed training,
 or any P1 model/ecosystem capability.
 
-The accepted Stage 4 records and locally complete Stage 5 records are:
+The accepted Stage 4 and Stage 5 records are:
 
 ```text
 docs/P0_5_C3_PLAN.md
@@ -37,13 +37,14 @@ still records partial retention: exact/private retention and an explicitly
 supplied evidence reviewer remain pending. Those facts are not rewritten by PR
 acceptance.
 
-Final Level 1 requalification passed locally under
+Final Level 1 requalification passed under
 [LEVEL1_CORE_REQUALIFICATION_PLAN.md](LEVEL1_CORE_REQUALIFICATION_PLAN.md) on
 tested source `b224ca1a127ee18fc5fd4b00a5df639401d60679`. Acceptance review is
 recorded, the exact/private archive is retained externally and verified, and
-the sanitized archive is verified but unpublished. The focused draft PR
-remains `REVIEW_REQUIRED` and unmerged. No public asset exists, and no P1
-model/ecosystem capability is validated.
+the sanitized archive is verified but unpublished. The focused result was
+reviewed and accepted as merged PR #14 (merge commit
+`50af4f8e26b97f3bb0b97fc0bf6d0480a5d0fe06`). No public asset exists, and no
+P1 model/ecosystem capability is validated.
 This remains an unofficial correctness-first result; the dense quadratic path
 is not efficiency evidence, and it does not validate paper-scale reproduction,
 retrieval benchmarks, optimized long-context efficiency, distributed training,
@@ -152,8 +153,9 @@ the corresponding Stage 4 lane passed.
 For final Level 1 requalification, follow the complete matrix, provenance,
 review, and evidence-retention boundary in
 [LEVEL1_CORE_REQUALIFICATION_PLAN.md](LEVEL1_CORE_REQUALIFICATION_PLAN.md).
-The fresh reviewed Stage 5 record satisfied that boundary locally. Stage 4
-acceptance alone remains insufficient for a future Stage 5 reproduction.
+The fresh reviewed Stage 5 record satisfied that boundary and was accepted by
+merged PR #14. Stage 4 acceptance alone remains insufficient for a future
+Stage 5 reproduction.
 
 For P1-preflight A, also run:
 
@@ -249,13 +251,13 @@ A sanitized archive may be attached to an explicitly configured release. The exa
 ## Suggested current baseline release note
 
 ```text
-Level 1 Core mathematical Hugging Face implementation complete locally.
+Level 1 Core mathematical Hugging Face implementation complete.
 Reviewed validation covers paper-oracle and three-way reference equivalence,
 C1 architecture/initialization, C2 MiPE/cache semantics, supported
 non-reentrant gradient checkpointing, bounded C3 training-contract
 diagnostics, TinyStories Psi=8/16 bf16 smoke training, and fresh qualifying
 GPT-2-vocabulary context-4096 CUDA bf16 short runs for Psi=8 and Psi=16.
-The focused Stage 5 draft PR remains REVIEW_REQUIRED and unmerged.
+The focused Stage 5 result was reviewed and accepted as merged PR #14.
 P1-preflight A evidence infrastructure is implemented; retention remains
 partial because explicit review and external exact/private retention are pending.
 Not validated: paper-scale reproduction, retrieval quality, optimized

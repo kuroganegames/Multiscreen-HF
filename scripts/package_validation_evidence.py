@@ -676,6 +676,7 @@ def _build_archive(
     tested_source_commit: str,
     artifacts: Sequence[Mapping[str, Any]],
     sensitive_values: Sequence[str],
+    manifest_sensitive_values: Sequence[str],
 ) -> tuple[bytes, str]:
     if archive_kind not in ARCHIVE_KINDS:
         raise InputValidationError(f"unsupported archive kind: {archive_kind!r}")
@@ -712,7 +713,7 @@ def _build_archive(
         _assert_clean_sanitized_bytes(
             manifest_bytes,
             archive_path="MANIFEST.json",
-            sensitive_values=sensitive_values,
+            sensitive_values=manifest_sensitive_values,
         )
     manifest_sha256 = sha256_bytes(manifest_bytes)
     checksummed = [
@@ -906,20 +907,38 @@ def package_evidence(
     if len(set(resolved_outputs.values())) != len(resolved_outputs):
         raise InputValidationError("exact and sanitized outputs must be different files")
 
-    automatic_sensitive_values = {
-        *sensitive_values,
-        getpass.getuser(),
+    shared_automatic_sensitive_values = (
         socket.gethostname(),
         os.fspath(Path.home().expanduser().resolve(strict=False)),
         os.fspath(repo),
         *(os.fspath(root) for root in roots.values()),
         *(os.fspath(output.parent) for output in resolved_outputs.values()),
-    }
+    )
+    # An ambient account name may also be a canonical evidence namespace such
+    # as ``runner.*``.  Keep it private in source payloads, but only treat it as
+    # sensitive control metadata when the caller supplies it explicitly.
     effective_sensitive_values = tuple(
         sorted(
             {
                 value
-                for value in automatic_sensitive_values
+                for value in (
+                    *sensitive_values,
+                    getpass.getuser(),
+                    *shared_automatic_sensitive_values,
+                )
+                if isinstance(value, str) and len(value) >= 3
+            },
+            key=lambda value: (-len(value), value),
+        )
+    )
+    manifest_sensitive_values = tuple(
+        sorted(
+            {
+                value
+                for value in (
+                    *sensitive_values,
+                    *shared_automatic_sensitive_values,
+                )
                 if isinstance(value, str) and len(value) >= 3
             },
             key=lambda value: (-len(value), value),
@@ -936,6 +955,7 @@ def package_evidence(
             tested_source_commit=commit,
             artifacts=artifacts,
             sensitive_values=effective_sensitive_values,
+            manifest_sensitive_values=manifest_sensitive_values,
         )
         archives_to_write.append(
             (
@@ -952,6 +972,7 @@ def package_evidence(
             tested_source_commit=commit,
             artifacts=artifacts,
             sensitive_values=effective_sensitive_values,
+            manifest_sensitive_values=manifest_sensitive_values,
         )
         archives_to_write.append(
             (

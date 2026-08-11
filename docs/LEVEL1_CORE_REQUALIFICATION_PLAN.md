@@ -11,8 +11,9 @@ Prior focused PRs: #9, #10, #11, #12, and #13 merged
 Tested source: b224ca1a127ee18fc5fd4b00a5df639401d60679
 Evidence commit: 843d5ac7825a1b0892316b70fa5c81c8de8f2d79
 Acceptance review: recorded
-Final validation and evidence closure: passed locally
-Final draft PR: REVIEW_REQUIRED; unmerged
+Final validation and evidence closure: passed
+Final focused PR: reviewed and merged as PR #14
+Merge commit: 50af4f8e26b97f3bb0b97fc0bf6d0480a5d0fe06
 ```
 
 The reviewed result is recorded in
@@ -259,5 +260,5 @@ stage stops at `REVIEW_REQUIRED`. No immutable tag is created before merge or
 without explicit user instruction.
 
 All local readiness conditions above passed for tested source
-`b224ca1a127ee18fc5fd4b00a5df639401d60679`. The descriptor is complete, but
-the focused draft PR remains `REVIEW_REQUIRED` and unmerged.
+`b224ca1a127ee18fc5fd4b00a5df639401d60679`. The descriptor is complete, and
+the focused result was reviewed and accepted as merged PR #14.

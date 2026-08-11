@@ -21,7 +21,7 @@ records with explicit gate-specific acceptance states.
 | P0.5-C2 | [P0_5_C2_PLAN.md](../P0_5_C2_PLAN.md) | [P0_5_C2_SUMMARY.md](P0_5_C2_SUMMARY.md) | focused deterministic tests | accepted; PR #10 and correction PR #11 merged |
 | P1-preflight B | [P1_PREFLIGHT_B_PLAN.md](../P1_PREFLIGHT_B_PLAN.md) | [P1_PREFLIGHT_B_SUMMARY.md](P1_PREFLIGHT_B_SUMMARY.md) | exact 4.57.6/5.14.1 focused tests and CUDA smokes | accepted; PR #12 merged |
 | P0.5-C3 | [plan][c3-plan] | [summary][c3-summary] | [JSON][c3-json] | accepted; PR #13 merged |
-| Final Level 1 requalification | [plan](../LEVEL1_CORE_REQUALIFICATION_PLAN.md) | [summary](LEVEL1_CORE_SUMMARY.md) | [JSON](LEVEL1_CORE_SUMMARY.json) | passed locally; evidence complete; draft PR `REVIEW_REQUIRED` |
+| Final Level 1 requalification | [plan](../LEVEL1_CORE_REQUALIFICATION_PLAN.md) | [summary](LEVEL1_CORE_SUMMARY.md) | [JSON](LEVEL1_CORE_SUMMARY.json) | accepted; evidence complete; PR #14 merged |
 
 This remains an unofficial correctness-first result; the dense quadratic path
 is not efficiency evidence, and it does not validate paper-scale reproduction,
@@ -37,7 +37,8 @@ CUDA-autocast cache-dtype correction as PR #11. Stage 3 was reviewed and merged
 as PR #12. Stage 4 passed locally and was reviewed and accepted by merged PR
 #13. Final Level 1 requalification passed locally on tested source
 `b224ca1a127ee18fc5fd4b00a5df639401d60679`, with reviewed and complete
-evidence closure. Its focused draft PR remains `REVIEW_REQUIRED` and unmerged.
+evidence closure. Its focused result was reviewed and accepted as merged PR
+#14 (merge commit `50af4f8e26b97f3bb0b97fc0bf6d0480a5d0fe06`).
 This remains an unofficial correctness-first result; the dense quadratic path
 is not efficiency evidence, and it does not validate paper-scale reproduction,
 retrieval benchmarks, optimized long-context efficiency, distributed training,

@@ -309,8 +309,7 @@ The separate final Level 1 requalification subsequently passed locally under
 [LEVEL1_CORE_REQUALIFICATION_PLAN.md](LEVEL1_CORE_REQUALIFICATION_PLAN.md). Its
 reviewed [summary](validation_results/LEVEL1_CORE_SUMMARY.md) and complete
 [evidence descriptor](validation_results/LEVEL1_CORE_EVIDENCE_ARCHIVE.json)
-record the Stage 5 result; the focused draft PR remains `REVIEW_REQUIRED` and
-unmerged.
+record the Stage 5 result, which was reviewed and accepted as merged PR #14.
 This remains an unofficial correctness-first result; the dense quadratic path
 is not efficiency evidence, and it does not validate paper-scale reproduction,
 retrieval benchmarks, optimized long-context efficiency, distributed training,
@@ -441,8 +440,8 @@ The exact Stage 5 execution matrix passed locally on tested source
 [LEVEL1_CORE_SUMMARY.md](validation_results/LEVEL1_CORE_SUMMARY.md); complete
 private retention, sanitization, and verification are recorded in
 [LEVEL1_CORE_EVIDENCE_ARCHIVE.json](validation_results/LEVEL1_CORE_EVIDENCE_ARCHIVE.json).
-Neither archive is published, and the focused draft PR remains
-`REVIEW_REQUIRED` and unmerged.
+Neither archive is published. The focused Stage 5 result was reviewed and
+accepted as merged PR #14.
 This remains an unofficial correctness-first result; the dense quadratic path
 is not efficiency evidence, and it does not validate paper-scale reproduction,
 retrieval benchmarks, optimized long-context efficiency, distributed training,

@@ -17,8 +17,9 @@ implementation: complete.** C1 was merged as PR #9, C2 as PR #10, the separate
 C2 CUDA-autocast cache-dtype correction as PR #11, Stage 3 as PR #12, and Stage
 4 as PR #13. The final Stage 5 matrix, human review, private retention,
 sanitization, and offline verification passed on tested source
-`b224ca1a127ee18fc5fd4b00a5df639401d60679`. The focused Stage 5 draft PR
-remains `REVIEW_REQUIRED` and unmerged. This result does not validate
+`b224ca1a127ee18fc5fd4b00a5df639401d60679`. The focused Stage 5 result was
+reviewed and accepted as merged PR #14 (merge commit
+`50af4f8e26b97f3bb0b97fc0bf6d0480a5d0fe06`). This result does not validate
 paper-scale reproduction, retrieval benchmarks, optimized long-context
 efficiency, distributed training, or any P1 model/ecosystem capability.
 
@@ -75,7 +76,7 @@ Final Level 1 requalification passed locally under the
 and complete evidence closure are recorded in the
 [Level 1 summary](docs/validation_results/LEVEL1_CORE_SUMMARY.md) and
 [descriptor](docs/validation_results/LEVEL1_CORE_EVIDENCE_ARCHIVE.json). The
-focused draft PR remains `REVIEW_REQUIRED` and unmerged. Stage 4 CUDA runs
+focused result was reviewed and accepted as merged PR #14. Stage 4 CUDA runs
 remain reduced project diagnostics, while Stage 5 remains a correctness and
 short-run qualification result rather than paper-scale reproduction, quality,
 or efficiency evidence.

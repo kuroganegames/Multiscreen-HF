@@ -520,6 +520,58 @@ class EvidenceArchiveTests(unittest.TestCase):
                 self.assertEqual(report["status"], "verified")
                 self.assertEqual(report["archive"]["archive_kind"], kind)
 
+    def test_ambient_runner_username_does_not_collide_with_logical_name(self) -> None:
+        source_bytes = b"username=runner\nloss=8.25\n"
+        source_path = "runner-collision.txt"
+        (self.source_root / source_path).write_bytes(source_bytes)
+        document = self._package_document_for(
+            source_path,
+            source_bytes,
+            archive_path="artifacts/runtime.txt",
+        )
+        document["artifacts"][0]["logical_name"] = "runner.p0_1.cpu_fp32"
+        sanitized_output = self.root / "runner-collision.tar.gz"
+
+        with mock.patch("getpass.getuser", return_value="runner"):
+            package_evidence(
+                document,
+                roots={"raw": self.source_root},
+                mode="sanitized-only",
+                exact_output=None,
+                sanitized_output=sanitized_output,
+                repository_root=self.repository,
+                created_at_utc=TIMESTAMP,
+            )
+
+        members = _read_regular_members(sanitized_output)
+        self.assertNotIn(b"runner", members["artifacts/runtime.txt"])
+        self.assertIn(b"<REDACTED:SENSITIVE_VALUE>", members["artifacts/runtime.txt"])
+        manifest = json.loads(members["MANIFEST.json"].decode("utf-8"))
+        source_member = next(
+            member
+            for member in manifest["members"]
+            if member["path"] == "artifacts/runtime.txt"
+        )
+        self.assertEqual(source_member["logical_name"], "runner.p0_1.cpu_fp32")
+        report = verify_archive(
+            sanitized_output,
+            verification_timestamp_utc=TIMESTAMP,
+        )
+        self.assertEqual(report["status"], "verified")
+
+        with mock.patch("getpass.getuser", return_value="runner"):
+            with self.assertRaisesRegex(IntegrityError, "MANIFEST.json"):
+                package_evidence(
+                    document,
+                    roots={"raw": self.source_root},
+                    mode="sanitized-only",
+                    exact_output=None,
+                    sanitized_output=self.root / "explicit-runner-collision.tar.gz",
+                    repository_root=self.repository,
+                    sensitive_values=("runner",),
+                    created_at_utc=TIMESTAMP,
+                )
+
     def _assert_package_rejected(
         self,
         document: dict[str, object],
