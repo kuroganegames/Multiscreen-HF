@@ -8,25 +8,35 @@ Stage: 5 of 5
 Implementation base: 3282eae7cb97ecfe01753460f6bce63d03e3cf88
 Branch: validation/level1-core-requalification
 Prior focused PRs: #9, #10, #11, #12, and #13 merged
-Final validation: not yet executed
+Tested source: b224ca1a127ee18fc5fd4b00a5df639401d60679
+Evidence commit: 843d5ac7825a1b0892316b70fa5c81c8de8f2d79
+Acceptance review: recorded
+Final validation and evidence closure: passed locally
+Final draft PR: REVIEW_REQUIRED; unmerged
 ```
+
+The reviewed result is recorded in
+[LEVEL1_CORE_SUMMARY.md](validation_results/LEVEL1_CORE_SUMMARY.md), and the
+complete retention and verification state is recorded in
+[LEVEL1_CORE_EVIDENCE_ARCHIVE.json](validation_results/LEVEL1_CORE_EVIDENCE_ARCHIVE.json).
 
 This is the final evidence gate for the five-stage Level 1 Core program. It
 requalifies the merged C1, C2, gradient-checkpointing, and C3 contracts on one
 clean tested-source commit. It does not add or validate a P1 ecosystem
 capability.
 
-Final execution requires both of these explicit inputs:
+The accepted final execution required both explicit inputs below. Any future
+reproduction must supply them again:
 
 ```text
 MULTISCREEN_EVIDENCE_REVIEWERS
 MULTISCREEN_EVIDENCE_ARCHIVE_DIR
 ```
 
-The GitHub login is not reviewer evidence. If either input is absent, static
-implementation and non-qualifying checks may proceed, but the final run,
-accepted evidence, canonical completion language, and draft evidence PR remain
-blocked.
+The GitHub login is not reviewer evidence. For a future reproduction, if either
+input is absent, static implementation and non-qualifying checks may proceed,
+but a new final run, accepted evidence, completion claim, and draft evidence PR
+remain blocked.
 
 The executable matrix also requires one explicitly supplied, existing
 `HF_CACHE_DIR` that is already warm for every Hub input. The cache is not
@@ -236,7 +246,7 @@ reviewer fields are complete, canonical documents are updated from that
 evidence, the branch tip is clean, and no forbidden artifact or private path is
 tracked.
 
-Accepted language may then state:
+The reviewed record now states:
 
 ```text
 Level 1 — Core mathematical Hugging Face implementation: complete
@@ -247,3 +257,7 @@ retrieval benchmarks, optimized long-context efficiency, distributed training,
 and every P1 model/ecosystem capability. The final PR remains draft and the
 stage stops at `REVIEW_REQUIRED`. No immutable tag is created before merge or
 without explicit user instruction.
+
+All local readiness conditions above passed for tested source
+`b224ca1a127ee18fc5fd4b00a5df639401d60679`. The descriptor is complete, but
+the focused draft PR remains `REVIEW_REQUIRED` and unmerged.

@@ -1,4 +1,4 @@
-# Multiscreen HF P0
+# Multiscreen HF
 
 Unofficial Hugging Face Transformers-compatible implementation of the **Multiscreen** architecture, with a paper-math oracle and P0 validation tests.
 
@@ -8,16 +8,19 @@ Current status:
 
 > **P0-qualified research implementation through P0-4.** Reviewed local CUDA bf16 GPT-2-vocabulary, context-4096 qualifying runs passed for both Psi=8 and Psi=16. This remains a correctness/stability smoke result, not a paper-scale or efficiency result.
 
-Current evidence-infrastructure gate:
+Historical evidence-infrastructure gate:
 
 > **P1-preflight A: validation provenance and evidence retention v1 — partial.** The schema, standard-library provenance/packaging/verification tools, synthetic tests, and policy are implemented. All four retained P0-4 summary/metrics files matched their committed hashes; both completion markers were found and hashed for the new descriptor; and a sanitized archive verified locally. Durable exact/private retention is blocked because `MULTISCREEN_EVIDENCE_ARCHIVE_DIR` was not configured, and acceptance review remains pending because no explicit reviewer was supplied. P0-4 remains complete; no P1 model/ecosystem capability is validated.
 
-Staged Level 1 Core status: **P0.5-C1, P0.5-C2, P1-preflight B, and P0.5-C3
-are accepted; final Level 1 requalification is the current pending Stage 5.**
-C1 was merged as PR #9, C2 as PR #10, the separate C2 CUDA-autocast
-cache-dtype correction as PR #11, Stage 3 as PR #12, and Stage 4 as PR #13.
-No Stage 5 qualifying evidence has been accepted, so the five-stage Level 1
-program is not yet complete.
+Staged Level 1 Core status: **Level 1 — Core mathematical Hugging Face
+implementation: complete.** C1 was merged as PR #9, C2 as PR #10, the separate
+C2 CUDA-autocast cache-dtype correction as PR #11, Stage 3 as PR #12, and Stage
+4 as PR #13. The final Stage 5 matrix, human review, private retention,
+sanitization, and offline verification passed on tested source
+`b224ca1a127ee18fc5fd4b00a5df639401d60679`. The focused Stage 5 draft PR
+remains `REVIEW_REQUIRED` and unmerged. This result does not validate
+paper-scale reproduction, retrieval benchmarks, optimized long-context
+efficiency, distributed training, or any P1 model/ecosystem capability.
 
 ## Start here
 
@@ -45,6 +48,9 @@ program is not yet complete.
 - Stage 4 accepted result: [docs/validation_results/P0_5_C3_SUMMARY.md](docs/validation_results/P0_5_C3_SUMMARY.md)
 - [Stage 4 evidence descriptor](docs/validation_results/P0_5_C3_EVIDENCE_ARCHIVE.json)
 - Stage 5 plan: [docs/LEVEL1_CORE_REQUALIFICATION_PLAN.md](docs/LEVEL1_CORE_REQUALIFICATION_PLAN.md)
+- Stage 5 reviewed result: [docs/validation_results/LEVEL1_CORE_SUMMARY.md](docs/validation_results/LEVEL1_CORE_SUMMARY.md) and [JSON](docs/validation_results/LEVEL1_CORE_SUMMARY.json)
+- Stage 5 complete evidence descriptor: [docs/validation_results/LEVEL1_CORE_EVIDENCE_ARCHIVE.json](docs/validation_results/LEVEL1_CORE_EVIDENCE_ARCHIVE.json)
+- Stage 5 verification reports: [exact/private](docs/validation_results/LEVEL1_CORE_EXACT_VERIFICATION.json) and [sanitized](docs/validation_results/LEVEL1_CORE_SANITIZED_VERIFICATION.json)
 
 ## Current Level 1 stage
 
@@ -64,11 +70,15 @@ evidence descriptor still truthfully records partial retention and the absence
 of an explicitly supplied evidence reviewer; PR acceptance does not rewrite
 those historical descriptor facts.
 
-Final Level 1 requalification is now the current Stage 5; see the
-[Stage 5 plan](docs/LEVEL1_CORE_REQUALIFICATION_PLAN.md). It remains pending
-and has not yet produced accepted qualifying evidence. The Stage 4 CUDA runs
-use reduced batch or duration settings and are project diagnostics, not
-paper-scale reproduction, quality, or efficiency claims.
+Final Level 1 requalification passed locally under the
+[Stage 5 plan](docs/LEVEL1_CORE_REQUALIFICATION_PLAN.md). The reviewed result
+and complete evidence closure are recorded in the
+[Level 1 summary](docs/validation_results/LEVEL1_CORE_SUMMARY.md) and
+[descriptor](docs/validation_results/LEVEL1_CORE_EVIDENCE_ARCHIVE.json). The
+focused draft PR remains `REVIEW_REQUIRED` and unmerged. Stage 4 CUDA runs
+remain reduced project diagnostics, while Stage 5 remains a correctness and
+short-run qualification result rather than paper-scale reproduction, quality,
+or efficiency evidence.
 
 ## What is included
 
@@ -317,11 +327,10 @@ codex
 Not yet validated:
 
 - P1-preflight A acceptance review and durable exact/private retention
-- final Level 1 core requalification; Stage 5 is current but not yet validated
-- completion of the five-stage Level 1 Core program
 - paper-scale pretraining or paper-quality reproduction
 - long-context retrieval at paper settings
 - long-context runtime or memory efficiency
+- distributed training
 - custom Triton/windowed kernels
 - PEFT/LoRA/QLoRA or Unsloth
 - torch.compile stability at scale

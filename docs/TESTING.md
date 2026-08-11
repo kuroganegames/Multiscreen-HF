@@ -305,9 +305,16 @@ identity and retention state in
 [P0_5_C3_EVIDENCE_ARCHIVE.json](validation_results/P0_5_C3_EVIDENCE_ARCHIVE.json).
 Stage 4 was reviewed and accepted by merged PR #13. Its existing evidence
 descriptor retains its recorded partial-retention and evidence-review state.
-Final Level 1 requalification is the separate current Stage 5 under
-[LEVEL1_CORE_REQUALIFICATION_PLAN.md](LEVEL1_CORE_REQUALIFICATION_PLAN.md); no
-Stage 5 qualifying evidence has yet been accepted.
+The separate final Level 1 requalification subsequently passed locally under
+[LEVEL1_CORE_REQUALIFICATION_PLAN.md](LEVEL1_CORE_REQUALIFICATION_PLAN.md). Its
+reviewed [summary](validation_results/LEVEL1_CORE_SUMMARY.md) and complete
+[evidence descriptor](validation_results/LEVEL1_CORE_EVIDENCE_ARCHIVE.json)
+record the Stage 5 result; the focused draft PR remains `REVIEW_REQUIRED` and
+unmerged.
+This remains an unofficial correctness-first result; the dense quadratic path
+is not efficiency evidence, and it does not validate paper-scale reproduction,
+retrieval benchmarks, optimized long-context efficiency, distributed training,
+or any P1 model/ecosystem capability.
 
 ## P0-1
 
@@ -429,12 +436,24 @@ For a future reproduction, retain its ignored raw artifacts under a distinct out
 
 ## Final Level 1 requalification
 
-This is the exact Stage 5 execution matrix. It applies only after P0.5-C3 was
-accepted by merged PR #13 and after the evidence-support changes in this
-section are committed. It does not reuse historical P0-4 or C3 metrics as
-evidence for the new tested commit.
+The exact Stage 5 execution matrix passed locally on tested source
+`b224ca1a127ee18fc5fd4b00a5df639401d60679`. The reviewed result is recorded in
+[LEVEL1_CORE_SUMMARY.md](validation_results/LEVEL1_CORE_SUMMARY.md); complete
+private retention, sanitization, and verification are recorded in
+[LEVEL1_CORE_EVIDENCE_ARCHIVE.json](validation_results/LEVEL1_CORE_EVIDENCE_ARCHIVE.json).
+Neither archive is published, and the focused draft PR remains
+`REVIEW_REQUIRED` and unmerged.
+This remains an unofficial correctness-first result; the dense quadratic path
+is not efficiency evidence, and it does not validate paper-scale reproduction,
+retrieval benchmarks, optimized long-context efficiency, distributed training,
+or any P1 model/ecosystem capability.
 
-Final execution requires an explicitly named reviewer and durable private
+The commands below remain the exact future reproduction and closure procedure.
+They apply only after P0.5-C3 was accepted by merged PR #13 and after the
+evidence-support changes in this section are committed. They do not reuse
+historical P0-4 or C3 metrics as evidence for a new tested commit.
+
+A future final execution requires an explicitly named reviewer and durable private
 storage. The run root must be a new absolute path outside every Git worktree;
 the archive directory and Hugging Face cache must already exist. The setup uses
 an owner-only default umask for every external private artifact it creates. Do

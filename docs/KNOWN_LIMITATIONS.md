@@ -4,20 +4,33 @@ This repository is a P0-qualified research implementation, not a full production
 
 ## Not yet validated
 
-- final Level 1 core requalification and completion of the five-stage program
-- qualifying Stage 5 evidence
 - paper-scale pretraining
 - 28M/286M/1.3B reproduction
 - long-context retrieval benchmarks at paper settings
 - long-context runtime efficiency
 - fused/windowed/Triton kernels
 - training throughput optimization
+- distributed training
 - PEFT/LoRA/QLoRA
 - Unsloth
 - torch.compile stability at scale
 - vLLM/SGLang serving
 - packed dataset segment isolation
 - beam search and broad generation compatibility
+
+## Level 1 validated scope
+
+**Level 1 — Core mathematical Hugging Face implementation: complete.** The
+fixed Stage 5 matrix and reviewed evidence closure passed locally on tested
+source `b224ca1a127ee18fc5fd4b00a5df639401d60679`; see the
+[summary](validation_results/LEVEL1_CORE_SUMMARY.md) and complete
+[descriptor](validation_results/LEVEL1_CORE_EVIDENCE_ARCHIVE.json). The
+focused draft PR remains `REVIEW_REQUIRED` and unmerged.
+
+This is correctness, compatibility, and bounded short-run qualification
+evidence. It does not validate paper-scale reproduction, retrieval benchmarks,
+optimized long-context efficiency, distributed training, or any P1
+model/ecosystem capability.
 
 ## P0-4 validated scope
 
@@ -65,7 +78,7 @@ long-position causal correctness.
 
 These C2 semantics were accepted by merged PR #10. PR #11 separately corrected
 CUDA-autocast cache-dtype prediction and did not change the position decision.
-This does not mark the full five-stage Level 1 program complete.
+Those C2 results alone did not complete the five-stage Level 1 program.
 
 ## Gradient-checkpointing boundary
 
@@ -103,11 +116,13 @@ reviewed and accepted by merged PR #13; acceptance does not broaden this
 bounded scope.
 
 The historical C3 evidence descriptor remains partial: exact/private retention
-and an explicitly supplied evidence reviewer are still pending. Final Level 1
-requalification is the current Stage 5 under
-[LEVEL1_CORE_REQUALIFICATION_PLAN.md](LEVEL1_CORE_REQUALIFICATION_PLAN.md), but
-it has no accepted qualifying evidence and the five-stage program is not
-complete.
+and an explicitly supplied evidence reviewer are still pending. Those
+historical facts are unchanged. The separate final Level 1 requalification
+subsequently passed locally under
+[LEVEL1_CORE_REQUALIFICATION_PLAN.md](LEVEL1_CORE_REQUALIFICATION_PLAN.md), with
+reviewed evidence recorded in
+[LEVEL1_CORE_SUMMARY.md](validation_results/LEVEL1_CORE_SUMMARY.md). It does
+not broaden the bounded C3 diagnostic into paper-scale evidence.
 
 ## P0-2 padding masks
 

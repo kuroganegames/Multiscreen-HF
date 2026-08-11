@@ -8,7 +8,9 @@ For compact validation run summaries, see [validation_results/VALIDATION_LOG_IND
 
 For future validation logging rules, see [LOGGING_POLICY.md](LOGGING_POLICY.md).
 
-For the current Stage 5 gate, see [LEVEL1_CORE_REQUALIFICATION_PLAN.md](LEVEL1_CORE_REQUALIFICATION_PLAN.md).
+For the closed Stage 5 plan and reviewed result, see
+[LEVEL1_CORE_REQUALIFICATION_PLAN.md](LEVEL1_CORE_REQUALIFICATION_PLAN.md) and
+[LEVEL1_CORE_SUMMARY.md](validation_results/LEVEL1_CORE_SUMMARY.md).
 
 ## Status summary
 
@@ -38,8 +40,14 @@ P0.5-C3: paper-training-contract smoke
   Status: complete; focused PR #13 reviewed and merged
 
 final Level 1 requalification and evidence
-  Status: current Stage 5; pending and not validated
+  Status: complete locally; evidence closure complete; draft PR REVIEW_REQUIRED
 ```
+
+**Level 1 — Core mathematical Hugging Face implementation: complete.** This
+does not validate paper-scale reproduction, retrieval benchmarks, optimized
+long-context efficiency, distributed training, or any P1 model/ecosystem
+capability. The focused Stage 5 draft PR remains `REVIEW_REQUIRED` and
+unmerged.
 
 The current implementation can be considered a **P0-qualified research implementation through P0-4**. P0-4 was accepted only from reviewed qualifying Psi=8/Psi=16 CUDA bf16 artifacts; static config validation and reduced diagnostics remain non-qualifying substitutes.
 
@@ -454,11 +462,29 @@ exact/private retention is blocked, sanitized evidence is verified but
 unpublished, and an explicit evidence reviewer was not supplied; the merge does
 not rewrite those historical retention facts.
 
+### Final Level 1 requalification
+
+The separate Stage 5 matrix passed locally on tested source
+`b224ca1a127ee18fc5fd4b00a5df639401d60679`. It ran the fixed 46-command matrix
+with two environment records and reviewed 187 raw events across P0-3, fresh
+Psi=8/Psi=16 P0-4 qualification, and bounded C3 diagnostics. All P0-1/P0-2,
+C1, C2, checkpointing, tokenizer-reload, save/reload, cache, generation,
+completion-marker, repository-hygiene, and failure-absence checks passed.
+
+Reviewer `kuroganegames` inspected all 46 lossless logs, 48 runner records,
+187 raw events, focused/full reports, and 130 reviewed logical artifacts.
+Acceptance review is recorded, the exact/private archive is retained
+externally and verified, and the separately sanitized archive is verified but
+unpublished. No public asset exists. See the
+[Level 1 summary](validation_results/LEVEL1_CORE_SUMMARY.md), complete
+[descriptor](validation_results/LEVEL1_CORE_EVIDENCE_ARCHIVE.json), and the
+[exact](validation_results/LEVEL1_CORE_EXACT_VERIFICATION.json) and
+[sanitized](validation_results/LEVEL1_CORE_SANITIZED_VERIFICATION.json)
+verification reports.
+
 ## Next validation boundary
 
-P0-4, P0.5-C1, P0.5-C2, P1-preflight B, and P0.5-C3 are complete. Final Level
-1 core requalification is the current Stage 5 under
-[LEVEL1_CORE_REQUALIFICATION_PLAN.md](LEVEL1_CORE_REQUALIFICATION_PLAN.md).
-It remains pending and has no accepted qualifying Stage 5 evidence; therefore
-the five-stage Level 1 Core program is not complete. No P1 ecosystem capability
-is validated yet.
+P0-4, P0.5-C1, P0.5-C2, P1-preflight B, P0.5-C3, and final Level 1 core
+requalification are complete locally. The focused Stage 5 draft PR still
+requires review and merge. A possible P1-1 PEFT/LoRA gate remains separate;
+no P1 ecosystem capability is validated yet.

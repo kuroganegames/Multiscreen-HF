@@ -48,10 +48,15 @@ P0.5-C3: paper-training-contract smoke
   review remain pending in the historical descriptor
 
 final Level 1 requalification and evidence
-  current focused Stage 5
+  complete locally on tested source b224ca1a127ee18fc5fd4b00a5df639401d60679
+  evidence commit: 843d5ac7825a1b0892316b70fa5c81c8de8f2d79
   plan: docs/LEVEL1_CORE_REQUALIFICATION_PLAN.md
-  pending; no Stage 5 qualifying evidence has been accepted
-  five-stage Level 1 Core program not complete
+  46-command matrix, 187 raw events, human review, private retention,
+  sanitization, and offline verification passed
+  Level 1 — Core mathematical Hugging Face implementation: complete
+  focused draft PR remains REVIEW_REQUIRED and unmerged
+  this does not validate paper-scale training, retrieval, optimized
+  long-context efficiency, distributed training, or any P1 capability
 
 P1 model/ecosystem capabilities
   none validated
@@ -71,6 +76,7 @@ docs/TESTING.md
 docs/KNOWN_LIMITATIONS.md
 docs/P0_5_C2_PLAN.md
 docs/LEVEL1_CORE_REQUALIFICATION_PLAN.md
+docs/CODEX_LEVEL1_CORE_HF_HANDOFF.md
 docs/adr/ADR-0001-mipe-position-semantics.md
 docs/P0_5_C3_PLAN.md
 docs/P1_PREFLIGHT_B_PLAN.md
@@ -88,6 +94,11 @@ docs/validation_results/P0_4_SUMMARY.json
 docs/validation_results/P0_4_EVIDENCE_ARCHIVE.json
 docs/validation_results/P0_5_C3_SUMMARY.md
 docs/validation_results/P0_5_C3_EVIDENCE_ARCHIVE.json
+docs/validation_results/LEVEL1_CORE_SUMMARY.md
+docs/validation_results/LEVEL1_CORE_SUMMARY.json
+docs/validation_results/LEVEL1_CORE_EVIDENCE_ARCHIVE.json
+docs/validation_results/LEVEL1_CORE_EXACT_VERIFICATION.json
+docs/validation_results/LEVEL1_CORE_SANITIZED_VERIFICATION.json
 ```
 
 The P0-4 plan and Codex handoff are retained reproduction/history documents; they do not mean P0-4 is pending:
@@ -346,15 +357,15 @@ P0.5-C2       accepted and merged in PR #10
 C2 correction accepted and merged in PR #11
 P1-preflight B accepted and merged in PR #12
 P0.5-C3       accepted and merged in PR #13
-final P0 core requalification current Stage 5; pending and not validated
+final P0 core requalification complete locally; draft PR REVIEW_REQUIRED
 P1-1 PEFT/LoRA smoke remains outside the Level 1 core program
 ```
 
-P0.5-C3 was accepted by reviewed and merged PR #13. Proceed with final P0 core
-requalification only as the separate Stage 5 defined in
-`docs/LEVEL1_CORE_REQUALIFICATION_PLAN.md`. Do not describe Stage 5 or the full
-Level 1 Core program as validated or complete until its focused implementation,
-test contract, evidence, and status update are reviewed.
+P0.5-C3 was accepted by reviewed and merged PR #13. The separate Stage 5 in
+`docs/LEVEL1_CORE_REQUALIFICATION_PLAN.md` passed locally with reviewed,
+retained, and verified evidence. The focused final PR remains draft and must
+not be merged or tagged automatically. This completion does not validate a P1
+model/ecosystem capability or broaden the limitations recorded above.
 
 ## Validation records
 

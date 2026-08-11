@@ -51,20 +51,20 @@
       "value": "2026-08-11T22:15:14Z"
     },
     "final_commit": {
-      "status": "pending",
-      "value": null
+      "status": "recorded",
+      "value": "843d5ac7825a1b0892316b70fa5c81c8de8f2d79"
     },
     "implementation_base_commit": "3282eae7cb97ecfe01753460f6bce63d03e3cf88",
     "working_branch": "validation/level1-core-requalification",
     "worktree_after_commit": {
-      "clean": null,
-      "collected_at_utc": null,
-      "porcelain_format": null,
-      "porcelain_sha256": null,
-      "staged_changes": null,
-      "status": "pending",
-      "unstaged_changes": null,
-      "untracked_count": null
+      "clean": true,
+      "collected_at_utc": "2026-08-11T22:23:01Z",
+      "porcelain_format": "git-status-porcelain-v1",
+      "porcelain_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "staged_changes": false,
+      "status": "recorded",
+      "unstaged_changes": false,
+      "untracked_count": 0
     },
     "worktree_before_edits": {
       "clean": true,
@@ -77,9 +77,8 @@
       "untracked_count": 0
     }
   },
-  "evidence_status": "partial",
+  "evidence_status": "complete",
   "limitations": [
-    "Final descriptor self-reference fields remain pending until clean commit A is observed.",
     "This is an unofficial correctness-first Hugging Face implementation.",
     "The dense quadratic screening path is not evidence of paper efficiency.",
     "No paper-scale training, retrieval benchmark, distributed training, or P1 ecosystem capability is validated.",
@@ -112,7 +111,7 @@
     }
   },
   "retention": {
-    "descriptor_updated_at_utc": "2026-08-11T22:15:14Z",
+    "descriptor_updated_at_utc": "2026-08-11T22:23:01Z",
     "exact_private_retained": true,
     "public_asset": null,
     "public_asset_published": false,
