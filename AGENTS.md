@@ -48,13 +48,14 @@ P0.5-C3: paper-training-contract smoke
   review remain pending in the historical descriptor
 
 final Level 1 requalification and evidence
-  complete locally on tested source b224ca1a127ee18fc5fd4b00a5df639401d60679
+  complete on tested source b224ca1a127ee18fc5fd4b00a5df639401d60679
   evidence commit: 843d5ac7825a1b0892316b70fa5c81c8de8f2d79
   plan: docs/LEVEL1_CORE_REQUALIFICATION_PLAN.md
   46-command matrix, 187 raw events, human review, private retention,
   sanitization, and offline verification passed
   Level 1 — Core mathematical Hugging Face implementation: complete
-  focused draft PR remains REVIEW_REQUIRED and unmerged
+  focused result reviewed and accepted as merged PR #14
+  merge commit: 50af4f8e26b97f3bb0b97fc0bf6d0480a5d0fe06
   this does not validate paper-scale training, retrieval, optimized
   long-context efficiency, distributed training, or any P1 capability
 
@@ -357,15 +358,16 @@ P0.5-C2       accepted and merged in PR #10
 C2 correction accepted and merged in PR #11
 P1-preflight B accepted and merged in PR #12
 P0.5-C3       accepted and merged in PR #13
-final P0 core requalification complete locally; draft PR REVIEW_REQUIRED
+final P0 core requalification accepted and merged in PR #14
 P1-1 PEFT/LoRA smoke remains outside the Level 1 core program
 ```
 
 P0.5-C3 was accepted by reviewed and merged PR #13. The separate Stage 5 in
 `docs/LEVEL1_CORE_REQUALIFICATION_PLAN.md` passed locally with reviewed,
-retained, and verified evidence. The focused final PR remains draft and must
-not be merged or tagged automatically. This completion does not validate a P1
-model/ecosystem capability or broaden the limitations recorded above.
+retained, and verified evidence. The focused final result was reviewed and
+accepted as merged PR #14. This completion does not validate a P1
+model/ecosystem capability or broaden the limitations recorded above; no tag
+is created without explicit user instruction.
 
 ## Validation records
 

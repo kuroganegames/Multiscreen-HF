@@ -40,14 +40,14 @@ P0.5-C3: paper-training-contract smoke
   Status: complete; focused PR #13 reviewed and merged
 
 final Level 1 requalification and evidence
-  Status: complete locally; evidence closure complete; draft PR REVIEW_REQUIRED
+  Status: complete; evidence closure complete; focused PR #14 reviewed and merged
 ```
 
 **Level 1 — Core mathematical Hugging Face implementation: complete.** This
 does not validate paper-scale reproduction, retrieval benchmarks, optimized
 long-context efficiency, distributed training, or any P1 model/ecosystem
-capability. The focused Stage 5 draft PR remains `REVIEW_REQUIRED` and
-unmerged.
+capability. The focused Stage 5 result was reviewed and accepted as merged PR
+#14 (merge commit `50af4f8e26b97f3bb0b97fc0bf6d0480a5d0fe06`).
 
 The current implementation can be considered a **P0-qualified research implementation through P0-4**. P0-4 was accepted only from reviewed qualifying Psi=8/Psi=16 CUDA bf16 artifacts; static config validation and reduced diagnostics remain non-qualifying substitutes.
 
@@ -485,6 +485,6 @@ verification reports.
 ## Next validation boundary
 
 P0-4, P0.5-C1, P0.5-C2, P1-preflight B, P0.5-C3, and final Level 1 core
-requalification are complete locally. The focused Stage 5 draft PR still
-requires review and merge. A possible P1-1 PEFT/LoRA gate remains separate;
-no P1 ecosystem capability is validated yet.
+requalification are complete. The focused Stage 5 result was reviewed and
+accepted as merged PR #14. A possible P1-1 PEFT/LoRA gate remains separate; no
+P1 ecosystem capability is validated yet.

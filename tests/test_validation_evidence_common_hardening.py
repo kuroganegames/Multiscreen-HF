@@ -486,6 +486,7 @@ class PackagerBoundaryHardeningTests(unittest.TestCase):
                 tested_source_commit=COMMIT,
                 artifacts=artifacts,
                 sensitive_values=(),
+                manifest_sensitive_values=(),
             )
         validate_layout.assert_called_once()
 

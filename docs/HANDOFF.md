@@ -6,10 +6,11 @@ The repository contains a **P0-qualified correctness-first research implementati
 
 **Level 1 — Core mathematical Hugging Face implementation: complete.** The
 final Stage 5 validation and evidence closure passed locally on tested source
-`b224ca1a127ee18fc5fd4b00a5df639401d60679`; its focused draft PR remains
-`REVIEW_REQUIRED` and unmerged. This result does not validate paper-scale
-reproduction, retrieval, optimized long-context efficiency, distributed
-training, or any P1 model/ecosystem capability.
+`b224ca1a127ee18fc5fd4b00a5df639401d60679`; the focused result was reviewed
+and accepted as merged PR #14 (merge commit
+`50af4f8e26b97f3bb0b97fc0bf6d0480a5d0fe06`). This result does not validate
+paper-scale reproduction, retrieval, optimized long-context efficiency,
+distributed training, or any P1 model/ecosystem capability.
 
 The historical evidence-infrastructure gate and status are:
 
@@ -34,7 +35,7 @@ P0.5-C1: accepted; focused PR #9 merged
 P0.5-C2: accepted; focused PR #10 merged; correction PR #11 merged
 P1-preflight B: accepted; focused PR #12 merged
 P0.5-C3 / Stage 4: accepted; focused PR #13 reviewed and merged
-final Level 1 requalification / Stage 5: complete locally; draft PR REVIEW_REQUIRED
+final Level 1 requalification / Stage 5: accepted; focused PR #14 reviewed and merged
 ```
 
 Start with:
@@ -76,19 +77,20 @@ Use [CODEX_P0_4_HANDOFF.md](CODEX_P0_4_HANDOFF.md) only for an intentional P0-4 
 | P0.5-C2 | Complete | Dual MiPE modes and long-boundary contracts were merged as PR #10; the CUDA-autocast cache-dtype correction was merged as PR #11. |
 | P1-preflight B | Complete | Supported non-reentrant API, exact 4.57.6/5.14.1 matrix, strong P0 regressions, and checkpointed CUDA smokes were accepted by merged PR #12. |
 | P0.5-C3 | Complete | The local gate was reviewed and accepted by merged PR #13. |
-| Final Level 1 requalification | Complete locally | Reviewed Stage 5 validation and evidence closure passed; the focused draft PR is `REVIEW_REQUIRED` and unmerged. |
+| Final Level 1 requalification | Complete | Reviewed Stage 5 validation and evidence closure passed and were accepted by merged PR #14. |
 | P1 ecosystem capabilities | None validated | PEFT/LoRA, QLoRA, Unsloth, generation matrix, compile, and serving remain future gates. |
 
 ### Baseline identity
 
 ```text
-Current baseline: Level 1 Core complete locally on reviewed Stage 5 evidence
+Current baseline: Level 1 Core complete on reviewed and accepted Stage 5 evidence
 P0.5-C1 merge / C2 base: ec805c1ba60c55ea4beb3ad68e0a00c0d718e909
 P0.5-C2 merge: 54aa96ee914e9f8ac7b58e6d176d4e3fbeb0ae27
 C2 correction / Stage 3 base: 0c83be6b4b043f4b965df4528534f24e9d5ab4f1
 Stage 3 merge / Stage 4 base: a2d43517c45dc39855db81b9286c4abf190a2c14
 Stage 4 merge / Stage 5 base: 3282eae7cb97ecfe01753460f6bce63d03e3cf88
-Current staged gate: final Level 1 requalification — complete locally; draft PR REVIEW_REQUIRED
+Stage 5 acceptance: focused PR #14 reviewed and merged
+Stage 5 merge commit: 50af4f8e26b97f3bb0b97fc0bf6d0480a5d0fe06
 Stage 5 tested source: b224ca1a127ee18fc5fd4b00a5df639401d60679
 Stage 5 evidence commit: 843d5ac7825a1b0892316b70fa5c81c8de8f2d79
 P1-preflight A implementation base (origin/main at branch creation): 34cbecd25bb38a6f92125071b1c08e42d71008f9
@@ -137,8 +139,8 @@ Final Level 1 requalification passed locally under
 The reviewed [summary](validation_results/LEVEL1_CORE_SUMMARY.md) and complete
 [evidence descriptor](validation_results/LEVEL1_CORE_EVIDENCE_ARCHIVE.json)
 bind the fixed matrix, human review, private retention, sanitization, and
-offline verification. The focused draft PR remains `REVIEW_REQUIRED` and
-unmerged.
+offline verification. The focused result was reviewed and accepted as merged
+PR #14.
 
 ## 2. First ten minutes after a fresh clone
 
@@ -535,7 +537,7 @@ P0.5-C1  architecture / initialization / all-scale contract — merged
 P0.5-C2  long-position / MiPE / cache semantics — merged
 P1-preflight B  gradient-checkpointing API modernization — merged as PR #12
 P0.5-C3  paper-training-contract smoke — accepted as merged PR #13
-final P0 core requalification — complete locally; draft PR REVIEW_REQUIRED
+final P0 core requalification — accepted as merged PR #14
 P1-1  PEFT/LoRA smoke
 ```
 

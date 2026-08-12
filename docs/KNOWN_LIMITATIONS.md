@@ -25,7 +25,7 @@ fixed Stage 5 matrix and reviewed evidence closure passed locally on tested
 source `b224ca1a127ee18fc5fd4b00a5df639401d60679`; see the
 [summary](validation_results/LEVEL1_CORE_SUMMARY.md) and complete
 [descriptor](validation_results/LEVEL1_CORE_EVIDENCE_ARCHIVE.json). The
-focused draft PR remains `REVIEW_REQUIRED` and unmerged.
+focused result was reviewed and accepted as merged PR #14.
 
 This is correctness, compatibility, and bounded short-run qualification
 evidence. It does not validate paper-scale reproduction, retrieval benchmarks,
