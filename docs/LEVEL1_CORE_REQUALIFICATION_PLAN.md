@@ -206,8 +206,10 @@ and `raw-events-reviewed=true`. Then:
 4. bind the descriptor to the gate, tested commit, and complete artifact set;
 5. publish neither archive by default, and never publish the exact archive.
 
-Historical P0-4 and C3 descriptors remain unchanged. Their partial retention
-cannot satisfy this gate and is not rewritten retroactively.
+During this Stage 5 run, the historical P0-4 and C3 descriptors remained
+unchanged. Their partial retention could not satisfy this gate and was not
+rewritten retroactively. A later C3 external-retention closure is a separate
+post-acceptance record and does not replace evidence for this gate.
 
 ## Descriptor closure
 

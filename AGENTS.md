@@ -44,8 +44,10 @@ P0.5-C3: paper-training-contract smoke
   accepted and merged in PR #13
   local contract, pinned-data, CUDA, regression, and evidence checks passed
   tested source: 8fa5dbf13530c942b2c9e5f03a572bd0cd5ca74f
-  sanitized archive verified; exact/private retention and explicit evidence
-  review remain pending in the historical descriptor
+  historical descriptor preserves the packaging-time partial state
+  later closure retains and verifies exact/private evidence; sanitized archive
+  reverified; explicit evidence review remains pending; overall evidence status
+  remains partial
 
 final Level 1 requalification and evidence
   complete on tested source b224ca1a127ee18fc5fd4b00a5df639401d60679
@@ -95,6 +97,9 @@ docs/validation_results/P0_4_SUMMARY.json
 docs/validation_results/P0_4_EVIDENCE_ARCHIVE.json
 docs/validation_results/P0_5_C3_SUMMARY.md
 docs/validation_results/P0_5_C3_EVIDENCE_ARCHIVE.json
+docs/validation_results/P0_5_C3_EVIDENCE_CLOSURE.json
+docs/validation_results/P0_5_C3_EXACT_VERIFICATION.json
+docs/validation_results/P0_5_C3_SANITIZED_VERIFICATION.json
 docs/validation_results/LEVEL1_CORE_SUMMARY.md
 docs/validation_results/LEVEL1_CORE_SUMMARY.json
 docs/validation_results/LEVEL1_CORE_EVIDENCE_ARCHIVE.json

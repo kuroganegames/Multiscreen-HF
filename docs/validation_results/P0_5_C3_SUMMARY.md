@@ -1,6 +1,6 @@
 # P0.5-C3 Summary: paper-training-contract smoke
 
-## Verdict
+## Recorded pre-merge verdict
 
 ```text
 Local gate result: passed
@@ -210,7 +210,7 @@ archive size:
   16,810 bytes
 manifest SHA-256:
   75fd240b2da86b2ea46258e354a5f5321552d1be19d6ea5f01697e32433d6a72
-verification report SHA-256:
+historical packaging verification report SHA-256:
   8579a1724a693faeec9934416ba8e11bf55c0d91487ac0de2b0f8cd2a55da81b
 sanitization report SHA-256:
   04f02677674a722716157c8ad919d74d275c88c8e7130fbabcc8b27c691be910
@@ -271,5 +271,8 @@ quality, retrieval performance, runtime or memory efficiency, optimized
 kernels, cross-hardware reproducibility, PEFT/LoRA, broad generation, serving,
 or production readiness.
 
-Stage 4 remains `REVIEW_REQUIRED`. Final Level 1 core requalification must not
-begin until this focused PR is reviewed and merged.
+The `REVIEW_REQUIRED` field above records the pre-merge Stage 4 handoff state.
+The focused result was subsequently reviewed and accepted by merged PR #13, and
+final Level 1 core requalification was later accepted by merged PR #14. The
+post-acceptance retention closure recorded here changes neither acceptance
+decision nor capability scope.

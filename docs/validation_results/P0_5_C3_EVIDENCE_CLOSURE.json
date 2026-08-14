@@ -42,20 +42,20 @@
       "value": "2026-08-14T04:28:04.154165Z"
     },
     "final_commit": {
-      "status": "pending",
-      "value": null
+      "status": "recorded",
+      "value": "4221e47d6920c0eca8ed45e754bc66696aca5664"
     },
     "implementation_base_commit": "ae2f3c1aeed1af48327a8c5caa90df64e05a141c",
     "working_branch": "evidence/p0-5-c3-external-retention",
     "worktree_after_commit": {
-      "clean": null,
-      "collected_at_utc": null,
-      "porcelain_format": null,
-      "porcelain_sha256": null,
-      "staged_changes": null,
-      "status": "pending",
-      "unstaged_changes": null,
-      "untracked_count": null
+      "clean": true,
+      "collected_at_utc": "2026-08-14T04:35:19Z",
+      "porcelain_format": "git-status-porcelain-v1",
+      "porcelain_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "staged_changes": false,
+      "status": "recorded",
+      "unstaged_changes": false,
+      "untracked_count": 0
     },
     "worktree_before_edits": {
       "clean": true,
@@ -81,8 +81,7 @@
     "It is not claimed byte-identical to the paper corpus or representative of its train split.",
     "The CUDA runs are bounded dense-reference diagnostics.",
     "They do not establish paper-scale training, quality, efficiency, or cross-hardware behavior.",
-    "This descriptor cannot self-record its containing evidence commit, so final_commit remains pending until the follow-up closure commit.",
-    "The post-evidence-commit clean-worktree observation remains pending until the follow-up closure commit.",
+    "The evidence commit and its clean post-commit worktree observation are recorded by this follow-up closure commit.",
     "This descriptor records later external retention without rewriting the historical Stage 4 evidence descriptor or accepted metrics."
   ],
   "original_run_provenance": {
@@ -112,7 +111,7 @@
     }
   },
   "retention": {
-    "descriptor_updated_at_utc": "2026-08-14T04:28:04.154165Z",
+    "descriptor_updated_at_utc": "2026-08-14T04:35:19Z",
     "exact_private_retained": true,
     "public_asset": null,
     "public_asset_published": false,

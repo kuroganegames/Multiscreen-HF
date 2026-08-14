@@ -32,10 +32,13 @@ CUDA-autocast cache-dtype correction was merged as PR #11. Stage 3 was reviewed
 and merged as PR #12. Stage 4 unit, pinned-data, CUDA bf16 operational,
 peak-exposure, full regression, and evidence checks passed on tested commit
 `8fa5dbf13530c942b2c9e5f03a572bd0cd5ca74f`; the focused Stage 4 result was
-reviewed and accepted by merged PR #13. The existing C3 evidence descriptor
-still records partial retention: exact/private retention and an explicitly
-supplied evidence reviewer remain pending. Those facts are not rewritten by PR
-acceptance.
+reviewed and accepted by merged PR #13. The historical C3 evidence descriptor
+still records the packaging-time partial state and is not rewritten by PR
+acceptance. A later
+[external-retention closure](validation_results/P0_5_C3_EVIDENCE_CLOSURE.json)
+retains and verifies the exact/private archive and reverifies the sanitized
+archive. An explicitly supplied evidence reviewer remains pending, so the
+closure's overall evidence status remains partial.
 
 Final Level 1 requalification passed under
 [LEVEL1_CORE_REQUALIFICATION_PLAN.md](LEVEL1_CORE_REQUALIFICATION_PLAN.md) on
