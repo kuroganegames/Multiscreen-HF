@@ -52,13 +52,13 @@
     },
     "final_commit": {
       "status": "recorded",
-      "value": "4221e47d6920c0eca8ed45e754bc66696aca5664"
+      "value": "05861b791f77ba189b5abebf7513ad19f34c659b"
     },
     "implementation_base_commit": "ae2f3c1aeed1af48327a8c5caa90df64e05a141c",
     "working_branch": "evidence/p0-5-c3-external-retention",
     "worktree_after_commit": {
       "clean": true,
-      "collected_at_utc": "2026-08-14T04:35:19Z",
+      "collected_at_utc": "2026-08-14T05:19:57Z",
       "porcelain_format": "git-status-porcelain-v1",
       "porcelain_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "staged_changes": false,
@@ -118,7 +118,7 @@
     }
   },
   "retention": {
-    "descriptor_updated_at_utc": "2026-08-14T05:07:02Z",
+    "descriptor_updated_at_utc": "2026-08-14T05:19:57Z",
     "exact_private_retained": true,
     "public_asset": null,
     "public_asset_published": false,
