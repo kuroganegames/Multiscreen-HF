@@ -222,15 +222,44 @@ public asset:
   none
 ```
 
-Retention is intentionally recorded as partial. Because
-`MULTISCREEN_EVIDENCE_ARCHIVE_DIR` was not configured, no exact/private
-archive was created or retained. The verified sanitized archive remains
-unpublished ignored local staging, and no explicit reviewer was supplied. The
-authenticated GitHub login was not treated as reviewer evidence.
+At the original Stage 4 packaging time, retention was partial:
+`MULTISCREEN_EVIDENCE_ARCHIVE_DIR` was not configured, so no exact/private
+archive was created. The verified sanitized archive remained unpublished, and
+no explicit evidence reviewer was supplied. Those dated facts remain unchanged
+in [the historical descriptor](P0_5_C3_EVIDENCE_ARCHIVE.json).
 
-See [P0_5_C3_EVIDENCE_ARCHIVE.json](P0_5_C3_EVIDENCE_ARCHIVE.json) for the
-machine-readable provenance, artifact inventory, archive identity, and pending
-review state.
+### Post-acceptance external-retention closure
+
+On 2026-08-14, the same 26 original source artifacts were reread from the
+retained raw root. Every size and SHA-256 matched the historical descriptor.
+An allowlist-only exact/private archive was then created directly in the
+existing external private-retention class and verified offline:
+
+```text
+exact/private archive:
+  validation-evidence-exact-p0-5-c3-8fa5dbf1-v2.tar.gz
+archive SHA-256:
+  db882b8eb5d871b4ca8696a324d4a67aa6bd36389dd173db4ea857587d57319e
+archive size:
+  15,932 bytes
+manifest SHA-256:
+  94ad9e97a9cc2681a6cb0b48bca2de4578828195d0b4905905112b5a6956654b
+archive members:
+  28 (26 source artifacts plus MANIFEST.json and SHA256SUMS)
+public:
+  false
+```
+
+The unchanged 29-member sanitized archive was also reverified against the new
+closure descriptor. Both descriptor-aware verification reports are committed
+with the [closure descriptor](P0_5_C3_EVIDENCE_CLOSURE.json). The exact archive
+remains private and the sanitized archive remains unpublished.
+
+No explicit evidence reviewer was supplied for this later closure, so
+`acceptance_review` and overall `evidence_status` remain `pending`/`partial`.
+The retention state itself is now `verified`. This follow-up does not rewrite
+original-run provenance, accepted metrics, PR #13 acceptance, or any model
+capability claim.
 
 ## Interpretation and limits
 

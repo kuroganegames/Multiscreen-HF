@@ -1,0 +1,408 @@
+{
+  "acceptance_review": {
+    "reviewers": [],
+    "status": "pending"
+  },
+  "archives": {
+    "exact_private": {
+      "archive_filename": "validation-evidence-exact-p0-5-c3-8fa5dbf1-v2.tar.gz",
+      "created_at_utc": "2026-08-14T04:24:40.515181Z",
+      "manifest_sha256": "94ad9e97a9cc2681a6cb0b48bca2de4578828195d0b4905905112b5a6956654b",
+      "public": false,
+      "sha256": "db882b8eb5d871b4ca8696a324d4a67aa6bd36389dd173db4ea857587d57319e",
+      "size_bytes": 15932,
+      "status": "verified",
+      "storage_class": "private_external",
+      "storage_locator": "private-external:p0-5-c3/8fa5dbf1/v2",
+      "verification_report_sha256": "102be0cc754a757b6a9a16bb8d926975d49d5d3ea6ec4d30f660d1a078229007",
+      "verified_at_utc": "2026-08-14T04:28:04.154165Z"
+    },
+    "sanitized_shareable": {
+      "archive_filename": "validation-evidence-sanitized-p0-5-c3-8fa5dbf1-v2.tar.gz",
+      "created_at_utc": "2026-08-09T08:13:05.545107Z",
+      "manifest_sha256": "75fd240b2da86b2ea46258e354a5f5321552d1be19d6ea5f01697e32433d6a72",
+      "public": false,
+      "sha256": "274e489f4b4872f8f8c797b56b9d49aebc3a8c0e005fe2c65694f136616a9573",
+      "size_bytes": 16810,
+      "status": "verified",
+      "storage_class": "sanitized_staging",
+      "storage_locator": "local-sanitized-staging:p0-5-c3/8fa5dbf1/v2",
+      "verification_report_sha256": "cc3ac3f8e66ab276ffa3a43a7235adb9f9aa9c9b4fb78f6d7a7f3971d90b696c",
+      "verified_at_utc": "2026-08-14T04:28:04.154165Z"
+    }
+  },
+  "evidence_gate": "P0.5-C3 external retention closure",
+  "evidence_handoff_provenance": {
+    "archive_created_at_utc": {
+      "status": "recorded",
+      "value": "2026-08-14T04:24:40.515181Z"
+    },
+    "archive_verified_at_utc": {
+      "status": "recorded",
+      "value": "2026-08-14T04:28:04.154165Z"
+    },
+    "final_commit": {
+      "status": "pending",
+      "value": null
+    },
+    "implementation_base_commit": "ae2f3c1aeed1af48327a8c5caa90df64e05a141c",
+    "working_branch": "evidence/p0-5-c3-external-retention",
+    "worktree_after_commit": {
+      "clean": null,
+      "collected_at_utc": null,
+      "porcelain_format": null,
+      "porcelain_sha256": null,
+      "staged_changes": null,
+      "status": "pending",
+      "unstaged_changes": null,
+      "untracked_count": null
+    },
+    "worktree_before_edits": {
+      "clean": true,
+      "collected_at_utc": "2026-08-14T04:25:55Z",
+      "porcelain_format": "git-status-porcelain-v1",
+      "porcelain_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "staged_changes": false,
+      "status": "recorded",
+      "unstaged_changes": false,
+      "untracked_count": 0
+    }
+  },
+  "evidence_status": "partial",
+  "limitations": [
+    "No explicit evidence reviewer was supplied for this post-acceptance retention closure; acceptance_review remains pending.",
+    "The authenticated GitHub login was not treated as reviewer evidence.",
+    "The exact/private archive is retained externally and verified; it must remain private.",
+    "The verified sanitized archive remains in ignored staging and has not been published.",
+    "A tested-source identity record was captured immediately before CUDA diagnostics.",
+    "No timestamped pre-CUDA worktree observation was retained, so run start remains not_recorded_in_original_run.",
+    "The branch-head manifest validator hardening is outside this archive and changed no training path.",
+    "The pinned dataset source is a third-party SlimPajama-family reupload test shard.",
+    "It is not claimed byte-identical to the paper corpus or representative of its train split.",
+    "The CUDA runs are bounded dense-reference diagnostics.",
+    "They do not establish paper-scale training, quality, efficiency, or cross-hardware behavior.",
+    "This descriptor cannot self-record its containing evidence commit, so final_commit remains pending until the follow-up closure commit.",
+    "The post-evidence-commit clean-worktree observation remains pending until the follow-up closure commit.",
+    "This descriptor records later external retention without rewriting the historical Stage 4 evidence descriptor or accepted metrics."
+  ],
+  "original_run_provenance": {
+    "original_run_review": {
+      "reviewers": [],
+      "status": "pending"
+    },
+    "run_worktree_at_end": {
+      "clean": true,
+      "collected_at_utc": "2026-08-09T08:12:09Z",
+      "porcelain_format": "git-status-porcelain-v1",
+      "porcelain_sha256": "e3b0c44298fc1c149afbf4f8996fb92427ae41e4649b934ca495991b7852b855",
+      "staged_changes": false,
+      "status": "recorded",
+      "unstaged_changes": false,
+      "untracked_count": 0
+    },
+    "run_worktree_at_start": {
+      "clean": null,
+      "collected_at_utc": null,
+      "porcelain_format": null,
+      "porcelain_sha256": null,
+      "staged_changes": null,
+      "status": "not_recorded_in_original_run",
+      "unstaged_changes": null,
+      "untracked_count": null
+    }
+  },
+  "retention": {
+    "descriptor_updated_at_utc": "2026-08-14T04:28:04.154165Z",
+    "exact_private_retained": true,
+    "public_asset": null,
+    "public_asset_published": false,
+    "sanitized_archive_verified": true,
+    "status": "verified"
+  },
+  "sanitization": {
+    "files_scanned": 26,
+    "replacement_count": 0,
+    "report_sha256": "04f02677674a722716157c8ad919d74d275c88c8e7130fbabcc8b27c691be910",
+    "rules_applied": [
+      "bearer_token",
+      "cache_path",
+      "credential_url",
+      "file_uri",
+      "github_token",
+      "huggingface_token",
+      "json_secret_assignment",
+      "openai_token",
+      "python_interpreter",
+      "secret_assignment",
+      "sensitive_literal",
+      "unix_absolute_path",
+      "windows_absolute_path"
+    ],
+    "status": "verified",
+    "unresolved_findings": []
+  },
+  "schema_version": "1.0.0",
+  "source_artifacts": [
+    {
+      "archive_path": "artifacts/p0-5-c3/contract/contract.json",
+      "classification": "validation_summary",
+      "exact_bytes_retained": true,
+      "logical_name": "c3-contract-contract-json",
+      "sanitized_copy_status": "verified",
+      "sha256": "f9e4fb2a47316faa5fe2f119889b279dc9326292c8bc4167fb371575e35fd994",
+      "size_bytes": 434
+    },
+    {
+      "archive_path": "artifacts/p0-5-c3/cuda/psi16/operational/P0_5_C3_OPERATIONAL_COMPLETE.json",
+      "classification": "completion_marker",
+      "exact_bytes_retained": true,
+      "logical_name": "c3-cuda-psi16-operational-p0-5-c3-operational-complete-json",
+      "sanitized_copy_status": "verified",
+      "sha256": "aee693a81356cd2f1b09ae3d6ccc2d5f660084faefd4cfec7b4197292f3badd1",
+      "size_bytes": 146
+    },
+    {
+      "archive_path": "artifacts/p0-5-c3/cuda/psi16/operational/metrics.jsonl",
+      "classification": "validation_metrics",
+      "exact_bytes_retained": true,
+      "logical_name": "c3-cuda-psi16-operational-metrics-jsonl",
+      "sanitized_copy_status": "verified",
+      "sha256": "f48d844b0e83eab77d3b5d0f68c1c23027d89f509c9f6fe6acda26e96945dbab",
+      "size_bytes": 1729
+    },
+    {
+      "archive_path": "artifacts/p0-5-c3/cuda/psi16/operational/summary.json",
+      "classification": "validation_summary",
+      "exact_bytes_retained": true,
+      "logical_name": "c3-cuda-psi16-operational-summary-json",
+      "sanitized_copy_status": "verified",
+      "sha256": "b7d78d3c9e5db55266cc563ff844c2ee69c20f1d9c5ec16209d3e0b83a6ab260",
+      "size_bytes": 18172
+    },
+    {
+      "archive_path": "artifacts/p0-5-c3/cuda/psi16/peak_exposure/P0_5_C3_PEAK_EXPOSURE_COMPLETE.json",
+      "classification": "completion_marker",
+      "exact_bytes_retained": true,
+      "logical_name": "c3-cuda-psi16-peak-exposure-p0-5-c3-peak-exposure-complete-json",
+      "sanitized_copy_status": "verified",
+      "sha256": "8c8deb1875c4df3878a80d4b11f04fc3d6e8459127dd262140612db75058f7f3",
+      "size_bytes": 148
+    },
+    {
+      "archive_path": "artifacts/p0-5-c3/cuda/psi16/peak_exposure/metrics.jsonl",
+      "classification": "validation_metrics",
+      "exact_bytes_retained": true,
+      "logical_name": "c3-cuda-psi16-peak-exposure-metrics-jsonl",
+      "sanitized_copy_status": "verified",
+      "sha256": "ba404c2eb9d0f44f6f7cfade0f7b849751ea82f4d8f59c681be691acd8f6892c",
+      "size_bytes": 544
+    },
+    {
+      "archive_path": "artifacts/p0-5-c3/cuda/psi16/peak_exposure/summary.json",
+      "classification": "validation_summary",
+      "exact_bytes_retained": true,
+      "logical_name": "c3-cuda-psi16-peak-exposure-summary-json",
+      "sanitized_copy_status": "verified",
+      "sha256": "8d0e7242a11504ccf9db0c66b13bac02123d2458b1752d0e06813d07237133bd",
+      "size_bytes": 18142
+    },
+    {
+      "archive_path": "artifacts/p0-5-c3/cuda/psi8/operational/P0_5_C3_OPERATIONAL_COMPLETE.json",
+      "classification": "completion_marker",
+      "exact_bytes_retained": true,
+      "logical_name": "c3-cuda-psi8-operational-p0-5-c3-operational-complete-json",
+      "sanitized_copy_status": "verified",
+      "sha256": "f68577ffcfd33596724613d4c7076e2fce28781a9ec991d8b54a3a212e5fd8bb",
+      "size_bytes": 145
+    },
+    {
+      "archive_path": "artifacts/p0-5-c3/cuda/psi8/operational/metrics.jsonl",
+      "classification": "validation_metrics",
+      "exact_bytes_retained": true,
+      "logical_name": "c3-cuda-psi8-operational-metrics-jsonl",
+      "sanitized_copy_status": "verified",
+      "sha256": "bdc99210f2601d131b5e600bd5fddebadda3580e58a629cf7754111b9bd357be",
+      "size_bytes": 1728
+    },
+    {
+      "archive_path": "artifacts/p0-5-c3/cuda/psi8/operational/summary.json",
+      "classification": "validation_summary",
+      "exact_bytes_retained": true,
+      "logical_name": "c3-cuda-psi8-operational-summary-json",
+      "sanitized_copy_status": "verified",
+      "sha256": "000e761009b6afe48629d68a755e76b372fd76d491a3c24e4996f2f48e3e91ef",
+      "size_bytes": 18170
+    },
+    {
+      "archive_path": "artifacts/p0-5-c3/cuda/psi8/peak_exposure/P0_5_C3_PEAK_EXPOSURE_COMPLETE.json",
+      "classification": "completion_marker",
+      "exact_bytes_retained": true,
+      "logical_name": "c3-cuda-psi8-peak-exposure-p0-5-c3-peak-exposure-complete-json",
+      "sanitized_copy_status": "verified",
+      "sha256": "5264df1c711552cc5f442466e3625c62a417f1331649e85ca5b47570173b966c",
+      "size_bytes": 147
+    },
+    {
+      "archive_path": "artifacts/p0-5-c3/cuda/psi8/peak_exposure/metrics.jsonl",
+      "classification": "validation_metrics",
+      "exact_bytes_retained": true,
+      "logical_name": "c3-cuda-psi8-peak-exposure-metrics-jsonl",
+      "sanitized_copy_status": "verified",
+      "sha256": "d5c0b22a62ff40eb07ccb12ac6152b75fadd308c371ce58420c2543728b467c6",
+      "size_bytes": 542
+    },
+    {
+      "archive_path": "artifacts/p0-5-c3/cuda/psi8/peak_exposure/summary.json",
+      "classification": "validation_summary",
+      "exact_bytes_retained": true,
+      "logical_name": "c3-cuda-psi8-peak-exposure-summary-json",
+      "sanitized_copy_status": "verified",
+      "sha256": "64a6ff8f4e49f945f794ac43256103d76ee830498b44d8c2b3d051868132186a",
+      "size_bytes": 18140
+    },
+    {
+      "archive_path": "artifacts/p0-5-c3/data/P0_5_C3_DATA_CONTRACT_COMPLETE.json",
+      "classification": "completion_marker",
+      "exact_bytes_retained": true,
+      "logical_name": "c3-data-p0-5-c3-data-contract-complete-json",
+      "sanitized_copy_status": "verified",
+      "sha256": "8bb9e74efcbe180f4dc62b731c9f0a246cda4c69a8398314519de497a16c561b",
+      "size_bytes": 115
+    },
+    {
+      "archive_path": "artifacts/p0-5-c3/data/data_contract.json",
+      "classification": "validation_metrics",
+      "exact_bytes_retained": true,
+      "logical_name": "c3-data-data-contract-json",
+      "sanitized_copy_status": "verified",
+      "sha256": "4a054083e432ab589201a386c3e09db17841eabd90b4e0d51f7484615a443852",
+      "size_bytes": 14670
+    },
+    {
+      "archive_path": "artifacts/p0-5-c3/environment/gpu-before.csv",
+      "classification": "environment_record",
+      "exact_bytes_retained": true,
+      "logical_name": "c3-environment-gpu-before-csv",
+      "sanitized_copy_status": "verified",
+      "sha256": "53ea6d759b7220930ade6f43665b58b71ecbda88c31cda5a11f0a3c00c7a0097",
+      "size_bytes": 148
+    },
+    {
+      "archive_path": "artifacts/p0-5-c3/environment/runtime.json",
+      "classification": "environment_record",
+      "exact_bytes_retained": true,
+      "logical_name": "c3-environment-runtime-json",
+      "sanitized_copy_status": "verified",
+      "sha256": "7f15b2d8ab56a3407b470ace21f8a2b29a11e0d18cbed63f1a598029974a737b",
+      "size_bytes": 307
+    },
+    {
+      "archive_path": "artifacts/p0-5-c3/provenance/run-end.txt",
+      "classification": "provenance",
+      "exact_bytes_retained": true,
+      "logical_name": "c3-provenance-run-end-txt",
+      "sanitized_copy_status": "verified",
+      "sha256": "d3a38b11aaad5b162dbf8f88f2109617d22379212b102f4aa34aa14e4732e626",
+      "size_bytes": 168
+    },
+    {
+      "archive_path": "artifacts/p0-5-c3/provenance/tested-source.txt",
+      "classification": "provenance",
+      "exact_bytes_retained": true,
+      "logical_name": "c3-provenance-tested-source-txt",
+      "sanitized_copy_status": "verified",
+      "sha256": "b19a67a6f07f2bd39db685af5819ddf3c1e05287d76533a35f9a5d4f4dc56bd3",
+      "size_bytes": 79
+    },
+    {
+      "archive_path": "artifacts/p0-5-c3/regression/all-tests-tf4576.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "c3-regression-all-tests-tf4576-log",
+      "sanitized_copy_status": "verified",
+      "sha256": "a99076289a6bca358fd5e7367258a6b04dcac2a567876f6534feb71a18307d5c",
+      "size_bytes": 180
+    },
+    {
+      "archive_path": "artifacts/p0-5-c3/regression/evidence-tooling.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "c3-regression-evidence-tooling-log",
+      "sanitized_copy_status": "verified",
+      "sha256": "acf40fed35468c5a9dc32b45208973b0b8138f2754c7d8562f351870fc03d1f6",
+      "size_bytes": 10406
+    },
+    {
+      "archive_path": "artifacts/p0-5-c3/regression/oracle.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "c3-regression-oracle-log",
+      "sanitized_copy_status": "verified",
+      "sha256": "6f9b5a476ae0a823de7599177db3d80ebebaa6827d56069905400c0746ad69db",
+      "size_bytes": 100
+    },
+    {
+      "archive_path": "artifacts/p0-5-c3/regression/p0-full-cpu-fp32.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "c3-regression-p0-full-cpu-fp32-log",
+      "sanitized_copy_status": "verified",
+      "sha256": "340bf0ead488c3ce040396ecc769f4b926800d99da7323d3a4a09a54d3be2345",
+      "size_bytes": 624
+    },
+    {
+      "archive_path": "artifacts/p0-5-c3/regression/p0-full-cuda-bf16.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "c3-regression-p0-full-cuda-bf16-log",
+      "sanitized_copy_status": "verified",
+      "sha256": "59ab4ba2840fa465af114a78090b75c32efc158e32f8df7745a887356055c035",
+      "size_bytes": 628
+    },
+    {
+      "archive_path": "artifacts/p0-5-c3/unit/tf4576.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "c3-unit-tf4576-log",
+      "sanitized_copy_status": "verified",
+      "sha256": "7b4ab2ad5bc85dd72e7d945aee8a04b14614ffedb3224038c83db7405f79a977",
+      "size_bytes": 3003
+    },
+    {
+      "archive_path": "artifacts/p0-5-c3/unit/tf5141.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "c3-unit-tf5141-log",
+      "sanitized_copy_status": "verified",
+      "sha256": "625223adcf4e87f5d7e7a327a53f3fec15422990e4ca0d0ed2e80a5d028ecd72",
+      "size_bytes": 3003
+    }
+  ],
+  "tested_source": {
+    "branch": "agent/p0-5-c3-paper-training-contract",
+    "commit": "8fa5dbf13530c942b2c9e5f03a572bd0cd5ca74f",
+    "repository": "kuroganegames/Multiscreen-HF"
+  },
+  "validation_gate": "P0.5-C3",
+  "validation_status": "passed",
+  "verification": {
+    "reports": [
+      {
+        "archive_kind": "exact_private",
+        "archive_sha256": "db882b8eb5d871b4ca8696a324d4a67aa6bd36389dd173db4ea857587d57319e",
+        "errors": [],
+        "status": "verified",
+        "verified_at_utc": "2026-08-14T04:28:04.154165Z"
+      },
+      {
+        "archive_kind": "sanitized_shareable",
+        "archive_sha256": "274e489f4b4872f8f8c797b56b9d49aebc3a8c0e005fe2c65694f136616a9573",
+        "errors": [],
+        "status": "verified",
+        "verified_at_utc": "2026-08-14T04:28:04.154165Z"
+      }
+    ],
+    "status": "verified",
+    "verifier_version": "1.0.0"
+  }
+}

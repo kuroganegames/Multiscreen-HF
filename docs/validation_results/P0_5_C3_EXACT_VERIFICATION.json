@@ -1,0 +1,27 @@
+{
+  "archive": {
+    "archive_kind": "exact_private",
+    "filename": "validation-evidence-exact-p0-5-c3-8fa5dbf1-v2.tar.gz",
+    "manifest_sha256": "94ad9e97a9cc2681a6cb0b48bca2de4578828195d0b4905905112b5a6956654b",
+    "member_count": 28,
+    "sha256": "db882b8eb5d871b4ca8696a324d4a67aa6bd36389dd173db4ea857587d57319e",
+    "size_bytes": 15932
+  },
+  "checks": {
+    "archive_sha256": "verified",
+    "canonical_gzip_and_tar": "verified",
+    "evidence_document": "verified",
+    "manifest": "verified",
+    "member_hashes": "verified",
+    "member_paths_and_types": "verified",
+    "sanitization": {
+      "status": "not_applicable"
+    },
+    "sha256sums": "verified"
+  },
+  "errors": [],
+  "format_version": "validation-evidence-verification-v1",
+  "status": "verified",
+  "verified_at_utc": "2026-08-14T04:28:04.154165Z",
+  "verifier_version": "1.0.0"
+}
