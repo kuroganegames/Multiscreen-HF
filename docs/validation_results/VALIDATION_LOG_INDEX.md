@@ -52,7 +52,7 @@ retention closure is a separate post-acceptance record.
 | Gate | Archive descriptor | Retention status |
 |---|---|---|
 | P0-4 | [P0_4_EVIDENCE_ARCHIVE.json](P0_4_EVIDENCE_ARCHIVE.json) | partial/blocked |
-| P0.5-C3 | [historical descriptor](P0_5_C3_EVIDENCE_ARCHIVE.json) / [closure](P0_5_C3_EVIDENCE_CLOSURE.json) | retention verified; evidence review pending; overall partial |
+| P0.5-C3 | [historical descriptor](P0_5_C3_EVIDENCE_ARCHIVE.json) / [closure](P0_5_C3_EVIDENCE_CLOSURE.json) | complete; exact/private retained and verified; review recorded; sanitized verified but unpublished |
 | Level 1 Core | [descriptor](LEVEL1_CORE_EVIDENCE_ARCHIVE.json) | complete; exact/private retained and verified; sanitized verified but unpublished |
 
 The Level 1 descriptor is supported by committed
@@ -76,8 +76,10 @@ the independent sanitization rescan verified. The closure is supported by
 committed [exact/private](P0_5_C3_EXACT_VERIFICATION.json) and
 [sanitized](P0_5_C3_SANITIZED_VERIFICATION.json) verification reports.
 Both archives are unpublished, no public asset exists, and explicit evidence
-review is pending; overall evidence status therefore remains partial. This is
-separate from the implementation/result acceptance recorded by merged PR #13.
+review by Codex covered all 26 source artifacts and all 8 optimizer-step raw
+events. Acceptance review is recorded and overall evidence status is complete.
+This is separate from the implementation/result acceptance recorded by merged
+PR #13.
 
 P0-4's historical partial retention and C3's later retention closure do not
 reopen their accepted implementation results. The complete Level 1 retention

@@ -307,8 +307,9 @@ Stage 4 was reviewed and accepted by merged PR #13. The historical descriptor
 remains an accurate packaging-time partial snapshot. A later
 [external-retention closure](validation_results/P0_5_C3_EVIDENCE_CLOSURE.json)
 records exact/private external retention and verification plus sanitized archive
-reverification. No explicit evidence reviewer was supplied, so acceptance
-review is pending and overall evidence status remains partial.
+reverification. Codex reviewed all 26 source artifacts and all 8 optimizer-step
+raw events; acceptance review is recorded and overall evidence status is
+complete.
 Neither archive is published, and the exact archive must remain private.
 
 After restoring both archive files to explicit local paths, reverify them fully offline:

@@ -46,8 +46,8 @@ P0.5-C3: paper-training-contract smoke
   tested source: 8fa5dbf13530c942b2c9e5f03a572bd0cd5ca74f
   historical descriptor preserves the packaging-time partial state
   later closure retains and verifies exact/private evidence; sanitized archive
-  reverified; explicit evidence review remains pending; overall evidence status
-  remains partial
+  reverified; Codex reviewed all 26 source artifacts and all 8 raw events
+  acceptance review recorded; overall evidence status complete
 
 final Level 1 requalification and evidence
   complete on tested source b224ca1a127ee18fc5fd4b00a5df639401d60679

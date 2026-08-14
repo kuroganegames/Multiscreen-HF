@@ -118,9 +118,9 @@ bounded scope.
 The historical C3 evidence descriptor remains a truthful packaging-time partial
 snapshot. A later [external-retention closure](validation_results/P0_5_C3_EVIDENCE_CLOSURE.json)
 retains and verifies the exact/private archive and reverifies the sanitized
-archive. An explicitly supplied evidence reviewer is still pending, so overall
-evidence status remains partial. The separate final Level 1 requalification
-passed locally under
+archive. Codex reviewed all 26 source artifacts and all 8 optimizer-step raw
+events; acceptance review is recorded and overall evidence status is complete.
+The separate final Level 1 requalification passed locally under
 [LEVEL1_CORE_REQUALIFICATION_PLAN.md](LEVEL1_CORE_REQUALIFICATION_PLAN.md), with
 reviewed evidence recorded in
 [LEVEL1_CORE_SUMMARY.md](validation_results/LEVEL1_CORE_SUMMARY.md). It does

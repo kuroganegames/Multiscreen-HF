@@ -134,10 +134,11 @@ descriptor records the packaging-time state: sanitized verification passed,
 exact/private retention was blocked, and no explicit reviewer was supplied. A
 later [external-retention closure](validation_results/P0_5_C3_EVIDENCE_CLOSURE.json)
 retains and verifies the exact/private archive and reverifies the sanitized
-archive. Both remain unpublished, no public asset exists, and acceptance review
-stays pending; the closure's overall evidence status is therefore partial. The
-focused implementation and local result were separately reviewed and accepted
-by merged PR #13.
+archive. Codex reviewed all 26 source artifacts and all 8 optimizer-step raw
+events; acceptance review is recorded and overall evidence status is complete.
+Both archives remain unpublished and no public asset exists. The focused
+implementation and local result were separately reviewed and accepted by merged
+PR #13.
 
 Final Level 1 requalification passed locally under
 [LEVEL1_CORE_REQUALIFICATION_PLAN.md](LEVEL1_CORE_REQUALIFICATION_PLAN.md).

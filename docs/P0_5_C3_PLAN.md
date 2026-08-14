@@ -43,8 +43,9 @@ reviewed and merged as PR #13. Its historical evidence descriptor remains an
 accurate packaging-time partial snapshot. The later
 [external-retention closure](validation_results/P0_5_C3_EVIDENCE_CLOSURE.json)
 records exact/private retention and offline verification plus sanitized archive
-reverification. No explicit evidence reviewer was supplied, so acceptance
-review is pending and the closure's overall evidence status remains partial.
+reverification. Codex reviewed all 26 source artifacts and all 8 optimizer-step
+raw events. Acceptance review is recorded and the closure's overall evidence
+status is complete.
 
 ## Objective
 

@@ -1,7 +1,16 @@
 {
   "acceptance_review": {
-    "reviewers": [],
-    "status": "pending"
+    "reviewers": [
+      {
+        "identifier": "Codex",
+        "raw_events_reviewed": true,
+        "review_commit": "8fa5dbf13530c942b2c9e5f03a572bd0cd5ca74f",
+        "review_method": "Codex read all 26 source artifacts and all 8 optimizer-step raw events; checked size/SHA-256, 64-row/14-chunk data bindings, marker/timestamp order, finite loss/gradients, nonzero updates, learning rates, no clipping, log completion, and no failures.",
+        "reviewed_at_utc": "2026-08-14T05:07:02Z",
+        "role": "evidence_reviewer"
+      }
+    ],
+    "status": "recorded"
   },
   "archives": {
     "exact_private": {
@@ -68,10 +77,8 @@
       "untracked_count": 0
     }
   },
-  "evidence_status": "partial",
+  "evidence_status": "complete",
   "limitations": [
-    "No explicit evidence reviewer was supplied for this post-acceptance retention closure; acceptance_review remains pending.",
-    "The authenticated GitHub login was not treated as reviewer evidence.",
     "The exact/private archive is retained externally and verified; it must remain private.",
     "The verified sanitized archive remains in ignored staging and has not been published.",
     "A tested-source identity record was captured immediately before CUDA diagnostics.",
@@ -111,7 +118,7 @@
     }
   },
   "retention": {
-    "descriptor_updated_at_utc": "2026-08-14T04:35:19Z",
+    "descriptor_updated_at_utc": "2026-08-14T05:07:02Z",
     "exact_private_retained": true,
     "public_asset": null,
     "public_asset_published": false,

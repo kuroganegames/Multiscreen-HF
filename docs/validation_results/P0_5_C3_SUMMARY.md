@@ -255,11 +255,14 @@ closure descriptor. Both descriptor-aware verification reports are committed
 with the [closure descriptor](P0_5_C3_EVIDENCE_CLOSURE.json). The exact archive
 remains private and the sanitized archive remains unpublished.
 
-No explicit evidence reviewer was supplied for this later closure, so
-`acceptance_review` and overall `evidence_status` remain `pending`/`partial`.
-The retention state itself is now `verified`. This follow-up does not rewrite
-original-run provenance, accepted metrics, PR #13 acceptance, or any model
-capability claim.
+On 2026-08-14, Codex was explicitly designated as evidence reviewer and read
+all 26 source artifacts and all 8 optimizer-step raw events. The recorded
+method covers size and SHA-256 identity, 64-row/14-chunk data bindings,
+marker/timestamp order, finite losses and gradients, nonzero updates, learning
+rates, disabled clipping, completed logs, and failure absence.
+`acceptance_review` is `recorded`, overall `evidence_status` is `complete`, and
+retention remains `verified`. This later review does not rewrite original-run
+provenance, accepted metrics, PR #13 acceptance, or any model capability claim.
 
 ## Interpretation and limits
 

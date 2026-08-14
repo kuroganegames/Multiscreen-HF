@@ -463,8 +463,9 @@ merged PR #13. Its historical evidence descriptor truthfully preserves the
 packaging-time partial state; the merge does not rewrite those facts. The later
 external-retention closure retains and verifies the exact/private archive and
 reverifies the sanitized archive. Both remain unpublished and no public asset
-exists. Because no explicit evidence reviewer was supplied, acceptance review
-is pending and the closure's overall evidence status remains partial.
+exists. Codex reviewed all 26 source artifacts and all 8 optimizer-step raw
+events; acceptance review is recorded and the closure's overall evidence
+status is complete.
 
 ### Final Level 1 requalification
 

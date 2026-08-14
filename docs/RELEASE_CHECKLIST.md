@@ -37,8 +37,9 @@ still records the packaging-time partial state and is not rewritten by PR
 acceptance. A later
 [external-retention closure](validation_results/P0_5_C3_EVIDENCE_CLOSURE.json)
 retains and verifies the exact/private archive and reverifies the sanitized
-archive. An explicitly supplied evidence reviewer remains pending, so the
-closure's overall evidence status remains partial.
+archive. Codex reviewed all 26 source artifacts and all 8 optimizer-step raw
+events; acceptance review is recorded and the closure's overall evidence
+status is complete.
 
 Final Level 1 requalification passed under
 [LEVEL1_CORE_REQUALIFICATION_PLAN.md](LEVEL1_CORE_REQUALIFICATION_PLAN.md) on
