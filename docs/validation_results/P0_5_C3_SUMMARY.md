@@ -1,6 +1,6 @@
 # P0.5-C3 Summary: paper-training-contract smoke
 
-## Verdict
+## Recorded pre-merge verdict
 
 ```text
 Local gate result: passed
@@ -210,7 +210,7 @@ archive size:
   16,810 bytes
 manifest SHA-256:
   75fd240b2da86b2ea46258e354a5f5321552d1be19d6ea5f01697e32433d6a72
-verification report SHA-256:
+historical packaging verification report SHA-256:
   8579a1724a693faeec9934416ba8e11bf55c0d91487ac0de2b0f8cd2a55da81b
 sanitization report SHA-256:
   04f02677674a722716157c8ad919d74d275c88c8e7130fbabcc8b27c691be910
@@ -222,15 +222,47 @@ public asset:
   none
 ```
 
-Retention is intentionally recorded as partial. Because
-`MULTISCREEN_EVIDENCE_ARCHIVE_DIR` was not configured, no exact/private
-archive was created or retained. The verified sanitized archive remains
-unpublished ignored local staging, and no explicit reviewer was supplied. The
-authenticated GitHub login was not treated as reviewer evidence.
+At the original Stage 4 packaging time, retention was partial:
+`MULTISCREEN_EVIDENCE_ARCHIVE_DIR` was not configured, so no exact/private
+archive was created. The verified sanitized archive remained unpublished, and
+no explicit evidence reviewer was supplied. Those dated facts remain unchanged
+in [the historical descriptor](P0_5_C3_EVIDENCE_ARCHIVE.json).
 
-See [P0_5_C3_EVIDENCE_ARCHIVE.json](P0_5_C3_EVIDENCE_ARCHIVE.json) for the
-machine-readable provenance, artifact inventory, archive identity, and pending
-review state.
+### Post-acceptance external-retention closure
+
+On 2026-08-14, the same 26 original source artifacts were reread from the
+retained raw root. Every size and SHA-256 matched the historical descriptor.
+An allowlist-only exact/private archive was then created directly in the
+existing external private-retention class and verified offline:
+
+```text
+exact/private archive:
+  validation-evidence-exact-p0-5-c3-8fa5dbf1-v2.tar.gz
+archive SHA-256:
+  db882b8eb5d871b4ca8696a324d4a67aa6bd36389dd173db4ea857587d57319e
+archive size:
+  15,932 bytes
+manifest SHA-256:
+  94ad9e97a9cc2681a6cb0b48bca2de4578828195d0b4905905112b5a6956654b
+archive members:
+  28 (26 source artifacts plus MANIFEST.json and SHA256SUMS)
+public:
+  false
+```
+
+The unchanged 29-member sanitized archive was also reverified against the new
+closure descriptor. Both descriptor-aware verification reports are committed
+with the [closure descriptor](P0_5_C3_EVIDENCE_CLOSURE.json). The exact archive
+remains private and the sanitized archive remains unpublished.
+
+On 2026-08-14, Codex was explicitly designated as evidence reviewer and read
+all 26 source artifacts and all 8 optimizer-step raw events. The recorded
+method covers size and SHA-256 identity, 64-row/14-chunk data bindings,
+marker/timestamp order, finite losses and gradients, nonzero updates, learning
+rates, disabled clipping, completed logs, and failure absence.
+`acceptance_review` is `recorded`, overall `evidence_status` is `complete`, and
+retention remains `verified`. This later review does not rewrite original-run
+provenance, accepted metrics, PR #13 acceptance, or any model capability claim.
 
 ## Interpretation and limits
 
@@ -242,5 +274,8 @@ quality, retrieval performance, runtime or memory efficiency, optimized
 kernels, cross-hardware reproducibility, PEFT/LoRA, broad generation, serving,
 or production readiness.
 
-Stage 4 remains `REVIEW_REQUIRED`. Final Level 1 core requalification must not
-begin until this focused PR is reviewed and merged.
+The `REVIEW_REQUIRED` field above records the pre-merge Stage 4 handoff state.
+The focused result was subsequently reviewed and accepted by merged PR #13, and
+final Level 1 core requalification was later accepted by merged PR #14. The
+post-acceptance retention closure recorded here changes neither acceptance
+decision nor capability scope.

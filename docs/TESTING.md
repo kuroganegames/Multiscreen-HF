@@ -300,11 +300,42 @@ Neither lane reproduces the paper global batch,
 duration, corpus selection, training precision, quality, or efficiency.
 
 The inspected result is recorded in
-[P0_5_C3_SUMMARY.md](validation_results/P0_5_C3_SUMMARY.md), with archive
-identity and retention state in
+[P0_5_C3_SUMMARY.md](validation_results/P0_5_C3_SUMMARY.md), with its historical
+packaging record in
 [P0_5_C3_EVIDENCE_ARCHIVE.json](validation_results/P0_5_C3_EVIDENCE_ARCHIVE.json).
-Stage 4 was reviewed and accepted by merged PR #13. Its existing evidence
-descriptor retains its recorded partial-retention and evidence-review state.
+Stage 4 was reviewed and accepted by merged PR #13. The historical descriptor
+remains an accurate packaging-time partial snapshot. A later
+[external-retention closure](validation_results/P0_5_C3_EVIDENCE_CLOSURE.json)
+records exact/private external retention and verification plus sanitized archive
+reverification. Codex reviewed all 26 source artifacts and all 8 optimizer-step
+raw events; acceptance review is recorded and overall evidence status is
+complete.
+Neither archive is published, and the exact archive must remain private.
+
+After restoring both archive files to explicit local paths, reverify them fully offline:
+
+```bash
+export MULTISCREEN_C3_EXACT_ARCHIVE=/absolute/private/path/validation-evidence-exact-p0-5-c3-8fa5dbf1-v2.tar.gz
+export MULTISCREEN_C3_SANITIZED_ARCHIVE=/absolute/staging/path/validation-evidence-sanitized-p0-5-c3-8fa5dbf1-v2.tar.gz
+
+C3_CLOSURE=docs/validation_results/P0_5_C3_EVIDENCE_CLOSURE.json
+C3_SCHEMA=schemas/validation_evidence_v1.schema.json
+
+python -S scripts/verify_validation_evidence.py \
+  --archive "$MULTISCREEN_C3_EXACT_ARCHIVE" \
+  --expected-sha256 db882b8eb5d871b4ca8696a324d4a67aa6bd36389dd173db4ea857587d57319e \
+  --evidence-document "$C3_CLOSURE" \
+  --schema "$C3_SCHEMA" \
+  --json
+
+python -S scripts/verify_validation_evidence.py \
+  --archive "$MULTISCREEN_C3_SANITIZED_ARCHIVE" \
+  --expected-sha256 274e489f4b4872f8f8c797b56b9d49aebc3a8c0e005fe2c65694f136616a9573 \
+  --evidence-document "$C3_CLOSURE" \
+  --schema "$C3_SCHEMA" \
+  --json
+```
+
 The separate final Level 1 requalification subsequently passed locally under
 [LEVEL1_CORE_REQUALIFICATION_PLAN.md](LEVEL1_CORE_REQUALIFICATION_PLAN.md). Its
 reviewed [summary](validation_results/LEVEL1_CORE_SUMMARY.md) and complete

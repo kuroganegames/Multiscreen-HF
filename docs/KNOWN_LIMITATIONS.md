@@ -115,10 +115,12 @@ batch behavior, or paper training precision. The focused Stage 4 result was
 reviewed and accepted by merged PR #13; acceptance does not broaden this
 bounded scope.
 
-The historical C3 evidence descriptor remains partial: exact/private retention
-and an explicitly supplied evidence reviewer are still pending. Those
-historical facts are unchanged. The separate final Level 1 requalification
-subsequently passed locally under
+The historical C3 evidence descriptor remains a truthful packaging-time partial
+snapshot. A later [external-retention closure](validation_results/P0_5_C3_EVIDENCE_CLOSURE.json)
+retains and verifies the exact/private archive and reverifies the sanitized
+archive. Codex reviewed all 26 source artifacts and all 8 optimizer-step raw
+events; acceptance review is recorded and overall evidence status is complete.
+The separate final Level 1 requalification passed locally under
 [LEVEL1_CORE_REQUALIFICATION_PLAN.md](LEVEL1_CORE_REQUALIFICATION_PLAN.md), with
 reviewed evidence recorded in
 [LEVEL1_CORE_SUMMARY.md](validation_results/LEVEL1_CORE_SUMMARY.md). It does

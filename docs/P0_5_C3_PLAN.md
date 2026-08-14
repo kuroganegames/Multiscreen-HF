@@ -39,9 +39,13 @@ source audit date: 2026-08-09
 This plan remains the design record. The executed Stage 4 result, CUDA metrics,
 dataset fingerprint, and evidence-retention state are recorded in
 [P0_5_C3_SUMMARY.md](validation_results/P0_5_C3_SUMMARY.md). The focused PR was
-reviewed and merged as PR #13. Its evidence descriptor remains historically
-accurate about partial exact/private retention and the absence of an explicitly
-supplied evidence reviewer.
+reviewed and merged as PR #13. Its historical evidence descriptor remains an
+accurate packaging-time partial snapshot. The later
+[external-retention closure](validation_results/P0_5_C3_EVIDENCE_CLOSURE.json)
+records exact/private retention and offline verification plus sanitized archive
+reverification. Codex reviewed all 26 source artifacts and all 8 optimizer-step
+raw events. Acceptance review is recorded and the closure's overall evidence
+status is complete.
 
 ## Objective
 

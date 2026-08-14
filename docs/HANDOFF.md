@@ -47,7 +47,9 @@ Start with:
 - Stage 3 accepted result: [P1_PREFLIGHT_B_SUMMARY.md](validation_results/P1_PREFLIGHT_B_SUMMARY.md)
 - Stage 4 plan: [P0_5_C3_PLAN.md](P0_5_C3_PLAN.md)
 - Stage 4 accepted result: [P0_5_C3_SUMMARY.md](validation_results/P0_5_C3_SUMMARY.md)
-- Stage 4 evidence: [P0_5_C3_EVIDENCE_ARCHIVE.json](validation_results/P0_5_C3_EVIDENCE_ARCHIVE.json)
+- Stage 4 historical evidence: [P0_5_C3_EVIDENCE_ARCHIVE.json](validation_results/P0_5_C3_EVIDENCE_ARCHIVE.json)
+- Stage 4 external-retention closure: [P0_5_C3_EVIDENCE_CLOSURE.json](validation_results/P0_5_C3_EVIDENCE_CLOSURE.json)
+- Stage 4 closure verification: [exact/private](validation_results/P0_5_C3_EXACT_VERIFICATION.json) and [sanitized](validation_results/P0_5_C3_SANITIZED_VERIFICATION.json)
 - Stage 5 plan: [LEVEL1_CORE_REQUALIFICATION_PLAN.md](LEVEL1_CORE_REQUALIFICATION_PLAN.md)
 - Stage 5 result: [LEVEL1_CORE_SUMMARY.md](validation_results/LEVEL1_CORE_SUMMARY.md) and [JSON](validation_results/LEVEL1_CORE_SUMMARY.json)
 - Stage 5 complete descriptor: [LEVEL1_CORE_EVIDENCE_ARCHIVE.json](validation_results/LEVEL1_CORE_EVIDENCE_ARCHIVE.json)
@@ -127,12 +129,16 @@ diagnostics.
 The exact contract, pinned data identity and accounting, Transformers
 4.57.6/5.14.1 focused matrix, full P0-1/P0-2 CPU fp32 and CUDA bf16
 regressions, and four Psi=8/Psi=16 CUDA bf16 diagnostics passed on tested
-commit `8fa5dbf13530c942b2c9e5f03a572bd0cd5ca74f`. The sanitized evidence
-archive verified locally. Exact/private retention is blocked because
-`MULTISCREEN_EVIDENCE_ARCHIVE_DIR` was not configured, no public asset
-exists, and no explicit evidence reviewer was supplied. These descriptor facts
-remain unchanged. The focused implementation and local result were separately
-reviewed and accepted by merged PR #13.
+commit `8fa5dbf13530c942b2c9e5f03a572bd0cd5ca74f`. The historical evidence
+descriptor records the packaging-time state: sanitized verification passed,
+exact/private retention was blocked, and no explicit reviewer was supplied. A
+later [external-retention closure](validation_results/P0_5_C3_EVIDENCE_CLOSURE.json)
+retains and verifies the exact/private archive and reverifies the sanitized
+archive. Codex reviewed all 26 source artifacts and all 8 optimizer-step raw
+events; acceptance review is recorded and overall evidence status is complete.
+Both archives remain unpublished and no public asset exists. The focused
+implementation and local result were separately reviewed and accepted by merged
+PR #13.
 
 Final Level 1 requalification passed locally under
 [LEVEL1_CORE_REQUALIFICATION_PLAN.md](LEVEL1_CORE_REQUALIFICATION_PLAN.md).

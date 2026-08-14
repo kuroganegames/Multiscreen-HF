@@ -43,15 +43,16 @@ This remains an unofficial correctness-first result; the dense quadratic path
 is not efficiency evidence, and it does not validate paper-scale reproduction,
 retrieval benchmarks, optimized long-context efficiency, distributed training,
 or any P1 model/ecosystem capability.
-These staged records do not change the accepted P0 boundary or historical P0-4
-and C3 retention states.
+These staged records do not change the accepted P0 boundary. The historical
+P0-4 and original C3 descriptors preserve their recorded states; the later C3
+retention closure is a separate post-acceptance record.
 
 ## Evidence retention
 
 | Gate | Archive descriptor | Retention status |
 |---|---|---|
 | P0-4 | [P0_4_EVIDENCE_ARCHIVE.json](P0_4_EVIDENCE_ARCHIVE.json) | partial/blocked |
-| P0.5-C3 | [descriptor](P0_5_C3_EVIDENCE_ARCHIVE.json) | partial; sanitized verified, review pending |
+| P0.5-C3 | [historical descriptor](P0_5_C3_EVIDENCE_ARCHIVE.json) / [closure](P0_5_C3_EVIDENCE_CLOSURE.json) | complete; exact/private retained and verified; review recorded; sanitized verified but unpublished |
 | Level 1 Core | [descriptor](LEVEL1_CORE_EVIDENCE_ARCHIVE.json) | complete; exact/private retained and verified; sanitized verified but unpublished |
 
 The Level 1 descriptor is supported by committed
@@ -66,18 +67,23 @@ retention remains blocked because `MULTISCREEN_EVIDENCE_ARCHIVE_DIR` was not
 configured; acceptance review is pending because no explicit reviewer was
 supplied; and no public asset exists.
 
-For P0.5-C3, all 26 source artifacts are represented in a 29-member canonical
-sanitized archive. Its archive, manifest, member hashes, `SHA256SUMS`, and
-independent sanitization rescan verified with zero replacements or unresolved
-findings. Exact/private retention is blocked because the external archive
-directory was not configured. The sanitized archive is unpublished local
-staging and explicit evidence review is pending. These historical descriptor
-facts remain partial and are separate from the implementation/result acceptance
-recorded by merged PR #13.
+For P0.5-C3, the historical descriptor preserves the packaging-time partial
+state. A later [closure](P0_5_C3_EVIDENCE_CLOSURE.json) retains
+and verifies the 28-member exact/private archive and reverifies the unchanged
+29-member canonical sanitized archive. All 26 source artifacts, complete
+archive hashes, manifests, member hashes, `SHA256SUMS`, canonical framing, and
+the independent sanitization rescan verified. The closure is supported by
+committed [exact/private](P0_5_C3_EXACT_VERIFICATION.json) and
+[sanitized](P0_5_C3_SANITIZED_VERIFICATION.json) verification reports.
+Both archives are unpublished, no public asset exists, and explicit evidence
+review by Codex covered all 26 source artifacts and all 8 optimizer-step raw
+events. Acceptance review is recorded and overall evidence status is complete.
+This is separate from the implementation/result acceptance recorded by merged
+PR #13.
 
-The historical P0-4 and C3 retention states do not reopen their accepted
-implementation results. The complete Level 1 retention record does not
-validate a P1 model/ecosystem capability. See the
+P0-4's historical partial retention and C3's later retention closure do not
+reopen their accepted implementation results. The complete Level 1 retention
+record does not validate a P1 model/ecosystem capability. See the
 [evidence archive policy](../EVIDENCE_ARCHIVE_POLICY.md) for storage,
 verification, and recovery requirements.
 

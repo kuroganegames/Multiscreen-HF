@@ -47,7 +47,9 @@ efficiency, distributed training, or any P1 model/ecosystem capability.
 - Stage 3 accepted result: [docs/validation_results/P1_PREFLIGHT_B_SUMMARY.md](docs/validation_results/P1_PREFLIGHT_B_SUMMARY.md)
 - Stage 4 plan: [docs/P0_5_C3_PLAN.md](docs/P0_5_C3_PLAN.md)
 - Stage 4 accepted result: [docs/validation_results/P0_5_C3_SUMMARY.md](docs/validation_results/P0_5_C3_SUMMARY.md)
-- [Stage 4 evidence descriptor](docs/validation_results/P0_5_C3_EVIDENCE_ARCHIVE.json)
+- Stage 4 historical evidence descriptor: [docs/validation_results/P0_5_C3_EVIDENCE_ARCHIVE.json](docs/validation_results/P0_5_C3_EVIDENCE_ARCHIVE.json)
+- Stage 4 external-retention closure: [docs/validation_results/P0_5_C3_EVIDENCE_CLOSURE.json](docs/validation_results/P0_5_C3_EVIDENCE_CLOSURE.json)
+- Stage 4 closure verification: [exact/private](docs/validation_results/P0_5_C3_EXACT_VERIFICATION.json) and [sanitized](docs/validation_results/P0_5_C3_SANITIZED_VERIFICATION.json)
 - Stage 5 plan: [docs/LEVEL1_CORE_REQUALIFICATION_PLAN.md](docs/LEVEL1_CORE_REQUALIFICATION_PLAN.md)
 - Stage 5 reviewed result: [docs/validation_results/LEVEL1_CORE_SUMMARY.md](docs/validation_results/LEVEL1_CORE_SUMMARY.md) and [JSON](docs/validation_results/LEVEL1_CORE_SUMMARY.json)
 - Stage 5 complete evidence descriptor: [docs/validation_results/LEVEL1_CORE_EVIDENCE_ARCHIVE.json](docs/validation_results/LEVEL1_CORE_EVIDENCE_ARCHIVE.json)
@@ -66,10 +68,13 @@ regressions, and Psi=8/Psi=16 CUDA bf16 operational and peak-exposure
 diagnostics passed on tested commit
 `8fa5dbf13530c942b2c9e5f03a572bd0cd5ca74f`; see the
 [Stage 4 result](docs/validation_results/P0_5_C3_SUMMARY.md). The focused Stage
-4 PR was reviewed and merged as PR #13, accepting P0.5-C3. Its existing
-evidence descriptor still truthfully records partial retention and the absence
-of an explicitly supplied evidence reviewer; PR acceptance does not rewrite
-those historical descriptor facts.
+4 PR was reviewed and merged as PR #13, accepting P0.5-C3. Its historical
+evidence descriptor still truthfully records the packaging-time partial state;
+PR acceptance does not rewrite that record. A later
+[external-retention closure](docs/validation_results/P0_5_C3_EVIDENCE_CLOSURE.json)
+retains and verifies the exact/private archive and reverifies the sanitized
+archive. Codex reviewed all 26 source artifacts and all 8 optimizer-step raw
+events; acceptance review is recorded and overall evidence status is complete.
 
 Final Level 1 requalification passed locally under the
 [Stage 5 plan](docs/LEVEL1_CORE_REQUALIFICATION_PLAN.md). The reviewed result

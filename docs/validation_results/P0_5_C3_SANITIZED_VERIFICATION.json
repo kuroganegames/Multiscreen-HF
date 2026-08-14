@@ -1,0 +1,49 @@
+{
+  "archive": {
+    "archive_kind": "sanitized_shareable",
+    "filename": "validation-evidence-sanitized-p0-5-c3-8fa5dbf1-v2.tar.gz",
+    "manifest_sha256": "75fd240b2da86b2ea46258e354a5f5321552d1be19d6ea5f01697e32433d6a72",
+    "member_count": 29,
+    "sha256": "274e489f4b4872f8f8c797b56b9d49aebc3a8c0e005fe2c65694f136616a9573",
+    "size_bytes": 16810
+  },
+  "checks": {
+    "archive_sha256": "verified",
+    "canonical_gzip_and_tar": "verified",
+    "evidence_document": "verified",
+    "manifest": "verified",
+    "member_hashes": "verified",
+    "member_paths_and_types": "verified",
+    "sanitization": {
+      "descriptor_values": {
+        "files_scanned": 26,
+        "replacement_count": 0,
+        "report_sha256": "04f02677674a722716157c8ad919d74d275c88c8e7130fbabcc8b27c691be910",
+        "rules_applied": [
+          "bearer_token",
+          "cache_path",
+          "credential_url",
+          "file_uri",
+          "github_token",
+          "huggingface_token",
+          "json_secret_assignment",
+          "openai_token",
+          "python_interpreter",
+          "secret_assignment",
+          "sensitive_literal",
+          "unix_absolute_path",
+          "windows_absolute_path"
+        ]
+      },
+      "files_scanned": 26,
+      "independent_members_scanned": 29,
+      "status": "verified"
+    },
+    "sha256sums": "verified"
+  },
+  "errors": [],
+  "format_version": "validation-evidence-verification-v1",
+  "status": "verified",
+  "verified_at_utc": "2026-08-14T04:28:04.154165Z",
+  "verifier_version": "1.0.0"
+}

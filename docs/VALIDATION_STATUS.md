@@ -454,13 +454,18 @@ one bounded exact-0.0625 peak-learning-rate update for each order. All values
 and updates were finite, clipping remained disabled, completion markers were
 present, and failure artifacts were absent. See
 [P0_5_C3_SUMMARY.md](validation_results/P0_5_C3_SUMMARY.md) and
-[P0_5_C3_EVIDENCE_ARCHIVE.json](validation_results/P0_5_C3_EVIDENCE_ARCHIVE.json).
+the historical [evidence descriptor](validation_results/P0_5_C3_EVIDENCE_ARCHIVE.json).
+Later retention is recorded in the [closure descriptor](validation_results/P0_5_C3_EVIDENCE_CLOSURE.json)
+and its committed exact/private and sanitized verification reports.
 
 The focused Stage 4 implementation and result were reviewed and accepted by
-merged PR #13. Its existing evidence descriptor still truthfully records that
-exact/private retention is blocked, sanitized evidence is verified but
-unpublished, and an explicit evidence reviewer was not supplied; the merge does
-not rewrite those historical retention facts.
+merged PR #13. Its historical evidence descriptor truthfully preserves the
+packaging-time partial state; the merge does not rewrite those facts. The later
+external-retention closure retains and verifies the exact/private archive and
+reverifies the sanitized archive. Both remain unpublished and no public asset
+exists. Codex reviewed all 26 source artifacts and all 8 optimizer-step raw
+events; acceptance review is recorded and the closure's overall evidence
+status is complete.
 
 ### Final Level 1 requalification
 
