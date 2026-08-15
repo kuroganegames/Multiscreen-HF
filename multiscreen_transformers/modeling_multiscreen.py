@@ -1159,13 +1159,19 @@ class MultiscreenForCausalLM(MultiscreenPreTrainedModel, GenerationMixin):
         position_ids: torch.LongTensor | None = None,
         start_pos: int | None = None,
         use_cache: bool | None = True,
+        next_sequence_length: int | None = None,
+        input_ids_include_prefix: bool | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
         """Prepare inputs for ``GenerationMixin.generate``.
 
-        Multiscreen keeps a simple tuple cache. When a cache is present, the
-        method slices ``input_ids`` to the new suffix and sets a scalar
-        ``start_pos`` equal to the cached sequence length.
+        A cached call accepts either the full sequence or an already-sliced
+        suffix. The layout must be proven by mutually consistent Transformers
+        metadata (``cache_position``, ``next_sequence_length``, or a full
+        ``attention_mask``) or by the strict, non-serialized
+        ``input_ids_include_prefix`` flag. Ambiguous layouts fail closed instead
+        of silently dropping tokens. Normal ``generate()`` supplies sufficient
+        metadata and does not require the explicit flag.
         """
 
         kv_caches = kwargs.pop("kv_caches", None)
@@ -1177,6 +1183,27 @@ class MultiscreenForCausalLM(MultiscreenPreTrainedModel, GenerationMixin):
         if input_ids.dim() != 2:
             raise ValueError("input_ids must have shape (batch, sequence_length)")
         batch_size, original_input_length = input_ids.shape
+        if input_ids_include_prefix is not None and type(input_ids_include_prefix) is not bool:
+            raise TypeError("input_ids_include_prefix must be a bool or None")
+
+        next_sequence_length_value = None
+        if next_sequence_length is not None:
+            next_sequence_length_value = MultiscreenModel._coerce_nonnegative_position(
+                next_sequence_length, "next_sequence_length"
+            )
+            if next_sequence_length_value == 0:
+                raise ValueError("next_sequence_length must be positive")
+
+        if attention_mask is not None:
+            if not isinstance(attention_mask, torch.Tensor):
+                raise TypeError("attention_mask must be a tensor")
+            if attention_mask.dim() != 2:
+                raise ValueError("attention_mask must have shape (batch, sequence_length)")
+            if int(attention_mask.shape[0]) != batch_size:
+                raise ValueError(
+                    f"attention_mask batch size {attention_mask.shape[0]} does not match "
+                    f"input batch {batch_size}"
+                )
         past_key_values, reported_past_length = (
             _multiscreen_normalize_past_key_values_for_forward(past_key_values)
         )
@@ -1193,35 +1220,89 @@ class MultiscreenForCausalLM(MultiscreenPreTrainedModel, GenerationMixin):
         )
 
         if past_length > 0:
-            input_contains_prefix = original_input_length > past_length
+            if original_input_length <= 0:
+                raise ValueError("cached generation requires at least one new token")
+
+            layout_claims: list[tuple[str, bool]] = []
+            if input_ids_include_prefix is not None:
+                layout_claims.append(("input_ids_include_prefix", input_ids_include_prefix))
+
             if cache_position is not None:
-                suffix_length = int(cache_position.numel())
-                if suffix_length == original_input_length:
-                    input_contains_prefix = False
-                elif not (
-                    input_contains_prefix
-                    and suffix_length == original_input_length - past_length
-                ):
-                    raise ValueError(
-                        f"cache_position length {suffix_length} matches neither the entire "
-                        f"already-sliced input length {original_input_length} nor the inferred "
-                        f"full-input suffix for cached length {past_length}"
-                    )
+                if not isinstance(cache_position, torch.Tensor):
+                    raise TypeError("cache_position must be a tensor")
+                cache_position_length = int(cache_position.numel())
                 cache_start = MultiscreenModel._start_pos_from_cache_position(
                     cache_position=cache_position,
-                    seq_len=suffix_length,
+                    seq_len=cache_position_length,
                 )
                 if cache_start != past_length:
                     raise ValueError(
                         f"cache_position starts at {cache_start}, expected cached length {past_length}"
                     )
-                if input_contains_prefix:
-                    input_ids = input_ids[:, past_length:]
-            elif input_contains_prefix:
-                input_ids = input_ids[:, past_length:]
-                suffix_length = int(input_ids.shape[1])
+                if cache_position_length == original_input_length:
+                    layout_claims.append(("cache_position", False))
+                elif (
+                    original_input_length > past_length
+                    and cache_position_length == original_input_length - past_length
+                ):
+                    layout_claims.append(("cache_position", True))
+                else:
+                    raise ValueError(
+                        f"cache_position length {cache_position_length} matches neither the "
+                        f"already-sliced input length {original_input_length} nor the full-input "
+                        f"suffix for cached length {past_length}"
+                    )
+
+            if next_sequence_length_value is not None:
+                if next_sequence_length_value == original_input_length:
+                    layout_claims.append(("next_sequence_length", False))
+                elif (
+                    original_input_length > past_length
+                    and next_sequence_length_value == original_input_length - past_length
+                ):
+                    layout_claims.append(("next_sequence_length", True))
+                else:
+                    raise ValueError(
+                        f"next_sequence_length={next_sequence_length_value} matches neither the "
+                        f"already-sliced input length {original_input_length} nor the full-input "
+                        f"suffix for cached length {past_length}"
+                    )
+
+            if (
+                attention_mask is not None
+                and int(attention_mask.shape[1]) == past_length + original_input_length
+            ):
+                layout_claims.append(("attention_mask", False))
+
+            if layout_claims:
+                input_contains_prefix = layout_claims[0][1]
+                if any(claim != input_contains_prefix for _, claim in layout_claims[1:]):
+                    rendered_claims = ", ".join(
+                        f"{source}={'full' if claim else 'suffix'}"
+                        for source, claim in layout_claims
+                    )
+                    raise ValueError(
+                        "cached generation input layout metadata disagree: "
+                        f"{rendered_claims}"
+                    )
+            elif original_input_length < past_length:
+                input_contains_prefix = False
             else:
-                # Treat already-sliced multi-token input as the new suffix.
+                raise ValueError(
+                    "cached generation input layout is ambiguous: input_ids may be a full "
+                    "sequence or an already-sliced suffix. Pass consistent cache_position, "
+                    "next_sequence_length, a full attention_mask, or input_ids_include_prefix."
+                )
+
+            if input_contains_prefix:
+                suffix_length = original_input_length - past_length
+                if suffix_length <= 0:
+                    raise ValueError(
+                        "input_ids_include_prefix=True requires at least one token after the "
+                        "cached prefix"
+                    )
+                input_ids = input_ids[:, past_length:]
+            else:
                 suffix_length = original_input_length
 
             if suffix_length <= 0:
@@ -1235,13 +1316,42 @@ class MultiscreenForCausalLM(MultiscreenPreTrainedModel, GenerationMixin):
                         f"start_pos={explicit_start} conflicts with cached length {past_length}"
                     )
             if position_ids is not None:
-                position_ids_for_suffix = position_ids
-                if (
-                    position_ids.dim() == 2
-                    and int(position_ids.shape[1]) == original_input_length
-                    and suffix_length < original_input_length
-                ):
-                    position_ids_for_suffix = position_ids[:, -suffix_length:]
+                if not isinstance(position_ids, torch.Tensor):
+                    raise TypeError("position_ids must be a tensor")
+                if position_ids.dim() != 2:
+                    raise ValueError("position_ids must have shape (batch, sequence_length)")
+                if int(position_ids.shape[0]) != batch_size:
+                    raise ValueError(
+                        f"position_ids batch {position_ids.shape[0]} does not match input batch "
+                        f"{batch_size}"
+                    )
+                position_ids_length = int(position_ids.shape[1])
+                if input_contains_prefix:
+                    allowed_lengths = {original_input_length, suffix_length}
+                    if position_ids_length not in allowed_lengths:
+                        raise ValueError(
+                            f"position_ids length {position_ids_length} matches neither full input "
+                            f"length {original_input_length} nor suffix length {suffix_length}"
+                        )
+                    position_ids_for_suffix = (
+                        position_ids[:, -suffix_length:]
+                        if position_ids_length == original_input_length
+                        else position_ids
+                    )
+                else:
+                    full_cached_length = past_length + suffix_length
+                    allowed_lengths = {suffix_length, full_cached_length}
+                    if position_ids_length not in allowed_lengths:
+                        raise ValueError(
+                            f"position_ids length {position_ids_length} matches neither suffix "
+                            f"length {suffix_length} nor full cached sequence length "
+                            f"{full_cached_length}"
+                        )
+                    position_ids_for_suffix = (
+                        position_ids[:, -suffix_length:]
+                        if position_ids_length == full_cached_length
+                        else position_ids
+                    )
                 position_start = MultiscreenModel._start_pos_from_position_ids(
                     position_ids=position_ids_for_suffix,
                     batch_size=batch_size,
@@ -1255,6 +1365,13 @@ class MultiscreenForCausalLM(MultiscreenPreTrainedModel, GenerationMixin):
             start_pos = past_length
         else:
             seq_len = original_input_length
+            if input_ids_include_prefix is False:
+                raise ValueError("input_ids_include_prefix=False requires a non-empty prefix cache")
+            if next_sequence_length_value is not None and next_sequence_length_value != seq_len:
+                raise ValueError(
+                    f"next_sequence_length={next_sequence_length_value} does not match no-cache "
+                    f"input length {seq_len}"
+                )
             cache_start = None
             if cache_position is not None:
                 cache_start = MultiscreenModel._start_pos_from_cache_position(

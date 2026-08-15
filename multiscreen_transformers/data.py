@@ -14,7 +14,8 @@ class PackedTextDataset(Dataset):
     """In-memory packed dataset for autoregressive language-model training.
 
     Texts are tokenized, separated by EOS, concatenated, and chunked into fixed
-    length sequences.
+    length sequences. ``eos_token_id`` takes priority over the tokenizer EOS;
+    construction fails when neither is available.
 
     By default this dataset follows the original ``dieOD/multiscreen-pytorch``
     trainer: each stored chunk has ``seq_len + 1`` tokens, ``input_ids`` are
@@ -27,6 +28,14 @@ class PackedTextDataset(Dataset):
     batches where ``labels == input_ids`` and the model performs the standard
     internal shift. In that mode the dataset emits ``labels_are_shifted=False``.
     """
+
+    @staticmethod
+    def _resolve_eos_token_id(tokenizer, eos_token_id: Optional[int]) -> int:
+        if eos_token_id is None:
+            eos_token_id = getattr(tokenizer, "eos_token_id", None)
+        if eos_token_id is None:
+            raise ValueError("eos_token_id must be provided explicitly or set on tokenizer")
+        return int(eos_token_id)
 
     def __init__(
         self,
@@ -44,11 +53,7 @@ class PackedTextDataset(Dataset):
         self.legacy_shifted_labels = bool(legacy_shifted_labels)
         self.return_labels_are_shifted = bool(return_labels_are_shifted)
 
-        if eos_token_id is None:
-            eos_token_id = getattr(tokenizer, "eos_token_id", None)
-        if eos_token_id is None:
-            eos_token_id = 0
-        self.eos_token_id = int(eos_token_id)
+        self.eos_token_id = self._resolve_eos_token_id(tokenizer, eos_token_id)
 
         all_ids: list[int] = []
         for text in texts:
@@ -105,6 +110,7 @@ class PackedTextDataset(Dataset):
         data_files: Optional[str | list[str] | dict[str, str | list[str]]] = None,
         data_dir: Optional[str] = None,
         revision: Optional[str] = None,
+        eos_token_id: Optional[int] = None,
     ) -> "PackedTextDataset":
         """Load and pack a Hugging Face dataset.
 
@@ -112,8 +118,12 @@ class PackedTextDataset(Dataset):
         useful when training from TinyStories or other Hub datasets on machines
         with a dedicated dataset cache volume.  ``data_files`` / ``data_dir`` /
         ``revision`` are kept as narrow passthroughs for local or pinned data
-        sources while preserving the original in-memory packing behavior.
+        sources while preserving the original in-memory packing behavior. EOS
+        resolution follows the constructor contract and happens before loading
+        the dataset.
         """
+
+        resolved_eos_token_id = cls._resolve_eos_token_id(tokenizer, eos_token_id)
 
         from datasets import load_dataset
 
@@ -130,6 +140,7 @@ class PackedTextDataset(Dataset):
             texts=(row[text_column] for row in ds),
             tokenizer=tokenizer,
             seq_len=seq_len,
+            eos_token_id=resolved_eos_token_id,
             max_tokens=max_tokens,
             legacy_shifted_labels=legacy_shifted_labels,
             return_labels_are_shifted=return_labels_are_shifted,
