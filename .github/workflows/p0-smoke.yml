@@ -250,6 +250,29 @@ jobs:
             -p 'test_tokenizer_reload_check.py' \
             -v
 
+      - name: Run Stage D generation and data contracts
+        env:
+          PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/oracle
+        run: |
+          python -m py_compile \
+            multiscreen_transformers/data.py \
+            multiscreen_transformers/modeling_multiscreen.py \
+            tests/test_generation_input_contract.py \
+            tests/test_packed_text_contract.py \
+            tests/test_mipe_position_cache_contract.py
+          python -m unittest discover \
+            -s tests \
+            -p 'test_generation_input_contract.py' \
+            -v
+          python -m unittest discover \
+            -s tests \
+            -p 'test_packed_text_contract.py' \
+            -v
+          python -m unittest discover \
+            -s tests \
+            -p 'test_mipe_position_cache_contract.py' \
+            -v
+
   p0-smoke:
     name: P0 CPU smoke
     runs-on: ubuntu-latest
@@ -327,6 +350,20 @@ jobs:
           python -m unittest discover \
             -s tests \
             -p 'test_mipe_position_cache_contract.py' \
+            -v
+
+      - name: Stage D generation input contract
+        env:
+          CUDA_VISIBLE_DEVICES: ""
+          HF_HUB_OFFLINE: "1"
+          TRANSFORMERS_OFFLINE: "1"
+          PYTHONDONTWRITEBYTECODE: "1"
+          PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/oracle
+        run: |
+          python -m py_compile tests/test_generation_input_contract.py
+          python -m unittest discover \
+            -s tests \
+            -p 'test_generation_input_contract.py' \
             -v
 
       - name: P0.5-C3 paper training contract
