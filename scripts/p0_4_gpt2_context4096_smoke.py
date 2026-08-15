@@ -4,8 +4,10 @@
 The harness is correctness-first and targets the dense P0-qualified baseline;
 it is not a throughput or long-context efficiency benchmark. A run writes
 ``P0-4_COMPLETE.md`` only when it uses GPT-2 vocab 50,257, context 4,096,
-CUDA bf16, and at least 50 optimizer steps. Reduced runs that pass all checks
-write ``P0-4_DIAGNOSTIC_COMPLETE.md`` instead.
+CUDA bf16, microbatch 1, at least 50 completed optimizer steps, and supported
+runtime non-reentrant gradient checkpointing. Gradient accumulation is not a
+qualification condition. Reduced runs that pass all checks write
+``P0-4_DIAGNOSTIC_COMPLETE.md`` instead.
 """
 
 from __future__ import annotations
@@ -38,6 +40,20 @@ else:
 
 GPT2_VOCAB_SIZE = 50_257
 STAGE = "P0-4"
+QUALIFICATION_SCHEMA_VERSION = "multiscreen-p0-4-qualification-v2"
+QUALIFICATION_CONDITION_NAMES = (
+    "gpt2_vocab_50257",
+    "context_4096",
+    "cuda_device",
+    "bf16_amp",
+    "microbatch_size_1",
+    "optimizer_steps_at_least_50",
+    "gradient_checkpointing_enabled",
+    "gradient_checkpointing_non_reentrant",
+)
+GRADIENT_CHECKPOINTING_KWARGS = {"use_reentrant": False}
+QUALIFIED_MARKER = "P0-4_COMPLETE.md"
+DIAGNOSTIC_MARKER = "P0-4_DIAGNOSTIC_COMPLETE.md"
 
 
 def repo_default() -> Path:
@@ -177,6 +193,7 @@ def validate_config_files(s: argparse.Namespace) -> dict[str, Any]:
     run = read_json(s.config_dir / "run.json")
     hidden = int(model.get("hidden_size", 0))
     psi = math.isqrt(hidden)
+    run_microbatch = nested(run, "training.microbatch_size", None)
     checks = {
         "model_type_multiscreen": model.get("model_type") == "multiscreen",
         "vocab_size_50257": int(model.get("vocab_size", -1)) == GPT2_VOCAB_SIZE,
@@ -189,8 +206,11 @@ def validate_config_files(s: argparse.Namespace) -> dict[str, Any]:
         "run_expected_vocab_50257": int(nested(run, "tokenizer.expected_vocab_size", -1)) == GPT2_VOCAB_SIZE,
         "run_seq_len_4096": int(nested(run, "training.seq_len", -1)) == 4096,
         "run_amp_bf16": str(nested(run, "training.amp_dtype", "")) in {"bf16", "bfloat16"},
-        "run_microbatch_1": int(nested(run, "training.microbatch_size", -1)) == 1,
+        "run_microbatch_1": type(run_microbatch) is int and run_microbatch == 1,
         "run_steps_at_least_50": int(nested(run, "training.optimizer_steps", -1)) >= 50,
+        "run_gradient_checkpointing_true": nested(
+            run, "training.gradient_checkpointing", None
+        ) is True,
     }
     failed = [name for name, passed in checks.items() if not passed]
     if failed:
@@ -372,9 +392,31 @@ def build_model(s: argparse.Namespace, tokenizer):
     model = MultiscreenForCausalLM(config)
     if s.gradient_checkpointing:
         model.gradient_checkpointing_enable(
-            gradient_checkpointing_kwargs={"use_reentrant": False}
+            gradient_checkpointing_kwargs=dict(GRADIENT_CHECKPOINTING_KWARGS)
         )
     return model
+
+
+def inspect_gradient_checkpointing_runtime(model) -> dict[str, Any]:
+    """Return fail-closed facts about the checkpoint function used by the model."""
+    base_model = getattr(model, "multiscreen", None)
+    model_enabled = getattr(model, "is_gradient_checkpointing", False)
+    base_enabled = getattr(base_model, "gradient_checkpointing", False)
+    installed = getattr(base_model, "_gradient_checkpointing_func", None)
+    installed_keywords = getattr(installed, "keywords", None)
+    kwargs = dict(installed_keywords) if isinstance(installed_keywords, Mapping) else None
+    enabled = bool(model_enabled) and bool(base_enabled)
+    non_reentrant = (
+        enabled
+        and callable(installed)
+        and kwargs is not None
+        and kwargs.get("use_reentrant") is False
+    )
+    return {
+        "enabled": bool(enabled),
+        "non_reentrant": bool(non_reentrant),
+        "kwargs": kwargs,
+    }
 
 
 def get_loss(model, batch: Mapping[str, Any], s: argparse.Namespace, device: torch.device) -> torch.Tensor:
@@ -582,17 +624,67 @@ def environment(device: torch.device) -> dict[str, Any]:
     return result
 
 
-def qualification(s: argparse.Namespace, vocab: int, device: torch.device) -> dict[str, Any]:
+def qualification(
+    s: argparse.Namespace,
+    vocab: int,
+    device: torch.device,
+    *,
+    optimizer_steps: int,
+    checkpointing_runtime: Mapping[str, Any],
+) -> dict[str, Any]:
+    checkpointing_enabled = checkpointing_runtime.get("enabled") is True
+    checkpointing_kwargs = checkpointing_runtime.get("kwargs")
+    checkpointing_non_reentrant = (
+        checkpointing_enabled
+        and checkpointing_runtime.get("non_reentrant") is True
+        and isinstance(checkpointing_kwargs, Mapping)
+        and checkpointing_kwargs.get("use_reentrant") is False
+    )
     conditions = {
-        "gpt2_vocab_50257": vocab == GPT2_VOCAB_SIZE, "context_4096": s.seq_len == 4096,
-        "cuda_device": device.type == "cuda", "bf16_amp": s.amp_dtype in {"bf16", "bfloat16"},
-        "optimizer_steps_at_least_50": s.steps >= 50,
+        "gpt2_vocab_50257": type(vocab) is int and vocab == GPT2_VOCAB_SIZE,
+        "context_4096": type(s.seq_len) is int and s.seq_len == 4096,
+        "cuda_device": device.type == "cuda",
+        "bf16_amp": s.amp_dtype in {"bf16", "bfloat16"},
+        "microbatch_size_1": type(s.batch_size) is int and s.batch_size == 1,
+        "optimizer_steps_at_least_50": (
+            type(optimizer_steps) is int and optimizer_steps >= 50
+        ),
+        "gradient_checkpointing_enabled": checkpointing_enabled,
+        "gradient_checkpointing_non_reentrant": checkpointing_non_reentrant,
     }
-    return {"qualified": all(conditions.values()), "conditions": conditions}
+    result = {
+        "schema_version": QUALIFICATION_SCHEMA_VERSION,
+        "qualified": all(value is True for value in conditions.values()),
+        "conditions": conditions,
+    }
+    validate_qualification(result)
+    return result
+
+
+def validate_qualification(value: Mapping[str, Any]) -> None:
+    if not isinstance(value, Mapping):
+        raise ValueError("qualification must be a mapping")
+    if set(value) != {"schema_version", "qualified", "conditions"}:
+        raise ValueError("qualification fields are incomplete or ambiguous")
+    if value.get("schema_version") != QUALIFICATION_SCHEMA_VERSION:
+        raise ValueError("qualification schema version is unsupported")
+    conditions = value.get("conditions")
+    if not isinstance(conditions, Mapping):
+        raise ValueError("qualification conditions must be a mapping")
+    if set(conditions) != set(QUALIFICATION_CONDITION_NAMES):
+        raise ValueError("qualification conditions are incomplete or ambiguous")
+    if any(type(conditions[name]) is not bool for name in QUALIFICATION_CONDITION_NAMES):
+        raise ValueError("qualification conditions must be exact booleans")
+    expected = all(conditions[name] is True for name in QUALIFICATION_CONDITION_NAMES)
+    if type(value.get("qualified")) is not bool or value.get("qualified") is not expected:
+        raise ValueError("qualification verdict does not match its conditions")
 
 
 def write_note(summary: Mapping[str, Any], output: Path) -> None:
     q = summary["qualification"]
+    for marker in (QUALIFIED_MARKER, DIAGNOSTIC_MARKER):
+        (output / marker).unlink(missing_ok=True)
+    validate_qualification(q)
     if q["qualified"]:
         t = summary["training"]
         c = summary["checks"]
@@ -609,7 +701,7 @@ def write_note(summary: Mapping[str, Any], output: Path) -> None:
             f"- cache_split_logits_max_abs: {c['cache']['cache_split_logits_max_abs']:.8g}", "",
             "This remains a short dense-reference smoke, not an efficiency or paper-scale result.", "",
         ]
-        name = "P0-4_COMPLETE.md"
+        name = QUALIFIED_MARKER
     else:
         unmet = [name for name, passed in q["conditions"].items() if not passed]
         lines = [
@@ -618,7 +710,7 @@ def write_note(summary: Mapping[str, Any], output: Path) -> None:
             "## Unmet qualification conditions", "", *[f"- `{name}`" for name in unmet], "",
             "Use the unmodified config defaults on CUDA bf16 to produce `P0-4_COMPLETE.md`.", "",
         ]
-        name = "P0-4_DIAGNOSTIC_COMPLETE.md"
+        name = DIAGNOSTIC_MARKER
     (output / name).write_text("\n".join(lines), encoding="utf-8")
 
 
@@ -638,7 +730,13 @@ def write_failure(output: Path, exc: BaseException) -> None:
 def run(s: argparse.Namespace) -> dict[str, Any]:
     s.output_dir.mkdir(parents=True, exist_ok=True)
     data_contract_path = require_new_data_contract_path(s.output_dir)
-    for name in ("failure.json", "P0-4_FAILED.md", "P0-4_COMPLETE.md", "P0-4_DIAGNOSTIC_COMPLETE.md", "summary.json"):
+    for name in (
+        "failure.json",
+        "P0-4_FAILED.md",
+        QUALIFIED_MARKER,
+        DIAGNOSTIC_MARKER,
+        "summary.json",
+    ):
         (s.output_dir / name).unlink(missing_ok=True)
     metrics = s.output_dir / "metrics.jsonl"
     metrics.write_text("", encoding="utf-8")
@@ -710,6 +808,7 @@ def run(s: argparse.Namespace) -> dict[str, Any]:
         raise AssertionError("Packed batch does not have requested sequence length")
 
     model = build_model(s, tokenizer).to(device).train()
+    checkpointing_runtime = inspect_gradient_checkpointing_runtime(model)
     psi = int(model.config.num_hidden_layers)
     if int(model.config.num_attention_heads) != psi or int(model.config.hidden_size) != psi * psi:
         raise AssertionError("Config violates Psi scaling")
@@ -721,10 +820,8 @@ def run(s: argparse.Namespace) -> dict[str, Any]:
         "hidden_size": int(model.config.hidden_size), "num_hidden_layers": psi,
         "num_attention_heads": int(model.config.num_attention_heads), "key_dim": int(model.config.key_dim),
         "value_dim": int(model.config.value_dim), "max_position_embeddings": int(model.config.max_position_embeddings),
-        "gradient_checkpointing": s.gradient_checkpointing,
-        "gradient_checkpointing_kwargs": {"use_reentrant": False}
-        if s.gradient_checkpointing
-        else None,
+        "gradient_checkpointing": checkpointing_runtime["enabled"],
+        "gradient_checkpointing_kwargs": checkpointing_runtime["kwargs"],
         "dense_similarity_one_layer_lower_bound_bytes": dense_lower_bound,
     }
     data_info = {
@@ -747,7 +844,13 @@ def run(s: argparse.Namespace) -> dict[str, Any]:
     generation_result = generation_check(loaded, tokenizer, s, device)
     append_jsonl(metrics, {"event": "generation_check", "stage": STAGE, "timestamp_utc": utc_now(), **generation_result})
 
-    q = qualification(s, len(tokenizer), device)
+    q = qualification(
+        s,
+        len(tokenizer),
+        device,
+        optimizer_steps=training["optimizer_steps"],
+        checkpointing_runtime=checkpointing_runtime,
+    )
     status = "passed" if q["qualified"] else "diagnostic_passed"
     summary = {
         "stage": STAGE, "status": status, "timestamp_utc": utc_now(), "qualification": q,
@@ -760,7 +863,7 @@ def run(s: argparse.Namespace) -> dict[str, Any]:
     return summary
 
 
-def parse_args() -> argparse.Namespace:
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--repo-root", default=str(repo_default()))
     p.add_argument("--config-dir", default="configs/p0_4_multiscreen_psi8_gpt2_ctx4096")
@@ -791,7 +894,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--seed", type=int, default=None)
     p.add_argument("--log-every", type=int, default=None)
     p.add_argument("--validate-config-only", action="store_true")
-    return p.parse_args()
+    return p.parse_args(argv)
 
 
 def main() -> None:
@@ -811,7 +914,7 @@ def main() -> None:
         if settings is not None and not args.validate_config_only:
             write_failure(settings.output_dir, exc)
         raise
-    note = "P0-4_COMPLETE.md" if summary["qualification"]["qualified"] else "P0-4_DIAGNOSTIC_COMPLETE.md"
+    note = QUALIFIED_MARKER if summary["qualification"]["qualified"] else DIAGNOSTIC_MARKER
     print("\nP0-4 smoke checks passed.")
     print(f"[P0-4] status: {summary['status']}")
     print(f"[P0-4] metrics: {settings.output_dir / 'metrics.jsonl'}")

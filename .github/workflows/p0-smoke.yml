@@ -216,6 +216,16 @@ jobs:
             -p 'test_gradient_checkpointing_contract.py' \
             -v
 
+      - name: Run P0-4 qualification contract
+        env:
+          PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/oracle
+        run: |
+          python -m py_compile tests/test_p0_4_qualification_contract.py
+          python -m unittest discover \
+            -s tests \
+            -p 'test_p0_4_qualification_contract.py' \
+            -v
+
       - name: Run focused paper training contract
         env:
           PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/oracle

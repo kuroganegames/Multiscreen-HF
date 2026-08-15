@@ -233,6 +233,12 @@ Reviewed local runs passed the strict GPT-2-vocabulary, context-4096 CUDA bf16 g
 
 Both runs recorded finite losses and gradients, configured probe-loss decrease, save/load, tokenizer reload, greedy generation with cache, and manual cache-split agreement within tolerance. The compact reviewed evidence and raw-artifact hashes are in [P0_4_SUMMARY.md](docs/validation_results/P0_4_SUMMARY.md) and [P0_4_SUMMARY.json](docs/validation_results/P0_4_SUMMARY.json).
 
+For a future reproduction, qualification requires GPT-2 vocabulary 50,257,
+sequence length 4,096, CUDA bf16, microbatch 1, at least 50 actually completed
+optimizer steps, runtime gradient checkpointing enabled, and the supported
+non-reentrant checkpointing path (`use_reentrant=False`). Gradient accumulation
+is not a qualification condition.
+
 The qualifying reproduction commands remain:
 
 ```bash
@@ -247,7 +253,9 @@ python scripts/p0_4_gpt2_context4096_smoke.py \
   --config-dir configs/p0_4_multiscreen_psi16_gpt2_ctx4096
 ```
 
-A CPU, reduced-context, different-dtype, or shorter run remains diagnostic and must not be reported as a P0-4 pass.
+A CPU, reduced-context, different-dtype, microbatch-other-than-1, fewer-step,
+checkpointing-disabled, or reentrant-checkpointing run remains diagnostic and
+must not be reported as a P0-4 pass.
 
 ## P1-preflight A
 

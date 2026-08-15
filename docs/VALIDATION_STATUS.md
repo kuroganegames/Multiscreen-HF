@@ -383,7 +383,9 @@ context length: 4,096
 device: CUDA
 AMP dtype: bf16
 microbatch: 1
-optimizer steps: at least 50
+actually completed optimizer steps: at least 50
+runtime gradient checkpointing: enabled
+runtime checkpointing mode: supported non-reentrant (`use_reentrant=False`)
 finite loss and gradient norms
 configured probe-loss decrease
 save/load and tokenizer reload
@@ -393,7 +395,12 @@ manual cache split within tolerance
 complete summary, metrics, and qualifying marker artifacts
 ```
 
-A reduced-context, CPU, other-dtype, or shorter run can pass diagnostic checks but remains non-qualifying. The accepted runtime and memory values are feasibility diagnostics only, not evidence of long-context efficiency.
+The accepted historical runs used gradient accumulation 8, but gradient
+accumulation is not a qualification condition. A reduced-context, CPU,
+other-dtype, microbatch-other-than-1, fewer-step, checkpointing-disabled, or
+reentrant-checkpointing run can pass diagnostic checks but remains
+non-qualifying. The accepted runtime and memory values are feasibility
+diagnostics only, not evidence of long-context efficiency.
 
 ## Staged Level 1 Core
 

@@ -450,7 +450,12 @@ python scripts/p0_4_gpt2_context4096_smoke.py \
   --config-dir configs/p0_4_multiscreen_psi16_gpt2_ctx4096
 ```
 
-A qualifying run uses GPT-2 vocab 50,257, sequence length 4,096, CUDA bf16, and at least 50 optimizer steps. Reduced runs write `P0-4_DIAGNOSTIC_COMPLETE.md`, not `P0-4_COMPLETE.md`.
+A qualifying run uses GPT-2 vocab 50,257, sequence length 4,096, CUDA bf16,
+microbatch 1, at least 50 actually completed optimizer steps, runtime gradient
+checkpointing enabled, and the supported non-reentrant checkpointing path
+(`use_reentrant=False`). Gradient accumulation is not a qualification
+condition. A run that misses any qualification condition writes
+`P0-4_DIAGNOSTIC_COMPLETE.md`, not `P0-4_COMPLETE.md`.
 
 Each fresh run writes a canonical `data_contract.json` before training. It
 binds the resolved default TinyStories source and fingerprint, the ordered
