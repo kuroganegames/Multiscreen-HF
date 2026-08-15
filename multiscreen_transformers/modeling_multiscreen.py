@@ -528,6 +528,12 @@ class MultiscreenModel(MultiscreenPreTrainedModel):
             reported_length=reported_past_length,
         )
 
+        if self.gradient_checkpointing and self.training and past_key_values is not None:
+            raise ValueError(
+                "gradient-checkpointed training with past_key_values is unsupported; "
+                "omit the cache or disable gradient checkpointing before training"
+            )
+
         explicit_start_pos = None
         if start_pos is not None:
             explicit_start_pos = self._coerce_nonnegative_position(start_pos, "start_pos")
@@ -960,6 +966,21 @@ class MultiscreenForCausalLM(MultiscreenPreTrainedModel, GenerationMixin):
         return self.lm_head(hidden_states)
 
     @staticmethod
+    def _cross_entropy_or_graph_zero(
+        logits: torch.Tensor,
+        labels: torch.Tensor,
+    ) -> torch.Tensor:
+        """Return ordinary CE, or a graph-connected zero when no target is valid."""
+
+        if not bool(labels.ne(-100).any().item()):
+            return logits.sum() * 0.0
+        return F.cross_entropy(
+            logits.reshape(-1, logits.shape[-1]),
+            labels.reshape(-1),
+            ignore_index=-100,
+        )
+
+    @staticmethod
     def _coerce_optional_bool(value: Any, name: str) -> bool | None:
         """Convert Python or collated tensor booleans to a scalar bool.
 
@@ -1075,30 +1096,20 @@ class MultiscreenForCausalLM(MultiscreenPreTrainedModel, GenerationMixin):
                 )
                 loss_labels = loss_labels.masked_fill(loss_attention_mask == 0, -100)
 
-            loss_fct = nn.CrossEntropyLoss(ignore_index=-100)
             if labels_are_shifted:
-                loss = loss_fct(
-                    logits.reshape(-1, self.config.vocab_size),
-                    loss_labels.reshape(-1),
-                )
+                loss = self._cross_entropy_or_graph_zero(logits, loss_labels)
             else:
-                if logits.shape[1] < 2:
-                    loss = logits.new_zeros(())
-                else:
-                    shift_logits = logits[..., :-1, :].contiguous()
-                    shift_labels = loss_labels[..., 1:].contiguous()
-                    if loss_attention_mask is not None:
-                        # Ignore predictions where either the query token or the
-                        # target token is padding. This avoids a left-padding edge
-                        # case where the last pad token predicts the first real token.
-                        valid_shift = (loss_attention_mask[..., :-1] != 0) & (
-                            loss_attention_mask[..., 1:] != 0
-                        )
-                        shift_labels = shift_labels.masked_fill(~valid_shift, -100)
-                    loss = loss_fct(
-                        shift_logits.reshape(-1, self.config.vocab_size),
-                        shift_labels.reshape(-1),
+                shift_logits = logits[..., :-1, :].contiguous()
+                shift_labels = loss_labels[..., 1:].contiguous()
+                if loss_attention_mask is not None:
+                    # Ignore predictions where either the query token or the
+                    # target token is padding. This avoids a left-padding edge
+                    # case where the last pad token predicts the first real token.
+                    valid_shift = (loss_attention_mask[..., :-1] != 0) & (
+                        loss_attention_mask[..., 1:] != 0
                     )
+                    shift_labels = shift_labels.masked_fill(~valid_shift, -100)
+                loss = self._cross_entropy_or_graph_zero(shift_logits, shift_labels)
 
         if not return_dict:
             output: tuple[Any, ...] = (logits,)
