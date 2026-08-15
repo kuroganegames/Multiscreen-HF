@@ -6,6 +6,7 @@ Hugging Face ``PreTrainedModel`` classes.
 
 from __future__ import annotations
 
+import copy
 import math
 import operator
 import weakref
@@ -845,6 +846,20 @@ class _NormalizedTiedLMHead(nn.Module):
         super().__init__()
         self._owner_ref = weakref.ref(owner)
 
+    def __deepcopy__(self, memo: dict[int, Any]) -> "_NormalizedTiedLMHead":
+        owner = self._owner_ref()
+        if owner is None:
+            raise RuntimeError("Cannot copy a Multiscreen lm_head after its owner was collected")
+        copied_owner = memo.get(id(owner))
+        if copied_owner is None:
+            raise RuntimeError("Multiscreen lm_head must be copied as part of its owning model")
+
+        copied = type(self).__new__(type(self))
+        memo[id(self)] = copied
+        copied.__dict__ = copy.deepcopy(self.__dict__, memo)
+        copied._owner_ref = weakref.ref(copied_owner)
+        return copied
+
     @property
     def weight(self) -> torch.Tensor:
         owner = self._owner_ref()
@@ -893,11 +908,40 @@ class MultiscreenForCausalLM(MultiscreenPreTrainedModel, GenerationMixin):
         self.config.vocab_size = value.num_embeddings
         self.vocab_size = value.num_embeddings
 
-    def get_output_embeddings(self) -> nn.Embedding:
-        return self.multiscreen.get_output_embeddings()
+    def get_output_embeddings(self) -> nn.Module:
+        return self.lm_head
 
-    def set_output_embeddings(self, value: nn.Embedding) -> None:
-        self.set_input_embeddings(value)
+    def set_output_embeddings(self, value: nn.Module) -> None:
+        if value is self.lm_head:
+            return
+        raise ValueError(
+            "Multiscreen uses a parameter-free normalized tied lm_head; "
+            "replacing the output embeddings is unsupported."
+        )
+
+    def _resize_token_embeddings(
+        self,
+        new_num_tokens: int,
+        pad_to_multiple_of: int | None = None,
+        mean_resizing: bool = True,
+    ) -> nn.Embedding:
+        # The output head is a parameter-free dynamic view of the input
+        # embedding. Transformers 5.x otherwise tries to resize it as an
+        # nn.Linear, so resize only the true input parameter.
+        old_embeddings = self.get_input_embeddings()
+        new_embeddings = self._get_resized_embeddings(
+            old_embeddings,
+            new_num_tokens,
+            pad_to_multiple_of,
+            mean_resizing,
+        )
+        if hasattr(old_embeddings, "_hf_hook"):
+            from accelerate.hooks import add_hook_to_module
+
+            add_hook_to_module(new_embeddings, old_embeddings._hf_hook)
+        new_embeddings.requires_grad_(old_embeddings.weight.requires_grad)
+        self.set_input_embeddings(new_embeddings)
+        return self.get_input_embeddings()
 
     def tie_weights(self, *args: Any, **kwargs: Any) -> None:
         # Output logits directly reuse the normalized input embedding matrix.

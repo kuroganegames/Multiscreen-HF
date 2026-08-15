@@ -241,7 +241,7 @@ class PaperArchitectureContractTests(unittest.TestCase):
             value_dim=8,
         )
         model = MultiscreenForCausalLM(config)
-        self.assertIs(model.get_input_embeddings(), model.get_output_embeddings())
+        self.assertIs(model.get_output_embeddings(), model.lm_head)
         self.assertIs(model.get_input_embeddings(), model.multiscreen.embed)
         self.assertEqual(list(model.lm_head.named_parameters()), [])
         self.assertFalse(any(name.startswith("lm_head.") for name in model.state_dict()))
