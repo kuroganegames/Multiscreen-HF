@@ -341,7 +341,10 @@ GPT-2 tokenizer vocabulary = 50,257
 sequence length = 4,096
 device = CUDA
 AMP dtype = bf16
-optimizer steps >= 50
+microbatch size = 1
+completed optimizer steps >= 50
+runtime gradient checkpointing = enabled
+runtime checkpointing = supported non-reentrant mode (`use_reentrant=False`)
 finite train losses and gradient norms
 configured probe-loss decrease
 save/load and tokenizer reload
@@ -351,7 +354,10 @@ summary/metrics and completion marker
 failure artifacts absent
 ```
 
-A CPU, shorter-context, different-dtype, or fewer-step run is diagnostic only. Static validation or CI diagnostics do not replace the accepted CUDA evidence.
+Gradient accumulation is not a P0-4 qualification condition. A CPU,
+shorter-context, different-dtype, microbatch-other-than-1, fewer-step,
+checkpointing-disabled, or reentrant-checkpointing run is diagnostic only.
+Static validation or CI diagnostics do not replace the accepted CUDA evidence.
 
 ## Future validation strategy
 

@@ -36,7 +36,14 @@ model/ecosystem capability.
 
 Both intended P0-4 model orders passed the recorded CUDA bf16 context-4096 qualification. This establishes short-run feasibility and stability under one recorded hardware/software environment only; it does not validate paper-scale training, retrieval quality, long-context efficiency, or cross-hardware reproducibility. See [validation_results/P0_4_SUMMARY.md](validation_results/P0_4_SUMMARY.md).
 
-A reduced-context, CPU, non-bf16, or fewer-than-50-step run is explicitly labeled diagnostic and must not be reported as a P0-4 pass.
+For a future reproduction, qualification additionally requires microbatch 1,
+at least 50 actually completed optimizer steps, runtime gradient checkpointing
+enabled, and the supported non-reentrant path (`use_reentrant=False`). Gradient
+accumulation is not a qualification condition.
+
+A reduced-context, CPU, non-bf16, microbatch-other-than-1,
+fewer-than-50-step, checkpointing-disabled, or reentrant-checkpointing run is
+explicitly labeled diagnostic and must not be reported as a P0-4 pass.
 
 ## Dense reference path
 
