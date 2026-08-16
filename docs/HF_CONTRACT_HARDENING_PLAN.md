@@ -203,6 +203,13 @@ bytecode behavior, and explicit CPU or CUDA visibility. `HOME` points inside
 the private run root. The exact Python executable and package identities are
 recorded separately for Transformers 4.57.6 and 5.14.1.
 
+Stage E fixes both `HF_DATASETS_DISABLE_PROGRESS_BARS=1` and
+`HF_HUB_DISABLE_PROGRESS_BARS=1`. The latter suppresses carriage-return
+progress output from Hub-controlled Transformers save/load paths so the
+recorded focused-test logs remain canonical UTF-8 LF text. This is a Stage
+E-only addition; the accepted Level 1 environment contract and reviewer remain
+unchanged.
+
 Each command name is single-use. `--require-absent` protects every generated
 output subtree. A failed attempt is retained; commands are never rerun into the
 same run root, and a new attempt receives both a new root and a complete new

@@ -1329,6 +1329,13 @@ authoritative scope, 53-command matrix, two environment records, raw-review
 contract, retention boundary, and two-commit closure are fixed in
 [HF_CONTRACT_HARDENING_PLAN.md](HF_CONTRACT_HARDENING_PLAN.md).
 
+Every recorded Stage E command fixes both
+`HF_DATASETS_DISABLE_PROGRESS_BARS=1` and
+`HF_HUB_DISABLE_PROGRESS_BARS=1` in its `/usr/bin/env -i` environment. Both
+are required because Hub-controlled Transformers save/load progress output
+can otherwise emit carriage returns, while the Stage E reviewer requires
+complete canonical UTF-8 LF focused-test logs.
+
 The Stage E support path is separate from the accepted Level 1 reviewer and
 builder. Run both the new and legacy fixture suites before selecting a clean
 tested-source commit:

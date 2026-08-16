@@ -579,6 +579,86 @@ class HfContractHardeningEvidenceReviewTests(unittest.TestCase):
         )
         self.assert_rejected("initial.*final|hygiene.*identity")
 
+    def test_stage_e_adds_hub_progress_suppression_without_changing_legacy(self) -> None:
+        legacy_environment = (
+            "PATH=/usr/bin:/bin",
+            "LANG=C.UTF-8",
+            "LC_ALL=C.UTF-8",
+            "TZ=UTC",
+            "HF_DATASETS_DISABLE_PROGRESS_BARS=1",
+            "HF_DATASETS_OFFLINE=1",
+            "HF_HUB_DISABLE_TELEMETRY=1",
+            "HF_HUB_OFFLINE=1",
+            "PYTHONDONTWRITEBYTECODE=1",
+            "PYTHONHASHSEED=0",
+            "PYTHONNOUSERSITE=1",
+            "PYTHONOPTIMIZE=0",
+            "PYTHONUNBUFFERED=1",
+            "PYTHONUTF8=1",
+            "TOKENIZERS_PARALLELISM=false",
+            "TRANSFORMERS_OFFLINE=1",
+        )
+        stage_e_environment = (
+            "PATH=/usr/bin:/bin",
+            "LANG=C.UTF-8",
+            "LC_ALL=C.UTF-8",
+            "TZ=UTC",
+            "HF_DATASETS_DISABLE_PROGRESS_BARS=1",
+            "HF_DATASETS_OFFLINE=1",
+            "HF_HUB_DISABLE_PROGRESS_BARS=1",
+            "HF_HUB_DISABLE_TELEMETRY=1",
+            "HF_HUB_OFFLINE=1",
+            "PYTHONDONTWRITEBYTECODE=1",
+            "PYTHONHASHSEED=0",
+            "PYTHONNOUSERSITE=1",
+            "PYTHONOPTIMIZE=0",
+            "PYTHONUNBUFFERED=1",
+            "PYTHONUTF8=1",
+            "TOKENIZERS_PARALLELISM=false",
+            "TRANSFORMERS_OFFLINE=1",
+        )
+        self.assertEqual(REVIEW._legacy.HERMETIC_FIXED_ENVIRONMENT, legacy_environment)
+        self.assertEqual(
+            REVIEW.STAGE_E_HERMETIC_FIXED_ENVIRONMENT,
+            stage_e_environment,
+        )
+
+        progress_assignment = "HF_HUB_DISABLE_PROGRESS_BARS=1"
+        for name in REVIEW.REQUIRED_COMMAND_NAMES:
+            with self.subTest(name=name):
+                environment = REVIEW._expected_environment(name, self.fixture.root)
+                self.assertEqual(environment.count(progress_assignment), 1)
+                self.assertEqual(
+                    environment[1 : 1 + len(stage_e_environment)],
+                    stage_e_environment,
+                )
+
+    def test_ledger_rejects_missing_or_duplicate_hub_progress_suppression(self) -> None:
+        progress_assignment = "HF_HUB_DISABLE_PROGRESS_BARS=1"
+        for label in ("missing", "duplicate"):
+            with self.subTest(label=label):
+                self.fixture = EvidenceFixture(
+                    Path(self.temporary.name) / f"hub-progress-{label}"
+                )
+                records = self.fixture.command_records()
+                record = next(
+                    item
+                    for item in records
+                    if item["name"] == "hf-output-head-tf5141"
+                )
+                argv = record["argv"]
+                index = argv.index(progress_assignment)
+                if label == "missing":
+                    argv.pop(index)
+                else:
+                    argv.insert(index + 1, progress_assignment)
+                self._rewrite_records(records)
+                with self.assertRaisesRegex(
+                    REVIEW.ReviewError,
+                    "non-hermetic or incorrectly classified environment",
+                ):
+                    self._ledger_only()
+
     def test_interpreters_must_be_absolute_and_distinct(self) -> None:
         records = self.fixture.command_records()
         for record in records:

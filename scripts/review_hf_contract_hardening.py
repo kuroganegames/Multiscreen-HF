@@ -69,6 +69,25 @@ HISTORICAL_PATHS = (
     "docs/validation_results/P0_5_C3_SUMMARY.json",
     "docs/validation_results/P0_5_C3_SUMMARY.md",
 )
+STAGE_E_HERMETIC_FIXED_ENVIRONMENT = (
+    "PATH=/usr/bin:/bin",
+    "LANG=C.UTF-8",
+    "LC_ALL=C.UTF-8",
+    "TZ=UTC",
+    "HF_DATASETS_DISABLE_PROGRESS_BARS=1",
+    "HF_DATASETS_OFFLINE=1",
+    "HF_HUB_DISABLE_PROGRESS_BARS=1",
+    "HF_HUB_DISABLE_TELEMETRY=1",
+    "HF_HUB_OFFLINE=1",
+    "PYTHONDONTWRITEBYTECODE=1",
+    "PYTHONHASHSEED=0",
+    "PYTHONNOUSERSITE=1",
+    "PYTHONOPTIMIZE=0",
+    "PYTHONUNBUFFERED=1",
+    "PYTHONUTF8=1",
+    "TOKENIZERS_PARALLELISM=false",
+    "TRANSFORMERS_OFFLINE=1",
+)
 P0_4_CONDITIONS = (
     "gpt2_vocab_50257",
     "context_4096",
@@ -246,7 +265,7 @@ def _expected_environment(name: str, run_root: Path) -> tuple[str, ...]:
         suffix = ("PYTHONPATH=.:oracle:third_party/multiscreen-pytorch",)
     return (
         f"HOME={run_root}",
-        *_legacy.HERMETIC_FIXED_ENVIRONMENT,
+        *STAGE_E_HERMETIC_FIXED_ENVIRONMENT,
         *device,
         *suffix,
     )
