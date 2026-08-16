@@ -38,13 +38,19 @@ jobs:
             scripts/package_validation_evidence.py \
             scripts/verify_validation_evidence.py \
             scripts/build_level1_evidence.py \
+            scripts/build_hf_contract_hardening_evidence.py \
+            scripts/check_hf_contract_hardening_offline_cache.py \
             scripts/check_level1_offline_cache.py \
             scripts/check_level1_repository.py \
             scripts/p0_3_evidence_contract.py \
             scripts/p0_4_evidence_contract.py \
             scripts/report_level1_environment.py \
             scripts/run_level1_requalification_command.py \
+            scripts/review_hf_contract_hardening.py \
             scripts/review_level1_requalification.py \
+            tests/test_hf_contract_hardening_evidence_builder.py \
+            tests/test_hf_contract_hardening_evidence_review.py \
+            tests/test_hf_contract_hardening_offline_cache.py \
             tests/test_level1_evidence_builder.py \
             tests/test_level1_offline_cache.py \
             tests/test_level1_*.py \
@@ -55,6 +61,9 @@ jobs:
 
       - name: Synthetic Level 1 evidence-support tests
         run: python -S -m unittest discover -s tests -p 'test_level1_*.py' -v
+
+      - name: Synthetic HF contract hardening evidence-support tests
+        run: python -S -m unittest discover -s tests -p 'test_hf_contract_hardening_*.py' -v
 
   c1-lower-bound:
     name: P0.5-C1 declared lower bounds
