@@ -12,6 +12,12 @@ For the closed Stage 5 plan and reviewed result, see
 [LEVEL1_CORE_REQUALIFICATION_PLAN.md](LEVEL1_CORE_REQUALIFICATION_PLAN.md) and
 [LEVEL1_CORE_SUMMARY.md](validation_results/LEVEL1_CORE_SUMMARY.md).
 
+For the completed local Stage E run, see
+[HF_CONTRACT_HARDENING_PLAN.md](HF_CONTRACT_HARDENING_PLAN.md),
+[HF_CONTRACT_HARDENING_SUMMARY.md](validation_results/HF_CONTRACT_HARDENING_SUMMARY.md),
+and the complete
+[evidence descriptor](validation_results/HF_CONTRACT_HARDENING_EVIDENCE_ARCHIVE.json).
+
 ## Status summary
 
 ```text
@@ -41,6 +47,9 @@ P0.5-C3: paper-training-contract smoke
 
 final Level 1 requalification and evidence
   Status: complete; evidence closure complete; focused PR #14 reviewed and merged
+
+HF contract hardening Stage E requalification
+  Status: evidence complete locally; draft PR review/merge pending
 ```
 
 **Level 1 — Core mathematical Hugging Face implementation: complete.** This
@@ -494,9 +503,52 @@ unpublished. No public asset exists. See the
 [sanitized](validation_results/LEVEL1_CORE_SANITIZED_VERIFICATION.json)
 verification reports.
 
+### HF contract hardening Stage E requalification
+
+Stage E passed locally on clean tested source
+`0d59083ddbd78619ca29bf9af730999834272a1a`, descended from implementation
+baseline `bf8cc34cb6aa16ffeec1f609166db5efae79e9df`. It requalified these eight
+bounded contracts together:
+
+1. the output head is a callable hidden-to-vocabulary projection;
+2. the normalized tied output head remains parameter-free;
+3. deepcopy isolates owner, mutation, gradient, and lifecycle state;
+4. gradient-checkpointed training with supplied past state fails before layer
+   execution;
+5. zero valid targets produce a finite graph-connected zero loss;
+6. cached-generation suffix handling never silently drops tokens;
+7. packed-text construction fails fast when EOS identity is missing; and
+8. P0-4 qualification requires microbatch one and enabled supported
+   non-reentrant gradient checkpointing in addition to the other strict
+   conditions.
+
+The fixed run contains 53 passed commands and two exact environment records.
+Transformers 4.57.6 and 5.14.1 each passed 117 focused tests. Full P0-1/P0-2
+CPU fp32 and CUDA bf16 passed, as did fresh checkpointed CUDA bf16 P0-3
+Psi=8/16 and fresh strict context-4096 CUDA bf16 P0-4 Psi=8/16.
+
+Codex read all 53 lossless logs and all 179 raw events and recorded explicit
+acceptance review against the tested source. Evidence commit
+`4fd704f805ea634c66d2c4c26dded425c819a51d` contains the compact
+[summary](validation_results/HF_CONTRACT_HARDENING_SUMMARY.md), JSON summary,
+partial descriptor, and committed
+[exact/private](validation_results/HF_CONTRACT_HARDENING_EXACT_VERIFICATION.json)
+and [sanitized](validation_results/HF_CONTRACT_HARDENING_SANITIZED_VERIFICATION.json)
+verification reports. Exact evidence is retained privately outside Git. The
+documentation closure records the complete descriptor. The
+separately built sanitized staging archive was independently rescanned and
+verified. Neither archive is published and no public asset exists.
+
+This is a P0/Level 1 correctness, compatibility, and bounded short-run
+hardening result. It does not validate paper-scale training, retrieval,
+optimized long-context efficiency, broad generation compatibility,
+distributed training, or any P1 model/ecosystem capability.
+
 ## Next validation boundary
 
-P0-4, P0.5-C1, P0.5-C2, P1-preflight B, P0.5-C3, and final Level 1 core
-requalification are complete. The focused Stage 5 result was reviewed and
-accepted as merged PR #14. A possible P1-1 PEFT/LoRA gate remains separate; no
-P1 ecosystem capability is validated yet.
+P0-4, the staged Level 1 core program, and the local Stage E evidence closure
+are complete. Stage E draft PR creation, review, and merge remain the immediate
+delivery boundary; no tag is implied. A possible P1-1 PEFT/LoRA gate remains a
+separate future scope after that delivery is accepted. No PEFT, LoRA, QLoRA,
+Unsloth, broad generation, compile, serving, or other P1 ecosystem capability
+is validated by Stage E.

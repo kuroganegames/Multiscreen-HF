@@ -1329,6 +1329,24 @@ authoritative scope, 53-command matrix, two environment records, raw-review
 contract, retention boundary, and two-commit closure are fixed in
 [HF_CONTRACT_HARDENING_PLAN.md](HF_CONTRACT_HARDENING_PLAN.md).
 
+The recorded run is complete on tested source
+`0d59083ddbd78619ca29bf9af730999834272a1a`, descended from implementation
+baseline `bf8cc34cb6aa16ffeec1f609166db5efae79e9df`. All 53 commands and two
+environment records passed; both exact Transformers 4.57.6 and 5.14.1 lanes
+passed 117 focused tests; full P0-1/P0-2 CPU fp32 and CUDA bf16 passed; and
+fresh checkpointed P0-3 Psi=8/16 plus fresh strict P0-4 Psi=8/16 passed. Codex
+reviewed all 53 lossless logs and 179 raw events. Evidence commit
+`4fd704f805ea634c66d2c4c26dded425c819a51d` records the compact evidence;
+draft PR creation, review, and merge remain pending.
+
+See the [compact summary](validation_results/HF_CONTRACT_HARDENING_SUMMARY.md),
+[machine-readable summary](validation_results/HF_CONTRACT_HARDENING_SUMMARY.json),
+[evidence descriptor](validation_results/HF_CONTRACT_HARDENING_EVIDENCE_ARCHIVE.json),
+[exact/private verification](validation_results/HF_CONTRACT_HARDENING_EXACT_VERIFICATION.json),
+and [sanitized verification](validation_results/HF_CONTRACT_HARDENING_SANITIZED_VERIFICATION.json).
+The exact/private and separately sanitized staging archives are retained and
+verified offline but unpublished.
+
 Every recorded Stage E command fixes both
 `HF_DATASETS_DISABLE_PROGRESS_BARS=1` and
 `HF_HUB_DISABLE_PROGRESS_BARS=1` in its `/usr/bin/env -i` environment. Both

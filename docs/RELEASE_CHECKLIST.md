@@ -7,6 +7,7 @@ Level 1 Core and P0-qualified baselines.
 
 ```text
 final Level 1 requalification: complete; focused PR #14 reviewed and merged
+HF contract hardening Stage E: evidence complete; draft PR review/merge pending
 ```
 
 This remains an unofficial correctness-first result; the dense quadratic path
@@ -25,6 +26,10 @@ docs/LEVEL1_CORE_REQUALIFICATION_PLAN.md
 docs/validation_results/LEVEL1_CORE_SUMMARY.{md,json}
 docs/validation_results/LEVEL1_CORE_EVIDENCE_ARCHIVE.json
 docs/validation_results/LEVEL1_CORE_{EXACT,SANITIZED}_VERIFICATION.json
+docs/HF_CONTRACT_HARDENING_PLAN.md
+docs/validation_results/HF_CONTRACT_HARDENING_SUMMARY.{md,json}
+docs/validation_results/HF_CONTRACT_HARDENING_EVIDENCE_ARCHIVE.json
+docs/validation_results/HF_CONTRACT_HARDENING_{EXACT,SANITIZED}_VERIFICATION.json
 ```
 
 C1 was reviewed and merged as PR #9. C2 was merged as PR #10, and its separate
@@ -49,6 +54,26 @@ the sanitized archive is verified but unpublished. The focused result was
 reviewed and accepted as merged PR #14 (merge commit
 `50af4f8e26b97f3bb0b97fc0bf6d0480a5d0fe06`). No public asset exists, and no
 P1 model/ecosystem capability is validated.
+
+HF contract hardening Stage E passed on tested source
+`0d59083ddbd78619ca29bf9af730999834272a1a`, based on implementation baseline
+`bf8cc34cb6aa16ffeec1f609166db5efae79e9df`. All 53 commands and two
+environment records passed, including 117 focused tests in each exact
+Transformers lane, full P0-1/P0-2 CPU fp32 and CUDA bf16, fresh checkpointed
+P0-3 Psi=8/16, and fresh strict P0-4 Psi=8/16. Codex reviewed all 53 lossless
+logs and 179 raw events. Evidence commit
+`4fd704f805ea634c66d2c4c26dded425c819a51d` records the summaries, partial
+descriptor, and two verification reports; the documentation closure records
+the complete descriptor. Exact/private and sanitized staging archives are retained
+and verified offline but unpublished. The Stage E draft PR has not yet been
+created, reviewed, or merged, and no tag was created or moved.
+
+See the [Stage E plan](HF_CONTRACT_HARDENING_PLAN.md),
+[summary](validation_results/HF_CONTRACT_HARDENING_SUMMARY.md),
+[descriptor](validation_results/HF_CONTRACT_HARDENING_EVIDENCE_ARCHIVE.json),
+[exact/private verification](validation_results/HF_CONTRACT_HARDENING_EXACT_VERIFICATION.json),
+and [sanitized verification](validation_results/HF_CONTRACT_HARDENING_SANITIZED_VERIFICATION.json).
+
 This remains an unofficial correctness-first result; the dense quadratic path
 is not efficiency evidence, and it does not validate paper-scale reproduction,
 retrieval benchmarks, optimized long-context efficiency, distributed training,

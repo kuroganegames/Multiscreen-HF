@@ -23,6 +23,21 @@ reviewed and accepted as merged PR #14 (merge commit
 paper-scale reproduction, retrieval benchmarks, optimized long-context
 efficiency, distributed training, or any P1 model/ecosystem capability.
 
+Stage E HF contract hardening requalification is **complete locally; draft PR
+pending**. The fixed 53-command matrix passed on clean tested source
+`0d59083ddbd78619ca29bf9af730999834272a1a` (implementation baseline
+`bf8cc34cb6aa16ffeec1f609166db5efae79e9df`) with two exact Transformers
+environment records, 117 focused tests in each of Transformers 4.57.6 and
+5.14.1, full P0-1/P0-2 CPU fp32 and CUDA bf16 regressions, and fresh
+checkpointed CUDA bf16 P0-3 and strict P0-4 Psi=8/Psi=16 runs. Codex reviewed
+all 53 lossless logs and all 179 raw events. Exact evidence is retained and
+verified privately outside Git; the separately built sanitized archive is
+rescanned and verified but remains unpublished. Evidence commit
+`4fd704f805ea634c66d2c4c26dded425c819a51d` records the canonical result. This
+does not validate paper-scale training, retrieval, optimized long-context
+efficiency, broad generation compatibility, distributed training, or a P1
+model/ecosystem capability.
+
 ## Start here
 
 - Development restart: [docs/HANDOFF.md](docs/HANDOFF.md)
@@ -54,6 +69,10 @@ efficiency, distributed training, or any P1 model/ecosystem capability.
 - Stage 5 reviewed result: [docs/validation_results/LEVEL1_CORE_SUMMARY.md](docs/validation_results/LEVEL1_CORE_SUMMARY.md) and [JSON](docs/validation_results/LEVEL1_CORE_SUMMARY.json)
 - Stage 5 complete evidence descriptor: [docs/validation_results/LEVEL1_CORE_EVIDENCE_ARCHIVE.json](docs/validation_results/LEVEL1_CORE_EVIDENCE_ARCHIVE.json)
 - Stage 5 verification reports: [exact/private](docs/validation_results/LEVEL1_CORE_EXACT_VERIFICATION.json) and [sanitized](docs/validation_results/LEVEL1_CORE_SANITIZED_VERIFICATION.json)
+- Stage E plan: [docs/HF_CONTRACT_HARDENING_PLAN.md](docs/HF_CONTRACT_HARDENING_PLAN.md)
+- Stage E reviewed result: [Markdown](docs/validation_results/HF_CONTRACT_HARDENING_SUMMARY.md) and [JSON](docs/validation_results/HF_CONTRACT_HARDENING_SUMMARY.json)
+- Stage E complete evidence descriptor: [docs/validation_results/HF_CONTRACT_HARDENING_EVIDENCE_ARCHIVE.json](docs/validation_results/HF_CONTRACT_HARDENING_EVIDENCE_ARCHIVE.json)
+- Stage E verification reports: [exact/private](docs/validation_results/HF_CONTRACT_HARDENING_EXACT_VERIFICATION.json) and [sanitized](docs/validation_results/HF_CONTRACT_HARDENING_SANITIZED_VERIFICATION.json)
 
 ## Current Level 1 stage
 
@@ -85,6 +104,14 @@ focused result was reviewed and accepted as merged PR #14. Stage 4 CUDA runs
 remain reduced project diagnostics, while Stage 5 remains a correctness and
 short-run qualification result rather than paper-scale reproduction, quality,
 or efficiency evidence.
+
+The later Stage E requalification validates the seven post-Level-1 hardening
+resolutions together, including the hardened eight-condition P0-4 predicate.
+Its reviewed local result and complete evidence closure are recorded in the
+[Stage E summary](docs/validation_results/HF_CONTRACT_HARDENING_SUMMARY.md) and
+[descriptor](docs/validation_results/HF_CONTRACT_HARDENING_EVIDENCE_ARCHIVE.json).
+The result has not yet been published as a draft PR and does not broaden the
+project's P0/Level 1 claim into a P1 capability.
 
 ## What is included
 

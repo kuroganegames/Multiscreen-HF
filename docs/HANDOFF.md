@@ -12,6 +12,22 @@ and accepted as merged PR #14 (merge commit
 paper-scale reproduction, retrieval, optimized long-context efficiency,
 distributed training, or any P1 model/ecosystem capability.
 
+**HF contract hardening Stage E: evidence complete locally; draft PR
+pending.** The fixed matrix passed on clean tested source
+`0d59083ddbd78619ca29bf9af730999834272a1a`, based on implementation baseline
+`bf8cc34cb6aa16ffeec1f609166db5efae79e9df`. It records 53 passed commands,
+two exact Transformers environments, 117 focused tests per lane, full
+P0-1/P0-2 CPU fp32 and CUDA bf16, and fresh checkpointed P0-3 plus strict P0-4
+Psi=8/16 runs. Codex reviewed all 53 lossless logs and all 179 raw events.
+Evidence commit `4fd704f805ea634c66d2c4c26dded425c819a51d` contains the two
+summaries, partial descriptor, and two verification reports. The documentation
+closure records the complete descriptor. Exact/private and separately
+sanitized staging
+archives are retained and verified offline but unpublished. Draft PR review
+and merge remain pending. This does not validate paper-scale training,
+retrieval, optimized long-context efficiency, broad generation compatibility,
+distributed training, or a P1 model/ecosystem capability.
+
 The historical evidence-infrastructure gate and status are:
 
 ```text
@@ -36,6 +52,7 @@ P0.5-C2: accepted; focused PR #10 merged; correction PR #11 merged
 P1-preflight B: accepted; focused PR #12 merged
 P0.5-C3 / Stage 4: accepted; focused PR #13 reviewed and merged
 final Level 1 requalification / Stage 5: accepted; focused PR #14 reviewed and merged
+HF contract hardening Stage E: evidence complete locally; draft PR review/merge pending
 ```
 
 Start with:
@@ -55,6 +72,10 @@ Start with:
 - Stage 5 complete descriptor: [LEVEL1_CORE_EVIDENCE_ARCHIVE.json](validation_results/LEVEL1_CORE_EVIDENCE_ARCHIVE.json)
 - Stage 5 verification: [exact/private](validation_results/LEVEL1_CORE_EXACT_VERIFICATION.json) and [sanitized](validation_results/LEVEL1_CORE_SANITIZED_VERIFICATION.json)
 - repository instructions: [`AGENTS.md`](../AGENTS.md)
+- Stage E plan: [HF_CONTRACT_HARDENING_PLAN.md](HF_CONTRACT_HARDENING_PLAN.md)
+- Stage E result: [HF_CONTRACT_HARDENING_SUMMARY.md](validation_results/HF_CONTRACT_HARDENING_SUMMARY.md) and [JSON](validation_results/HF_CONTRACT_HARDENING_SUMMARY.json)
+- Stage E complete descriptor: [HF_CONTRACT_HARDENING_EVIDENCE_ARCHIVE.json](validation_results/HF_CONTRACT_HARDENING_EVIDENCE_ARCHIVE.json)
+- Stage E verification: [exact/private](validation_results/HF_CONTRACT_HARDENING_EXACT_VERIFICATION.json) and [sanitized](validation_results/HF_CONTRACT_HARDENING_SANITIZED_VERIFICATION.json)
 - gate design: [P1_PREFLIGHT_A_PLAN.md](P1_PREFLIGHT_A_PLAN.md)
 - Codex Goal handoff: [CODEX_P1_PREFLIGHT_A_HANDOFF.md](CODEX_P1_PREFLIGHT_A_HANDOFF.md)
 - canonical validation boundary: [VALIDATION_STATUS.md](VALIDATION_STATUS.md)
@@ -80,12 +101,13 @@ Use [CODEX_P0_4_HANDOFF.md](CODEX_P0_4_HANDOFF.md) only for an intentional P0-4 
 | P1-preflight B | Complete | Supported non-reentrant API, exact 4.57.6/5.14.1 matrix, strong P0 regressions, and checkpointed CUDA smokes were accepted by merged PR #12. |
 | P0.5-C3 | Complete | The local gate was reviewed and accepted by merged PR #13. |
 | Final Level 1 requalification | Complete | Reviewed Stage 5 validation and evidence closure passed and were accepted by merged PR #14. |
+| HF contract hardening Stage E | Evidence complete locally | Seven post-Level-1 hardening resolutions, fresh P0 regressions/training, review, and private evidence closure passed; draft PR review/merge remains pending. |
 | P1 ecosystem capabilities | None validated | PEFT/LoRA, QLoRA, Unsloth, generation matrix, compile, and serving remain future gates. |
 
 ### Baseline identity
 
 ```text
-Current baseline: Level 1 Core complete on reviewed and accepted Stage 5 evidence
+Current local validation baseline: HF contract hardening Stage E evidence complete; draft PR pending
 P0.5-C1 merge / C2 base: ec805c1ba60c55ea4beb3ad68e0a00c0d718e909
 P0.5-C2 merge: 54aa96ee914e9f8ac7b58e6d176d4e3fbeb0ae27
 C2 correction / Stage 3 base: 0c83be6b4b043f4b965df4528534f24e9d5ab4f1
@@ -97,6 +119,12 @@ Stage 5 tested source: b224ca1a127ee18fc5fd4b00a5df639401d60679
 Stage 5 evidence commit: 843d5ac7825a1b0892316b70fa5c81c8de8f2d79
 P1-preflight A implementation base (origin/main at branch creation): 34cbecd25bb38a6f92125071b1c08e42d71008f9
 Primary implementation: multiscreen_transformers/modeling_multiscreen.py
+Stage E implementation baseline: bf8cc34cb6aa16ffeec1f609166db5efae79e9df
+Stage E tested/review source: 0d59083ddbd78619ca29bf9af730999834272a1a
+Stage E evidence commit: 4fd704f805ea634c66d2c4c26dded425c819a51d
+Stage E result: docs/validation_results/HF_CONTRACT_HARDENING_SUMMARY.{md,json}
+Stage E complete descriptor: docs/validation_results/HF_CONTRACT_HARDENING_EVIDENCE_ARCHIVE.json
+Stage E delivery state: draft PR not yet created, reviewed, or merged
 Primary config: multiscreen_transformers/configuration_multiscreen.py
 Primary equation oracle: oracle/paper_math_oracle.py
 Canonical validation status: docs/VALIDATION_STATUS.md
@@ -147,6 +175,21 @@ The reviewed [summary](validation_results/LEVEL1_CORE_SUMMARY.md) and complete
 bind the fixed matrix, human review, private retention, sanitization, and
 offline verification. The focused result was reviewed and accepted as merged
 PR #14.
+
+HF contract hardening Stage E then requalified the seven post-Level-1
+resolutions together: callable hidden-to-vocabulary output head,
+parameter-free normalized tied head, deepcopy isolation,
+gradient-checkpointing-plus-past fail-fast, finite graph-connected
+zero-valid-target loss, no silent cached-suffix token drop, missing-EOS
+fail-fast, and the hardened eight-condition P0-4 predicate. Both exact
+Transformers lanes passed 117 focused tests; full P0-1/P0-2 and fresh CUDA
+bf16 P0-3/P0-4 Psi=8/16 passed. Codex explicitly reviewed all 53 logs and 179
+raw events. The [summary](validation_results/HF_CONTRACT_HARDENING_SUMMARY.md),
+[descriptor](validation_results/HF_CONTRACT_HARDENING_EVIDENCE_ARCHIVE.json),
+and committed verification reports bind the complete local evidence state.
+The exact/private and sanitized staging archives remain unpublished. This is a
+bounded P0/Level 1 hardening result, not evidence for paper-scale, efficiency,
+broad generation, distributed, or P1 claims.
 
 ## 2. First ten minutes after a fresh clone
 
@@ -536,7 +579,7 @@ The recorded result includes finite losses and gradients, probe-loss decrease, s
 
 P1-preflight A may add a separate evidence-archive descriptor. It must not change the accepted training metrics.
 
-## 13. Level 1 completion and possible next gate
+## 13. Stage E completion and possible next gate
 
 ```text
 P0.5-C1  architecture / initialization / all-scale contract — merged
@@ -544,12 +587,20 @@ P0.5-C2  long-position / MiPE / cache semantics — merged
 P1-preflight B  gradient-checkpointing API modernization — merged as PR #12
 P0.5-C3  paper-training-contract smoke — accepted as merged PR #13
 final P0 core requalification — accepted as merged PR #14
+HF contract hardening Stage E — evidence complete locally; draft PR pending
 P1-1  PEFT/LoRA smoke
 ```
 
 The final P0 core requalification is reproducible only under the separate
 Stage 5 plan. No P1 ecosystem capability is validated merely because the Level
 1 Core program passed.
+
+The immediate next workflow checkpoint is the focused Stage E draft PR. PR
+review and merge require separate user actions; no tag is implied. Only after
+that delivery is accepted should a distinct future capability gate such as
+P1-1 PEFT/LoRA be planned. The Stage E result does not itself validate PEFT,
+LoRA, QLoRA, Unsloth, serving, compile, broad generation, or another P1
+ecosystem capability.
 
 ## 14. Final report format
 

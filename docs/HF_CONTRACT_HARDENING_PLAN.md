@@ -3,24 +3,23 @@
 ## Status
 
 ```text
-state: PLANNED — NOT RUN
+state: EVIDENCE COMPLETE — DRAFT PR REVIEW/MERGE PENDING
 implementation baseline: bf8cc34cb6aa16ffeec1f609166db5efae79e9df
 baseline meaning: merge commit containing reviewed Stages A-D (PR #21)
 working branch: validation/hf-contract-hardening-requalification
-tested-source commit: not selected
-review commit: not recorded
-evidence commit: not created
-closure tip: not created
+tested-source commit: 0d59083ddbd78619ca29bf9af730999834272a1a
+review commit: 0d59083ddbd78619ca29bf9af730999834272a1a
+evidence commit: 4fd704f805ea634c66d2c4c26dded425c819a51d
+closure tip: not recorded; draft PR has not been created
 ```
 
-Stage E execution has not started, no fresh training result exists, and no new
-validation or retention claim is made by this plan. A clean tested-source
-commit will be selected only after the Stage E evidence-support implementation
-and its tests are committed.
+Stage E execution and evidence retention are complete for the tested source
+above. The final draft PR has not yet been created, reviewed, or merged, and no
+tag has been created or moved.
 
-At planning time on 2026-08-16, both exact Transformers interpreters and CUDA
-devices were discoverable. The following required execution inputs were not
-configured:
+The following block is a historical planning-time note from 2026-08-16. At
+that point both exact Transformers interpreters and CUDA devices were
+discoverable, while these required execution inputs were not yet configured:
 
 ```text
 MULTISCREEN_EVIDENCE_REVIEWERS
@@ -28,8 +27,10 @@ MULTISCREEN_EVIDENCE_ARCHIVE_DIR
 HF_CACHE_DIR
 ```
 
-These observations are readiness notes, not acceptance evidence. All
-preconditions must be rechecked from the eventual clean tested-source commit.
+Those observations remain readiness history, not acceptance evidence. During
+the actual run the preconditions were rechecked from the clean tested source,
+an explicit `Codex` reviewer was supplied, and the offline cache and external
+private-retention location were configured.
 
 ## Authority and objective
 
@@ -82,10 +83,10 @@ The evidence must distinguish these identities without inference:
 | --- | --- |
 | Historical Level 1 tested commit | `b224ca1a127ee18fc5fd4b00a5df639401d60679` |
 | Stage E implementation baseline | `bf8cc34cb6aa16ffeec1f609166db5efae79e9df` |
-| Stage E tested source | Future clean evidence-support/plan commit `T` |
-| Review commit | Exactly `T` |
-| Evidence commit | Future commit `A` |
-| Closure tip | Future commit `B` |
+| Stage E tested source | `0d59083ddbd78619ca29bf9af730999834272a1a` |
+| Review commit | `0d59083ddbd78619ca29bf9af730999834272a1a` |
+| Evidence commit | `4fd704f805ea634c66d2c4c26dded425c819a51d` |
+| Closure tip | Not recorded; do not infer it from the evidence commit |
 
 The live Stage E reviewer and builder must verify that every tracked path and
 blob under these accepted historical record sets is identical between the
@@ -99,6 +100,28 @@ docs/validation_results/P0_5_C3_*
 
 Only a path-free aggregate of that comparison belongs in the new compact
 review. Historical files are not sources for the Stage E archive.
+
+## Execution result
+
+The complete recorded run passed 53 commands and two environment records on
+the tested source. Both exact Transformers 4.57.6 and 5.14.1 lanes passed 117
+focused tests, full P0-1/P0-2 passed on CPU fp32 and CUDA bf16, and fresh
+checkpointed P0-3 Psi=8/16 plus fresh strict P0-4 Psi=8/16 passed. Together
+these results verify the callable hidden-to-vocabulary head, parameter-free
+normalized tied head, deepcopy isolation, checkpointing-plus-past fail-fast,
+finite graph-connected zero-valid-target loss, no silent cached-suffix token
+drop, missing-EOS fail-fast, and the hardened P0-4 microbatch-one plus enabled
+non-reentrant-checkpointing predicate.
+
+Codex read all 53 lossless logs and all 179 raw events before recording the
+review. Exact/private and separately sanitized staging archives were retained
+outside Git and verified offline; neither archive is published. The compact
+[summary](validation_results/HF_CONTRACT_HARDENING_SUMMARY.md),
+[JSON summary](validation_results/HF_CONTRACT_HARDENING_SUMMARY.json),
+[descriptor](validation_results/HF_CONTRACT_HARDENING_EVIDENCE_ARCHIVE.json),
+[exact verification](validation_results/HF_CONTRACT_HARDENING_EXACT_VERIFICATION.json),
+and [sanitized verification](validation_results/HF_CONTRACT_HARDENING_SANITIZED_VERIFICATION.json)
+record the result. Draft PR creation, review, and merge remain pending.
 
 ## Evidence-support design
 
@@ -570,26 +593,26 @@ of historical metrics, or an in-place retry.
 
 ## Acceptance checklist
 
-Stage E reaches `COMPLETE` only when every item is true:
+Stage E evidence is `COMPLETE`. The remaining unchecked item is the delivery
+workflow, not a missing validation or retention result:
 
-- [ ] all seven Stage A-D resolutions are present in the clean tested source;
-- [ ] all 53 recorded commands and two environment records pass review;
-- [ ] 117 focused tests pass independently in Transformers 4.57.6;
-- [ ] 117 focused tests pass independently in Transformers 5.14.1;
-- [ ] formula/oracle and full P0-1/P0-2 CPU fp32/CUDA bf16 pass;
-- [ ] fresh checkpointed CUDA bf16 P0-3 Psi=8/16 passes;
-- [ ] fresh strict P0-4 Psi=8 passes the hardened predicate and focused review;
-- [ ] fresh strict P0-4 Psi=16 passes the hardened predicate;
-- [ ] all 179 raw events and 53 lossless logs receive explicit review;
-- [ ] exact/private evidence is retained and verified outside Git;
-- [ ] a separately built sanitized archive is rescanned and verified offline;
-- [ ] reviewer, review method, review commit, and raw-event review are recorded;
-- [ ] the five new canonical evidence files are closed without private data;
-- [ ] canonical documentation is current and historical evidence is unchanged;
+- [x] all seven Stage A-D resolutions are present in the clean tested source;
+- [x] all 53 recorded commands and two environment records pass review;
+- [x] 117 focused tests pass independently in Transformers 4.57.6;
+- [x] 117 focused tests pass independently in Transformers 5.14.1;
+- [x] formula/oracle and full P0-1/P0-2 CPU fp32/CUDA bf16 pass;
+- [x] fresh checkpointed CUDA bf16 P0-3 Psi=8/16 passes;
+- [x] fresh strict P0-4 Psi=8 passes the hardened predicate and focused review;
+- [x] fresh strict P0-4 Psi=16 passes the hardened predicate;
+- [x] all 179 raw events and 53 lossless logs receive explicit review;
+- [x] exact/private evidence is retained and verified outside Git;
+- [x] a separately built sanitized archive is rescanned and verified offline;
+- [x] reviewer, review method, review commit, and raw-event review are recorded;
+- [x] the five new canonical evidence files are closed without private data;
+- [x] canonical documentation is current and historical evidence is unchanged;
 - [ ] the final branch is clean and a draft PR is created;
-- [ ] no automatic merge or tag occurs.
+- [x] no automatic merge or tag occurs.
 
-Creating this plan satisfies none of the unchecked acceptance items. The next
-implementation checkpoint is the Stage E-specific reviewer, builder, cache
-preflight, and adversarial fixture suite; fresh GPU execution remains gated on
-the explicit reviewer and retention inputs.
+The next checkpoint is to finish the canonical documentation commit, confirm a
+clean branch, and create the draft PR. PR review and merge remain separate user
+actions; no tag is implied.
