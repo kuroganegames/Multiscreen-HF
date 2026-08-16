@@ -1,5 +1,8 @@
 # Multiscreen HF
 
+> \[!WARNING]
+> Directed by GPT-5.6 Pro, developed by codex and prayed by me.
+
 Unofficial Hugging Face Transformers-compatible implementation of the **Multiscreen** architecture, with a paper-math oracle and P0 validation tests.
 
 This repository is a research artifact. It is not an official implementation of the Multiscreen paper, and it does not claim paper-scale performance reproduction.
