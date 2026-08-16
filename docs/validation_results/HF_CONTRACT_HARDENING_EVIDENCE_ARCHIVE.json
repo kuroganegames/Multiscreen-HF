@@ -1,0 +1,1370 @@
+{
+  "acceptance_review": {
+    "reviewers": [
+      {
+        "identifier": "Codex",
+        "raw_events_reviewed": true,
+        "review_commit": "0d59083ddbd78619ca29bf9af730999834272a1a",
+        "review_method": "Codex read all 53 lossless logs and 179 raw events, both P0-4 summaries and completion markers, and both machine reports; checked event order, finite loss and gradients, qualification, tokenizer, cache, data bindings, and repository hygiene.",
+        "reviewed_at_utc": "2026-08-16T02:51:24Z",
+        "role": "evidence_reviewer"
+      }
+    ],
+    "status": "recorded"
+  },
+  "archives": {
+    "exact_private": {
+      "archive_filename": "hf-contract-hardening-0d59083ddbd78619ca29bf9af730999834272a1a.exact.tar.gz",
+      "created_at_utc": "2026-08-16T02:52:37.235530Z",
+      "manifest_sha256": "dbb1c283d4d5d4378a1e098bc0d7fa81874cf2df1bb0d441f904e870f3323676",
+      "public": false,
+      "sha256": "3847075bfd5d995dc7434958765153ca09b71c532d640c4c180bf4b4706a3e2a",
+      "size_bytes": 88782,
+      "status": "verified",
+      "storage_class": "private_external",
+      "storage_locator": "private-external:hf-contract-hardening-0d59083ddbd78619ca29bf9af730999834272a1a",
+      "verification_report_sha256": "b6e37e8844f47c6c2d9f20814a7a4e75b35ee1efcd5ac092b431b3b014ea100e",
+      "verified_at_utc": "2026-08-16T02:52:48Z"
+    },
+    "sanitized_shareable": {
+      "archive_filename": "hf-contract-hardening-0d59083ddbd78619ca29bf9af730999834272a1a.sanitized.tar.gz",
+      "created_at_utc": "2026-08-16T02:52:37.235530Z",
+      "manifest_sha256": "1bd1b6ba87568c1cd38a0497683b0d2667caf6bda89776bc740acbb31b2ecd51",
+      "public": false,
+      "sha256": "b01c91736c83b4871d4df7cc688efb9e748942d62f42672b596a049e3b952006",
+      "size_bytes": 104136,
+      "status": "verified",
+      "storage_class": "sanitized_staging",
+      "storage_locator": "sanitized-staging:hf-contract-hardening-0d59083ddbd78619ca29bf9af730999834272a1a",
+      "verification_report_sha256": "aef9107230fd6c072ee1061ac06c40250c72b314bb9dd3606a5dee5e89392c36",
+      "verified_at_utc": "2026-08-16T02:52:48Z"
+    }
+  },
+  "evidence_gate": "Stage E final requalification",
+  "evidence_handoff_provenance": {
+    "archive_created_at_utc": {
+      "status": "recorded",
+      "value": "2026-08-16T02:52:37.235530Z"
+    },
+    "archive_verified_at_utc": {
+      "status": "recorded",
+      "value": "2026-08-16T02:52:48Z"
+    },
+    "final_commit": {
+      "status": "recorded",
+      "value": "4fd704f805ea634c66d2c4c26dded425c819a51d"
+    },
+    "implementation_base_commit": "bf8cc34cb6aa16ffeec1f609166db5efae79e9df",
+    "working_branch": "validation/hf-contract-hardening-requalification",
+    "worktree_after_commit": {
+      "clean": true,
+      "collected_at_utc": "2026-08-16T02:56:13Z",
+      "porcelain_format": "git-status-porcelain-v1",
+      "porcelain_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "staged_changes": false,
+      "status": "recorded",
+      "unstaged_changes": false,
+      "untracked_count": 0
+    },
+    "worktree_before_edits": {
+      "clean": true,
+      "collected_at_utc": "2026-08-16T02:51:24Z",
+      "porcelain_format": "git-status-porcelain-v1",
+      "porcelain_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "staged_changes": false,
+      "status": "recorded",
+      "unstaged_changes": false,
+      "untracked_count": 0
+    }
+  },
+  "evidence_status": "complete",
+  "limitations": [
+    "This is an unofficial correctness-first Hugging Face implementation.",
+    "The dense quadratic screening path is not evidence of paper efficiency.",
+    "No paper-scale training, retrieval benchmark, distributed training, or P1 ecosystem capability is validated.",
+    "Neither archive is published by default; the exact archive must remain private."
+  ],
+  "original_run_provenance": {
+    "original_run_review": {
+      "reviewers": [],
+      "status": "not_applicable"
+    },
+    "run_worktree_at_end": {
+      "clean": true,
+      "collected_at_utc": "2026-08-16T02:43:47.114311Z",
+      "porcelain_format": "git-status-porcelain-v1",
+      "porcelain_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "staged_changes": false,
+      "status": "recorded",
+      "unstaged_changes": false,
+      "untracked_count": 0
+    },
+    "run_worktree_at_start": {
+      "clean": true,
+      "collected_at_utc": "2026-08-16T02:24:05.350385Z",
+      "porcelain_format": "git-status-porcelain-v1",
+      "porcelain_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "staged_changes": false,
+      "status": "recorded",
+      "unstaged_changes": false,
+      "untracked_count": 0
+    }
+  },
+  "retention": {
+    "descriptor_updated_at_utc": "2026-08-16T02:56:13Z",
+    "exact_private_retained": true,
+    "public_asset": null,
+    "public_asset_published": false,
+    "sanitized_archive_verified": true,
+    "status": "verified"
+  },
+  "sanitization": {
+    "files_scanned": 133,
+    "replacement_count": 597,
+    "report_sha256": "7bd6e9341bfa21c5ae39593da1d85fc75ab1fbeac130727e7afbb5c349c33865",
+    "rules_applied": [
+      "bearer_token",
+      "cache_path",
+      "credential_url",
+      "file_uri",
+      "github_token",
+      "huggingface_token",
+      "json_secret_assignment",
+      "openai_token",
+      "python_interpreter",
+      "secret_assignment",
+      "sensitive_literal",
+      "unix_absolute_path",
+      "windows_absolute_path"
+    ],
+    "status": "verified",
+    "unresolved_findings": []
+  },
+  "schema_version": "1.0.0",
+  "source_artifacts": [
+    {
+      "archive_path": "artifacts/hf-contract-hardening/review/acceptance-provenance.json",
+      "classification": "provenance",
+      "exact_bytes_retained": true,
+      "logical_name": "hardening.acceptance_provenance",
+      "sanitized_copy_status": "verified",
+      "sha256": "b925e046919e65bf8c7f8bd59864403fcfd0b4fb1ced4e8caad85a2d4b2fd523",
+      "size_bytes": 2474
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/review/hf-contract-hardening-raw-review.json",
+      "classification": "validation_summary",
+      "exact_bytes_retained": true,
+      "logical_name": "hardening.full_review",
+      "sanitized_copy_status": "verified",
+      "sha256": "7d90ad7253c2d60d15342d66f91f4d90aa0547762cdcc6a2920952c1da7d030b",
+      "size_bytes": 50595
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/.level1-requalification-run.json",
+      "classification": "provenance",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.run_marker",
+      "sanitized_copy_status": "verified",
+      "sha256": "239701a5b7d2c69aa9713ea7616b0c00f61589736089c57fe5d9252acef6c4a7",
+      "size_bytes": 283
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/artifacts/p0-3/P0-3_COMPLETE.md",
+      "classification": "completion_marker",
+      "exact_bytes_retained": true,
+      "logical_name": "p0_3.completion_marker",
+      "sanitized_copy_status": "verified",
+      "sha256": "93082ef3bbdb69686140ba17b20b462e73f7c9416a5576724d18b92e45ae03d6",
+      "size_bytes": 1604
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/artifacts/p0-3/data_contract.json",
+      "classification": "validation_metrics",
+      "exact_bytes_retained": true,
+      "logical_name": "p0_3.data_contract",
+      "sanitized_copy_status": "verified",
+      "sha256": "1c3c240982bc3302a0c1d7de21e3b2c5b1b35df0aaa02b470c2f559f315f4517",
+      "size_bytes": 1621
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/artifacts/p0-3/p0_3_results.json",
+      "classification": "validation_summary",
+      "exact_bytes_retained": true,
+      "logical_name": "p0_3.results",
+      "sanitized_copy_status": "verified",
+      "sha256": "b69c5ec17550bcaf4d7d3e102205c8975bf0c27274514cc3f94db3384f187ecd",
+      "size_bytes": 2511
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/artifacts/p0-3/psi16/p0_3_metrics.json",
+      "classification": "validation_metrics",
+      "exact_bytes_retained": true,
+      "logical_name": "p0_3.psi16.metrics",
+      "sanitized_copy_status": "verified",
+      "sha256": "969eed324a663cd6498408612f4da219a4812d4a82987c31ea8d2250ff92793a",
+      "size_bytes": 1185
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/artifacts/p0-3/psi8/p0_3_metrics.json",
+      "classification": "validation_metrics",
+      "exact_bytes_retained": true,
+      "logical_name": "p0_3.psi8.metrics",
+      "sanitized_copy_status": "verified",
+      "sha256": "a98d7123381381c32fb1b51dc7a6d23966be2e33111f73b6a360fe276f4eced3",
+      "size_bytes": 1180
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/artifacts/p0-3/tokenizer-reload-psi16.json",
+      "classification": "validation_summary",
+      "exact_bytes_retained": true,
+      "logical_name": "tokenizer_reload.p0_3_psi16",
+      "sanitized_copy_status": "verified",
+      "sha256": "1f1394916ee8e83e2207098f91d8e1a8b9b55e95dbdd78a2ae7b169f3e9181ec",
+      "size_bytes": 2139
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/artifacts/p0-3/tokenizer-reload-psi8.json",
+      "classification": "validation_summary",
+      "exact_bytes_retained": true,
+      "logical_name": "tokenizer_reload.p0_3_psi8",
+      "sanitized_copy_status": "verified",
+      "sha256": "5b7bbc54b8d71c42a29faac05d66ac19eba7153dfd8d98d96aa42f15ac6cce04",
+      "size_bytes": 2137
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/artifacts/p0-4/psi16/P0-4_COMPLETE.md",
+      "classification": "completion_marker",
+      "exact_bytes_retained": true,
+      "logical_name": "p0_4_psi16.completion_marker",
+      "sanitized_copy_status": "verified",
+      "sha256": "aa2aa1f64b8c1551d5a466cc57c7ed98253a4fea741f1c0db88f5468ffb4a2d1",
+      "size_bytes": 679
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/artifacts/p0-4/psi16/data_contract.json",
+      "classification": "validation_metrics",
+      "exact_bytes_retained": true,
+      "logical_name": "p0_4_psi16.data_contract",
+      "sanitized_copy_status": "verified",
+      "sha256": "775b264f6efe9a93aa3a29c8da1b27cdebd5a88e8b43475029deedf0e352a7d6",
+      "size_bytes": 1642
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/artifacts/p0-4/psi16/metrics.jsonl",
+      "classification": "validation_metrics",
+      "exact_bytes_retained": true,
+      "logical_name": "p0_4_psi16.metrics",
+      "sanitized_copy_status": "verified",
+      "sha256": "b60b05b3462b64ac92de411c2fec74fba99c93cf14eb529a06bc22e82f2e56e5",
+      "size_bytes": 32008
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/artifacts/p0-4/psi16/summary.json",
+      "classification": "validation_summary",
+      "exact_bytes_retained": true,
+      "logical_name": "p0_4_psi16.summary",
+      "sanitized_copy_status": "verified",
+      "sha256": "78f84dacdc692420c8dc81158be2d77747baa6e1e0a6100c3c7c9e0fb5d5c79a",
+      "size_bytes": 4692
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/artifacts/p0-4/psi16/tokenizer-reload.json",
+      "classification": "validation_summary",
+      "exact_bytes_retained": true,
+      "logical_name": "tokenizer_reload.p0_4_psi16",
+      "sanitized_copy_status": "verified",
+      "sha256": "0ed9d5cd144a91648dc8a453d99511ff1da598a62f2a9c264ec18f82956dd3f7",
+      "size_bytes": 2121
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/artifacts/p0-4/psi8/P0-4_COMPLETE.md",
+      "classification": "completion_marker",
+      "exact_bytes_retained": true,
+      "logical_name": "p0_4_psi8.completion_marker",
+      "sanitized_copy_status": "verified",
+      "sha256": "241d751b3bc4f77d9d2f3b604521fa961a1bbf1dd6c34a0a515c623c2ee7b411",
+      "size_bytes": 672
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/artifacts/p0-4/psi8/data_contract.json",
+      "classification": "validation_metrics",
+      "exact_bytes_retained": true,
+      "logical_name": "p0_4_psi8.data_contract",
+      "sanitized_copy_status": "verified",
+      "sha256": "775b264f6efe9a93aa3a29c8da1b27cdebd5a88e8b43475029deedf0e352a7d6",
+      "size_bytes": 1642
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/artifacts/p0-4/psi8/metrics.jsonl",
+      "classification": "validation_metrics",
+      "exact_bytes_retained": true,
+      "logical_name": "p0_4_psi8.metrics",
+      "sanitized_copy_status": "verified",
+      "sha256": "13eaf0ef3dfa2ad51be7181c9c5ab22e67e01801afc64b6f1cfc783d344b5620",
+      "size_bytes": 31876
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/artifacts/p0-4/psi8/raw-review.json",
+      "classification": "validation_summary",
+      "exact_bytes_retained": true,
+      "logical_name": "p0_4_psi8.focused_review",
+      "sanitized_copy_status": "verified",
+      "sha256": "8d3472b642380736e13618aa87ddd113dd816d65ab03c13195950d2595a2ab00",
+      "size_bytes": 33885
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/artifacts/p0-4/psi8/summary.json",
+      "classification": "validation_summary",
+      "exact_bytes_retained": true,
+      "logical_name": "p0_4_psi8.summary",
+      "sanitized_copy_status": "verified",
+      "sha256": "b02ca05dbc7f9633675069f362da22b3b044eb9f789218bee0010ebe93031fea",
+      "size_bytes": 4702
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/artifacts/p0-4/psi8/tokenizer-reload.json",
+      "classification": "validation_summary",
+      "exact_bytes_retained": true,
+      "logical_name": "tokenizer_reload.p0_4_psi8",
+      "sanitized_copy_status": "verified",
+      "sha256": "32294f4abcfff02b0061295784424591d1f3bc9627902b7ebd7b6b46fbbf2a14",
+      "size_bytes": 2119
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/commands.jsonl",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.commands_ledger",
+      "sanitized_copy_status": "verified",
+      "sha256": "3f8b07a22a1f1bc3d42bb3254cb56b13bce600e5b2e2ebcc2fe7b69806c9ae28",
+      "size_bytes": 96390
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/environment.jsonl",
+      "classification": "environment_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.environment_ledger",
+      "sanitized_copy_status": "verified",
+      "sha256": "92c83d82926fdf868900ebaba112dc4101cf179e944c8165f9e95a49beb770fb",
+      "size_bytes": 1499
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/c1-manifest.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.c1-manifest",
+      "sanitized_copy_status": "verified",
+      "sha256": "af63ba7ffba435a78f3270168a6e20831b3b9089ad0db51871b595828677b5be",
+      "size_bytes": 89
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/environment-cuda0.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.environment-cuda0",
+      "sanitized_copy_status": "verified",
+      "sha256": "f8551f454750c05cd228ebf4b4e37ac78c009ec2428dd2cce1f840619308bc09",
+      "size_bytes": 1262
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/environment-tf4576.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.environment-tf4576",
+      "sanitized_copy_status": "verified",
+      "sha256": "287648090c947921b53b1a97a55f0631ec539bcbf533b87696197ad4d8b423d7",
+      "size_bytes": 538
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/environment-tf5141.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.environment-tf5141",
+      "sanitized_copy_status": "verified",
+      "sha256": "e8d41c9329c81e093fc26bf0d3266bd6959007808c3a7482f00aae8ca33f2641",
+      "size_bytes": 518
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/formula-units.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.formula-units",
+      "sanitized_copy_status": "verified",
+      "sha256": "a819319b84a2cd3d55d89497bf3f3cd590ac03fcbf426cf06963d84cd5e321b0",
+      "size_bytes": 26
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/generation-input-tf4576.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.generation-input-tf4576",
+      "sanitized_copy_status": "verified",
+      "sha256": "f9a7ca7e3dc7f900dc73f60656746af017f431c66cee53bbe07784a0f611ab43",
+      "size_bytes": 2783
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/generation-input-tf5141.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.generation-input-tf5141",
+      "sanitized_copy_status": "verified",
+      "sha256": "8b4517f92e38da1be8b530afe2327e507416ec0b6070bb0ee30a72d1ac7f864d",
+      "size_bytes": 2783
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/gradient-checkpointing-tf4576.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.gradient-checkpointing-tf4576",
+      "sanitized_copy_status": "verified",
+      "sha256": "b2c94c5745de545204ffd923c112ae1228a8f5d99f9cddf343fe93b8d73e2440",
+      "size_bytes": 1518
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/gradient-checkpointing-tf5141.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.gradient-checkpointing-tf5141",
+      "sanitized_copy_status": "verified",
+      "sha256": "5401739059f8421751170ff97c18bfc7ba05a030f51ef2c7161d13897806faee",
+      "size_bytes": 1518
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/hardening-evidence-support-tests.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.hardening-evidence-support-tests",
+      "sanitized_copy_status": "verified",
+      "sha256": "8d5a769a6109281ba83a81795caa770fbcfbf8352a500e22b90fe5049f77ab7c",
+      "size_bytes": 6723
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/hf-output-head-tf4576.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.hf-output-head-tf4576",
+      "sanitized_copy_status": "verified",
+      "sha256": "f7ebb1192f823abd3849e30a6cec466135f240b568f5a109e2419673bde23ab5",
+      "size_bytes": 744
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/hf-output-head-tf5141.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.hf-output-head-tf5141",
+      "sanitized_copy_status": "verified",
+      "sha256": "d616ad7fe280fd71e1064a2bee8358d5de32095304fa47deb97572adf23c48f7",
+      "size_bytes": 744
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/json-validation.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.json-validation",
+      "sanitized_copy_status": "verified",
+      "sha256": "4328e6d78a9b757f683ddcd0aca52cda3e3eaf0cfa50c210291d847b554567f9",
+      "size_bytes": 298
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/level1-evidence-support-tests.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.level1-evidence-support-tests",
+      "sanitized_copy_status": "verified",
+      "sha256": "9eeef72b10f3f00159aa97dd3417d99ba1e3f29cad80b04a09606b36e5b1afb9",
+      "size_bytes": 29911
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/markdown-links.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.markdown-links",
+      "sanitized_copy_status": "verified",
+      "sha256": "62d213d655ff499cc780458a0a7ab3a6f1d74c97daba765b2ee24941c862a6ec",
+      "size_bytes": 348
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/mipe-position-cache-tf4576.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.mipe-position-cache-tf4576",
+      "sanitized_copy_status": "verified",
+      "sha256": "e3d97c6f93c358702a8107c9fa947e05b35a3e8bce1b98ea0090ee9cedb741ae",
+      "size_bytes": 5139
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/mipe-position-cache-tf5141.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.mipe-position-cache-tf5141",
+      "sanitized_copy_status": "verified",
+      "sha256": "7c99bb5a24ad0ca763ce6ccc07e5702c56723af2f5c2d625f4374a3f3134e072",
+      "size_bytes": 5214
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/offline-cache-preflight.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.offline-cache-preflight",
+      "sanitized_copy_status": "verified",
+      "sha256": "6721b3006768dfab2b398fd757afa92da1d534ff3f8ec71e835dd57560868a3c",
+      "size_bytes": 1718
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/oracle-selfcheck.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.oracle-selfcheck",
+      "sanitized_copy_status": "verified",
+      "sha256": "5294c7b1c91064205f001c74b6a6d22ba1727be79069d4bdb077fb37b63c9e6d",
+      "size_bytes": 37
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/oracle-smoke.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.oracle-smoke",
+      "sanitized_copy_status": "verified",
+      "sha256": "9b549006d1d5f8cb10df81c42e086c962a7fac8ea7287c137e60c6cf4fb1070d",
+      "size_bytes": 37
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/p0-1-cpu-fp32.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.p0-1-cpu-fp32",
+      "sanitized_copy_status": "verified",
+      "sha256": "d7cab47c6627dfa4e9bfab668c097afc3581108377c446c96916b398a81418ad",
+      "size_bytes": 399
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/p0-1-cuda-bf16.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.p0-1-cuda-bf16",
+      "sanitized_copy_status": "verified",
+      "sha256": "b864b0ea31599388fd8ad36a7047d5322b2756e576e9f3fc02d0537ba157f1e3",
+      "size_bytes": 401
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/p0-2-cpu-fp32.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.p0-2-cpu-fp32",
+      "sanitized_copy_status": "verified",
+      "sha256": "06f9ddd66c2b707582299a539ed522666718fd176fc54a0470d8afda7de968e6",
+      "size_bytes": 225
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/p0-2-cuda-bf16.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.p0-2-cuda-bf16",
+      "sanitized_copy_status": "verified",
+      "sha256": "505a6680ea91902166c89e4b0a85427611877e057ae4e7cef8e76e633ce93af9",
+      "size_bytes": 227
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/p0-3-checkpointed.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "p0_3.stdout",
+      "sanitized_copy_status": "verified",
+      "sha256": "5d4f5dc421666c1ba83ad7bb63ace4b621485aa67f5fdd19b8bb0562fe2c9fbf",
+      "size_bytes": 5285
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/p0-3-tokenizer-psi16.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.p0-3-tokenizer-psi16",
+      "sanitized_copy_status": "verified",
+      "sha256": "807b17c5fa4e32d1e52ec464f9f5a7f8571b210ab5c8d47e58c80b2aa1897cba",
+      "size_bytes": 42
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/p0-3-tokenizer-psi8.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.p0-3-tokenizer-psi8",
+      "sanitized_copy_status": "verified",
+      "sha256": "214135a78eef01668f61c3cad1d5ad4cc9699b285e5e408d2de2510604b68a6b",
+      "size_bytes": 41
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/p0-4-psi16-preflight.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.p0-4-psi16-preflight",
+      "sanitized_copy_status": "verified",
+      "sha256": "ee39353db10c9cdc6aed7213c440b04e6d94bd1173fe361d4163d01c1e89878c",
+      "size_bytes": 622
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/p0-4-psi16.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.p0-4-psi16",
+      "sanitized_copy_status": "verified",
+      "sha256": "86a8fa990bb68001b2c659f67f73e0d5bdf28d9413f114f02f64d7e9a90e6844",
+      "size_bytes": 4583
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/p0-4-psi8-preflight.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.p0-4-psi8-preflight",
+      "sanitized_copy_status": "verified",
+      "sha256": "f9c9f1db8e79717f51b88df7acbcebf98bd00801699afd322703325b065c0e7d",
+      "size_bytes": 620
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/p0-4-psi8.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.p0-4-psi8",
+      "sanitized_copy_status": "verified",
+      "sha256": "30539ff912c4fa846c4ad851c8fe68cea34288f66182dbcffcec89c9e3589c09",
+      "size_bytes": 4559
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/p0-4-qualification-tf4576.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.p0-4-qualification-tf4576",
+      "sanitized_copy_status": "verified",
+      "sha256": "c8573f7767cead723e404aeeab7e5ad70d605f9cac48def3bec5d7dddc1eb200",
+      "size_bytes": 2116
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/p0-4-qualification-tf5141.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.p0-4-qualification-tf5141",
+      "sanitized_copy_status": "verified",
+      "sha256": "456a073527be9f7327c75dbe8d8d74173b11a3da2576dc7e8bf3d69f9d4d4653",
+      "size_bytes": 2116
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/p0-4-review-psi8.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.p0-4-review-psi8",
+      "sanitized_copy_status": "verified",
+      "sha256": "61e3c272734e0f6664a11725d436f7f3ea2504a2b67adcb7eb390fcbae73feee",
+      "size_bytes": 221
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/p0-4-tokenizer-psi16.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.p0-4-tokenizer-psi16",
+      "sanitized_copy_status": "verified",
+      "sha256": "1c9d208ce95998849c67d0f40e66f82100d47083be7db5852ecffead0e0213a3",
+      "size_bytes": 42
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/p0-4-tokenizer-psi8.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.p0-4-tokenizer-psi8",
+      "sanitized_copy_status": "verified",
+      "sha256": "156f2f11a7d693a6722323b6b8d916c69220aa149b0b00d6920f98ffac25dca2",
+      "size_bytes": 41
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/packed-text-tf4576.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.packed-text-tf4576",
+      "sanitized_copy_status": "verified",
+      "sha256": "144d254df307218f764b25dd1ab09d028797486603150fa27179bb2181b1a406",
+      "size_bytes": 1976
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/packed-text-tf5141.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.packed-text-tf5141",
+      "sanitized_copy_status": "verified",
+      "sha256": "144d254df307218f764b25dd1ab09d028797486603150fa27179bb2181b1a406",
+      "size_bytes": 1976
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/paper-architecture-tf4576.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.paper-architecture-tf4576",
+      "sanitized_copy_status": "verified",
+      "sha256": "967fa854c7c5246c9e8d93fe501a2f90518e13a7ebe95b62800a73ee92384e9c",
+      "size_bytes": 1019
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/paper-architecture-tf5141.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.paper-architecture-tf5141",
+      "sanitized_copy_status": "verified",
+      "sha256": "8f3a50d8dab586c4fc7fb3f4b4b52fa9e09289e50a46d6452d4cf7e5b492bebb",
+      "size_bytes": 1019
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/paper-initialization-tf4576.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.paper-initialization-tf4576",
+      "sanitized_copy_status": "verified",
+      "sha256": "6137b2394766d4863e69db9129d52a0640a5810c21d6fbfe8d3ead3b28264394",
+      "size_bytes": 675
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/paper-initialization-tf5141.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.paper-initialization-tf5141",
+      "sanitized_copy_status": "verified",
+      "sha256": "6137b2394766d4863e69db9129d52a0640a5810c21d6fbfe8d3ead3b28264394",
+      "size_bytes": 675
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/paper-training-contract-tf4576.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.paper-training-contract-tf4576",
+      "sanitized_copy_status": "verified",
+      "sha256": "2aa7dcf5f735aaa7f9387cd6789563b990a76a765afaa882e9a4383685647178",
+      "size_bytes": 4631
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/paper-training-contract-tf5141.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.paper-training-contract-tf5141",
+      "sanitized_copy_status": "verified",
+      "sha256": "c91a3f8edb98ac0ab0b6b6dfd2ed67ee2b89b5e50def4f439d8aa11d35ea30af",
+      "size_bytes": 4631
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/repository-hygiene-final.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.repository-hygiene-final",
+      "sanitized_copy_status": "verified",
+      "sha256": "b918e6ad1a8d3ed518c675d7ac38cff54841582966e6d02bc00bd64ffd1d8f2d",
+      "size_bytes": 1136
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/repository-hygiene.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.repository-hygiene",
+      "sanitized_copy_status": "verified",
+      "sha256": "b918e6ad1a8d3ed518c675d7ac38cff54841582966e6d02bc00bd64ffd1d8f2d",
+      "size_bytes": 1136
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/syntax-hardening.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.syntax-hardening",
+      "sanitized_copy_status": "verified",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/tokenizer-reload-tests-tf4576.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.tokenizer-reload-tests-tf4576",
+      "sanitized_copy_status": "verified",
+      "sha256": "5dde616403f7a24a74872c72124735a6d7cea61a4debcf4b0f28caec067cf445",
+      "size_bytes": 2490
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/tokenizer-reload-tests-tf5141.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.tokenizer-reload-tests-tf5141",
+      "sanitized_copy_status": "verified",
+      "sha256": "f2f6112894022848171aacb275d0b081e65d815bb9aa541275195755bf8a558b",
+      "size_bytes": 2490
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/training-edge-tf4576.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.training-edge-tf4576",
+      "sanitized_copy_status": "verified",
+      "sha256": "a790b87c938965acce69fa53d8413c279b9b6db2da12819d517418108347fdfe",
+      "size_bytes": 1825
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/training-edge-tf5141.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.training-edge-tf5141",
+      "sanitized_copy_status": "verified",
+      "sha256": "a11fb26b712d325cfb16e3a010d5ee0ba760c380a8c4c8f30f3f235f3b000295",
+      "size_bytes": 1825
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/validation-evidence-tests.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.validation-evidence-tests",
+      "sanitized_copy_status": "verified",
+      "sha256": "729803e2655fc1a40467ad9623b4d5e172f55fbcb155698f3d8a748efe859206",
+      "size_bytes": 10589
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/logs/workflow-yaml.log",
+      "classification": "other",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.log.workflow-yaml",
+      "sanitized_copy_status": "verified",
+      "sha256": "192a3899972b9011cacdeba03651d14eb7dacd9810ccffa2c67b3867d14bffba",
+      "size_bytes": 366
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/c1-manifest.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.c1-manifest",
+      "sanitized_copy_status": "verified",
+      "sha256": "cbdcbcd13517b5237083a5eac1b3ede41f0effabed1f4a5bc5e9ea5dc63510f4",
+      "size_bytes": 1616
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/environment-cuda0.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.environment-cuda0",
+      "sanitized_copy_status": "verified",
+      "sha256": "c4dadf2f41c6503d098499b6be30577aa5de396bbc4f513e0fec3803ad356dec",
+      "size_bytes": 1588
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/environment-tf4576.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.environment-tf4576",
+      "sanitized_copy_status": "verified",
+      "sha256": "3a45da738718500112270ceb1444450f494ad057c899ba9b0ab517e1a921536f",
+      "size_bytes": 1559
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/environment-tf5141.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.environment-tf5141",
+      "sanitized_copy_status": "verified",
+      "sha256": "64d2fdd5342c333015a203f9b920b68cd4cab9e009517e825c1f3c9ca085d71e",
+      "size_bytes": 1557
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/formula-units.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.formula-units",
+      "sanitized_copy_status": "verified",
+      "sha256": "46e39da73e5cf90465a368f18060a067e84d34b149d9811559b8a81dd722f242",
+      "size_bytes": 1543
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/generation-input-tf4576.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.generation-input-tf4576",
+      "sanitized_copy_status": "verified",
+      "sha256": "15899a5467941075910eda5460cecba0a31f6b161da6931071ba1cfa7694a24d",
+      "size_bytes": 1653
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/generation-input-tf5141.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.generation-input-tf5141",
+      "sanitized_copy_status": "verified",
+      "sha256": "27882241fac28afeca14d13fda9945f3d1e45f898aa9920238b895b111192398",
+      "size_bytes": 1651
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/gradient-checkpointing-tf4576.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.gradient-checkpointing-tf4576",
+      "sanitized_copy_status": "verified",
+      "sha256": "d6cfc4b956cd0998d800e50cf33263e330a50efb2ba3f1915c9b4722ae39b7b2",
+      "size_bytes": 1703
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/gradient-checkpointing-tf5141.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.gradient-checkpointing-tf5141",
+      "sanitized_copy_status": "verified",
+      "sha256": "e7cc116ba0a06a3db4fc762b9a11e61049bd358c197dad569251e0d6f2dd88da",
+      "size_bytes": 1701
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/hardening-evidence-support-tests.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.hardening-evidence-support-tests",
+      "sanitized_copy_status": "verified",
+      "sha256": "8618fa55d3847617b9a69da7f56d65a9ff981f35e9d8665afe6feedd18d163ae",
+      "size_bytes": 1635
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/hf-output-head-tf4576.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.hf-output-head-tf4576",
+      "sanitized_copy_status": "verified",
+      "sha256": "a60198ee8b9b588552457c058a1e2493963eff7ce6b620066a777c216d2a86f2",
+      "size_bytes": 1646
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/hf-output-head-tf5141.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.hf-output-head-tf5141",
+      "sanitized_copy_status": "verified",
+      "sha256": "13ede151e60a40eb37cf7951be191009fddb81bdfb93a5706f206b2d0bf74f75",
+      "size_bytes": 1644
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/json-validation.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.json-validation",
+      "sanitized_copy_status": "verified",
+      "sha256": "260314bad4b2838b9bc761c9060078cb7ee8dfc80633655d0db5e70690303915",
+      "size_bytes": 1632
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/level1-evidence-support-tests.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.level1-evidence-support-tests",
+      "sanitized_copy_status": "verified",
+      "sha256": "39a6ee0cc0e5180b99664043d382398a319010bdf5de5c17276c2bcb5d841cd1",
+      "size_bytes": 1617
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/markdown-links.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.markdown-links",
+      "sanitized_copy_status": "verified",
+      "sha256": "b58aef596ccb78009629c5bae721293933cd31acbbaf7e38426593fa8f30919a",
+      "size_bytes": 1640
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/mipe-position-cache-tf4576.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.mipe-position-cache-tf4576",
+      "sanitized_copy_status": "verified",
+      "sha256": "6b474ad6f78757e7ec514200a90c4aeac1fb85ace7aab01590b8b47ce2653ba2",
+      "size_bytes": 1694
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/mipe-position-cache-tf5141.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.mipe-position-cache-tf5141",
+      "sanitized_copy_status": "verified",
+      "sha256": "dfd18edaf73fcba41f599b1c893574ba3f2c39117b23bb5887fd1d6e7e88f73b",
+      "size_bytes": 1692
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/offline-cache-preflight.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.offline-cache-preflight",
+      "sanitized_copy_status": "verified",
+      "sha256": "2101d1167f766dd205c32810a390787f1cee4d511cf3582bdbcd1940fc249849",
+      "size_bytes": 1713
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/oracle-selfcheck.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.oracle-selfcheck",
+      "sanitized_copy_status": "verified",
+      "sha256": "b487ba1df345e2e5ccb4585511e60a30dd5cc3f1ca219c765274332ef45283e7",
+      "size_bytes": 1563
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/oracle-smoke.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.oracle-smoke",
+      "sanitized_copy_status": "verified",
+      "sha256": "c870c41f0523c7e880ca5a079fc715f1a5a37c71d5d38d206ec44379644187b2",
+      "size_bytes": 1551
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/p0-1-cpu-fp32.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.p0-1-cpu-fp32",
+      "sanitized_copy_status": "verified",
+      "sha256": "72c284cc1d372d7229dd663ebdf863e02641c162b1542bf5808882d228eaad81",
+      "size_bytes": 1661
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/p0-1-cuda-bf16.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.p0-1-cuda-bf16",
+      "sanitized_copy_status": "verified",
+      "sha256": "919eab49ebb9a0c5c38715259363f163e1c40dcce729ae6cf61687f269f6c16e",
+      "size_bytes": 1698
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/p0-2-cpu-fp32.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.p0-2-cpu-fp32",
+      "sanitized_copy_status": "verified",
+      "sha256": "a22719a4a3646ec621778b2b2f22943e5d7e14a7ed79805cd17670036b826b92",
+      "size_bytes": 1773
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/p0-2-cuda-bf16.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.p0-2-cuda-bf16",
+      "sanitized_copy_status": "verified",
+      "sha256": "b9481c73761b2f9d7bb190c753fc0e4c4c4a090bb045154e89104cd482fe0da1",
+      "size_bytes": 1810
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/p0-3-checkpointed.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.p0-3-checkpointed",
+      "sanitized_copy_status": "verified",
+      "sha256": "a06d1f08c4a1360d0fe03cad4b26e10e7e0f28b62be40b79ed1f273379267ae3",
+      "size_bytes": 2798
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/p0-3-tokenizer-psi16.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.p0-3-tokenizer-psi16",
+      "sanitized_copy_status": "verified",
+      "sha256": "214de7748af299cd95a51d420eff3704eba1a211e20cb0d28b36a7bd432c39f7",
+      "size_bytes": 2064
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/p0-3-tokenizer-psi8.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.p0-3-tokenizer-psi8",
+      "sanitized_copy_status": "verified",
+      "sha256": "d43958f34f2409ae7840cee8f6927d23e0451d72d0b7d2ff1636c6c0cabdc2fe",
+      "size_bytes": 2056
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/p0-4-psi16-preflight.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.p0-4-psi16-preflight",
+      "sanitized_copy_status": "verified",
+      "sha256": "984a254a22d4ad08d5599fc894bba8f9daa94f34781bf1e2d7b823801eae3631",
+      "size_bytes": 1717
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/p0-4-psi16.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.p0-4-psi16",
+      "sanitized_copy_status": "verified",
+      "sha256": "56660d9ec9f457bf6836e697f99defd7214b1fda1344ef0494fc7e9a73b2742d",
+      "size_bytes": 2520
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/p0-4-psi8-preflight.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.p0-4-psi8-preflight",
+      "sanitized_copy_status": "verified",
+      "sha256": "8841e007a71ef6fb3e7d9780ef550b6788d385dd5f448ed8e72d7e22d1fe13b5",
+      "size_bytes": 1714
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/p0-4-psi8.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.p0-4-psi8",
+      "sanitized_copy_status": "verified",
+      "sha256": "fd5a8e0dbfcebd945599ea20e150029d17ca1bcf221f4673c01fb78226d3d3c9",
+      "size_bytes": 2515
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/p0-4-qualification-tf4576.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.p0-4-qualification-tf4576",
+      "sanitized_copy_status": "verified",
+      "sha256": "33a6df6f44ceb5c48f6d0730585c730ee41af9f09ea1a5db3d6d1b75c52e04ac",
+      "size_bytes": 1659
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/p0-4-qualification-tf5141.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.p0-4-qualification-tf5141",
+      "sanitized_copy_status": "verified",
+      "sha256": "b7cee3aa387aa6fd26489606fad41ec4f070c51e3800305066630789fc279125",
+      "size_bytes": 1657
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/p0-4-review-psi8.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.p0-4-review-psi8",
+      "sanitized_copy_status": "verified",
+      "sha256": "ce870d9b82d67eb2ba2db854b467c0b69b33d57190ea5cc0e4b4250fe06686e4",
+      "size_bytes": 2310
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/p0-4-tokenizer-psi16.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.p0-4-tokenizer-psi16",
+      "sanitized_copy_status": "verified",
+      "sha256": "1e5474d3f92e29f9114c11663c8dfcfa4a8f3fa7082b7bfe8237a15d34f88917",
+      "size_bytes": 2199
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/p0-4-tokenizer-psi8.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.p0-4-tokenizer-psi8",
+      "sanitized_copy_status": "verified",
+      "sha256": "a203f0d7af864580554dadacb9967e14b8d1eb0c7aaf7ba79a2b46fe71a9f911",
+      "size_bytes": 2192
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/packed-text-tf4576.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.packed-text-tf4576",
+      "sanitized_copy_status": "verified",
+      "sha256": "ef9b6f63ff93937cec99d19d1645749109d312d740097b54549809e7f9bcae91",
+      "size_bytes": 1638
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/packed-text-tf5141.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.packed-text-tf5141",
+      "sanitized_copy_status": "verified",
+      "sha256": "760cd09a906d1dde4a7ceede263fa5555fb743cecbf0c7409eed13e313fa2d35",
+      "size_bytes": 1636
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/paper-architecture-tf4576.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.paper-architecture-tf4576",
+      "sanitized_copy_status": "verified",
+      "sha256": "fc3bebbf8dbd612984c191f7dec86229a966063b1ac6d384b6a1c372cfe1d011",
+      "size_bytes": 1659
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/paper-architecture-tf5141.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.paper-architecture-tf5141",
+      "sanitized_copy_status": "verified",
+      "sha256": "09eb024884b923578b57b063beeb257aeb7c7012e249ac989d495c47e13baa5b",
+      "size_bytes": 1657
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/paper-initialization-tf4576.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.paper-initialization-tf4576",
+      "sanitized_copy_status": "verified",
+      "sha256": "085e886f695f121246aa7ba3f577dd5d07ee60b5b0892e6c3417f9d5aad40050",
+      "size_bytes": 1664
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/paper-initialization-tf5141.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.paper-initialization-tf5141",
+      "sanitized_copy_status": "verified",
+      "sha256": "4a1b0b6ae27df8e4f04a9e9af60d871ed23d21828595617815e50aeab0f7aea3",
+      "size_bytes": 1662
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/paper-training-contract-tf4576.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.paper-training-contract-tf4576",
+      "sanitized_copy_status": "verified",
+      "sha256": "c124c488ded83c7d190a1a4ce0727adb42138e79d7ccb7866d00e2ade315df35",
+      "size_bytes": 1697
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/paper-training-contract-tf5141.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.paper-training-contract-tf5141",
+      "sanitized_copy_status": "verified",
+      "sha256": "4ea530394ad30e6a0034a9d5598ff6ebcf0ad5db5f1405d94b680e348a15f846",
+      "size_bytes": 1695
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/repository-hygiene-final.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.repository-hygiene-final",
+      "sanitized_copy_status": "verified",
+      "sha256": "6fdfd14acea661cc407758dd93ba2512ef11e6ff1393986a7b20a455d599f1dd",
+      "size_bytes": 1655
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/repository-hygiene.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.repository-hygiene",
+      "sanitized_copy_status": "verified",
+      "sha256": "6e2e0e896defc808f25cc6515912d1afafc244a97d9ee0c76eb29ac2fcdf29ac",
+      "size_bytes": 1643
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/runtime-tf4576.json",
+      "classification": "environment_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.runtime-tf4576",
+      "sanitized_copy_status": "verified",
+      "sha256": "b046ee8513035d52d8de2a5aa0fff997c2e7faa2905c9f4a4901c05f6677883c",
+      "size_bytes": 750
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/runtime-tf5141.json",
+      "classification": "environment_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.runtime-tf5141",
+      "sanitized_copy_status": "verified",
+      "sha256": "a87fb5c41383ad27ada7a6780fe1ca8fc5c7340f46127a52c333a6cf42916e51",
+      "size_bytes": 749
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/syntax-hardening.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.syntax-hardening",
+      "sanitized_copy_status": "verified",
+      "sha256": "e67078da66ac16d3227afe2fed82d45cba918bc565f8cd5fd8db81938904fa13",
+      "size_bytes": 5059
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/tokenizer-reload-tests-tf4576.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.tokenizer-reload-tests-tf4576",
+      "sanitized_copy_status": "verified",
+      "sha256": "b5c3bc3e018c349e4b54f2e91b3fc481e976b624795e9b685b1a096cd2d6f77f",
+      "size_bytes": 1623
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/tokenizer-reload-tests-tf5141.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.tokenizer-reload-tests-tf5141",
+      "sanitized_copy_status": "verified",
+      "sha256": "561eb9982cf590c1d0e44595e1e214b3a6e210ebdd8a39b49add6508f9851343",
+      "size_bytes": 1621
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/training-edge-tf4576.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.training-edge-tf4576",
+      "sanitized_copy_status": "verified",
+      "sha256": "37df7e00bdcd00c9088ac30408b4c15bf08e6e1b456ff5d66957a34a79a6140d",
+      "size_bytes": 1644
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/training-edge-tf5141.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.training-edge-tf5141",
+      "sanitized_copy_status": "verified",
+      "sha256": "1c41e051a97c84af0c4b9cb219589694dcac646aeea0d4069058e5630ae7d217",
+      "size_bytes": 1642
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/validation-evidence-tests.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.validation-evidence-tests",
+      "sanitized_copy_status": "verified",
+      "sha256": "0e941c336b7fa71f6e4eecb1c9400ccdd6785a6aa2484ba66494bca8c9b032e5",
+      "size_bytes": 1617
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/run/records/workflow-yaml.json",
+      "classification": "command_record",
+      "exact_bytes_retained": true,
+      "logical_name": "runner.record.workflow-yaml",
+      "sanitized_copy_status": "verified",
+      "sha256": "512b796509084a936a4c5fcec4e95dd977e6728a3719f9407b70ca66260e2d7b",
+      "size_bytes": 1637
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/summary/HF_CONTRACT_HARDENING_SUMMARY.json",
+      "classification": "validation_summary",
+      "exact_bytes_retained": true,
+      "logical_name": "hardening.machine_summary",
+      "sanitized_copy_status": "verified",
+      "sha256": "9e8b20daa468db5974f0f572acba096798dc68cafba3570101d793072b06211b",
+      "size_bytes": 2581
+    },
+    {
+      "archive_path": "artifacts/hf-contract-hardening/summary/HF_CONTRACT_HARDENING_SUMMARY.md",
+      "classification": "validation_summary",
+      "exact_bytes_retained": true,
+      "logical_name": "hardening.human_summary",
+      "sanitized_copy_status": "verified",
+      "sha256": "d8b5538d17a2e969db8cac87115d46b82a2d302fd12a7792ccf63ccd1487f680",
+      "size_bytes": 1014
+    }
+  ],
+  "tested_source": {
+    "branch": "validation/hf-contract-hardening-requalification",
+    "commit": "0d59083ddbd78619ca29bf9af730999834272a1a",
+    "repository": "kuroganegames/Multiscreen-HF"
+  },
+  "validation_gate": "HF Contract Hardening",
+  "validation_status": "passed",
+  "verification": {
+    "reports": [
+      {
+        "archive_kind": "exact_private",
+        "archive_sha256": "3847075bfd5d995dc7434958765153ca09b71c532d640c4c180bf4b4706a3e2a",
+        "errors": [],
+        "status": "verified",
+        "verified_at_utc": "2026-08-16T02:52:48Z"
+      },
+      {
+        "archive_kind": "sanitized_shareable",
+        "archive_sha256": "b01c91736c83b4871d4df7cc688efb9e748942d62f42672b596a049e3b952006",
+        "errors": [],
+        "status": "verified",
+        "verified_at_utc": "2026-08-16T02:52:48Z"
+      }
+    ],
+    "status": "verified",
+    "verifier_version": "1.0.0"
+  }
+}

@@ -1321,3 +1321,90 @@ git diff --cached --check
 Push and open the focused Stage 5 draft PR only after all commands above pass.
 Do not publish either archive, merge the PR, or create an immutable tag as part
 of this procedure.
+
+## HF contract hardening Stage E
+
+Stage E requalifies the integrated post-Level-1 hardening baseline. Its
+authoritative scope, 53-command matrix, two environment records, raw-review
+contract, retention boundary, and two-commit closure are fixed in
+[HF_CONTRACT_HARDENING_PLAN.md](HF_CONTRACT_HARDENING_PLAN.md).
+
+The recorded run is complete on tested source
+`0d59083ddbd78619ca29bf9af730999834272a1a`, descended from implementation
+baseline `bf8cc34cb6aa16ffeec1f609166db5efae79e9df`. All 53 commands and two
+environment records passed; both exact Transformers 4.57.6 and 5.14.1 lanes
+passed 117 focused tests; full P0-1/P0-2 CPU fp32 and CUDA bf16 passed; and
+fresh checkpointed P0-3 Psi=8/16 plus fresh strict P0-4 Psi=8/16 passed. Codex
+reviewed all 53 lossless logs and 179 raw events. Evidence commit
+`4fd704f805ea634c66d2c4c26dded425c819a51d` records the compact evidence;
+draft PR creation, review, and merge remain pending.
+
+See the [compact summary](validation_results/HF_CONTRACT_HARDENING_SUMMARY.md),
+[machine-readable summary](validation_results/HF_CONTRACT_HARDENING_SUMMARY.json),
+[evidence descriptor](validation_results/HF_CONTRACT_HARDENING_EVIDENCE_ARCHIVE.json),
+[exact/private verification](validation_results/HF_CONTRACT_HARDENING_EXACT_VERIFICATION.json),
+and [sanitized verification](validation_results/HF_CONTRACT_HARDENING_SANITIZED_VERIFICATION.json).
+The exact/private and separately sanitized staging archives are retained and
+verified offline but unpublished.
+
+Every recorded Stage E command fixes both
+`HF_DATASETS_DISABLE_PROGRESS_BARS=1` and
+`HF_HUB_DISABLE_PROGRESS_BARS=1` in its `/usr/bin/env -i` environment. Both
+are required because Hub-controlled Transformers save/load progress output
+can otherwise emit carriage returns, while the Stage E reviewer requires
+complete canonical UTF-8 LF focused-test logs.
+
+The Stage E support path is separate from the accepted Level 1 reviewer and
+builder. Run both the new and legacy fixture suites before selecting a clean
+tested-source commit:
+
+```bash
+export PYTHONDONTWRITEBYTECODE=1
+export PYTHONPATH=.
+
+python -S -m py_compile \
+  scripts/build_hf_contract_hardening_evidence.py \
+  scripts/check_hf_contract_hardening_offline_cache.py \
+  scripts/review_hf_contract_hardening.py \
+  tests/test_hf_contract_hardening_evidence_builder.py \
+  tests/test_hf_contract_hardening_evidence_review.py \
+  tests/test_hf_contract_hardening_offline_cache.py
+
+python -S -m unittest discover \
+  -s tests \
+  -p 'test_hf_contract_hardening_*.py' \
+  -v
+
+python -S -m unittest discover \
+  -s tests \
+  -p 'test_level1_*.py' \
+  -v
+
+python -S -m unittest discover \
+  -s tests \
+  -p 'test_validation_evidence*.py' \
+  -v
+```
+
+The new offline preflight checks only the fixed P0-3 and P0-4 public inputs;
+it deliberately does not require the historical C3 prepared cache. A real
+preflight must run offline with one explicit canonical cache:
+
+```bash
+: "${HF_CACHE_DIR:?set HF_CACHE_DIR to the existing offline cache}"
+test -d "$HF_CACHE_DIR"
+
+HF_DATASETS_OFFLINE=1 \
+HF_HUB_OFFLINE=1 \
+TRANSFORMERS_OFFLINE=1 \
+python -P -B scripts/check_hf_contract_hardening_offline_cache.py \
+  --repo-root "$PWD" \
+  --cache-dir "$HF_CACHE_DIR"
+```
+
+Do not begin the recorded matrix until the exact 4.57.6 and 5.14.1 Python
+lanes, CUDA bf16, a new external private run root, an explicit reviewer, and a
+writable external exact-archive directory are all available. Psi=16 P0-4 must
+not start until the recorded Psi=8 v2 focused review passes and is inspected.
+Historical Level 1, P0-4, and P0.5-C3 evidence files remain immutable and are
+not members of the Stage E archive.

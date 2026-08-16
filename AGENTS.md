@@ -61,6 +61,23 @@ final Level 1 requalification and evidence
   this does not validate paper-scale training, retrieval, optimized
   long-context efficiency, distributed training, or any P1 capability
 
+HF contract hardening Stage E requalification
+  evidence complete locally on tested source
+  0d59083ddbd78619ca29bf9af730999834272a1a
+  implementation baseline: bf8cc34cb6aa16ffeec1f609166db5efae79e9df
+  evidence commit: 4fd704f805ea634c66d2c4c26dded425c819a51d
+  53 commands, 2 exact environment records, 117 focused tests per
+  Transformers lane, full P0-1/P0-2 CPU fp32/CUDA bf16, fresh
+  checkpointed P0-3 Psi=8/16, and fresh strict P0-4 Psi=8/16 passed
+  Codex reviewed all 53 lossless logs and all 179 raw events
+  exact/private and sanitized staging archives retained and verified offline
+  both archives unpublished; draft PR review/merge pending
+  callable output head, parameter-free tied head, deepcopy isolation,
+  checkpointing-plus-past fail-fast, graph-connected zero-target loss,
+  no silent cached-suffix drop, missing-EOS fail-fast, and hardened
+  eight-condition P0-4 qualification are covered
+  no paper-scale, efficiency, broad-generation, distributed, or P1 claim
+
 P1 model/ecosystem capabilities
   none validated
 ```
@@ -105,6 +122,12 @@ docs/validation_results/LEVEL1_CORE_SUMMARY.json
 docs/validation_results/LEVEL1_CORE_EVIDENCE_ARCHIVE.json
 docs/validation_results/LEVEL1_CORE_EXACT_VERIFICATION.json
 docs/validation_results/LEVEL1_CORE_SANITIZED_VERIFICATION.json
+docs/HF_CONTRACT_HARDENING_PLAN.md
+docs/validation_results/HF_CONTRACT_HARDENING_SUMMARY.md
+docs/validation_results/HF_CONTRACT_HARDENING_SUMMARY.json
+docs/validation_results/HF_CONTRACT_HARDENING_EVIDENCE_ARCHIVE.json
+docs/validation_results/HF_CONTRACT_HARDENING_EXACT_VERIFICATION.json
+docs/validation_results/HF_CONTRACT_HARDENING_SANITIZED_VERIFICATION.json
 ```
 
 The P0-4 plan and Codex handoff are retained reproduction/history documents; they do not mean P0-4 is pending:
@@ -370,6 +393,7 @@ C2 correction accepted and merged in PR #11
 P1-preflight B accepted and merged in PR #12
 P0.5-C3       accepted and merged in PR #13
 final P0 core requalification accepted and merged in PR #14
+HF contract hardening Stage E evidence complete locally; draft PR pending
 P1-1 PEFT/LoRA smoke remains outside the Level 1 core program
 ```
 
@@ -381,6 +405,14 @@ model/ecosystem capability or broaden the limitations recorded above; no tag
 is created without explicit user instruction.
 
 ## Validation records
+
+The Stage E result is bound to tested source
+`0d59083ddbd78619ca29bf9af730999834272a1a` and evidence commit
+`4fd704f805ea634c66d2c4c26dded425c819a51d`. Its exact/private and sanitized
+staging archives are retained and verified offline but unpublished. Draft PR
+review and merge remain pending. This hardening requalification preserves the
+same P0/Level 1 scope and does not validate broad generation compatibility or
+any P1 model/ecosystem capability.
 
 Compact accepted summaries and archive descriptors belong in:
 

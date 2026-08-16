@@ -1,0 +1,49 @@
+{
+  "archive": {
+    "archive_kind": "sanitized_shareable",
+    "filename": "hf-contract-hardening-0d59083ddbd78619ca29bf9af730999834272a1a.sanitized.tar.gz",
+    "manifest_sha256": "1bd1b6ba87568c1cd38a0497683b0d2667caf6bda89776bc740acbb31b2ecd51",
+    "member_count": 136,
+    "sha256": "b01c91736c83b4871d4df7cc688efb9e748942d62f42672b596a049e3b952006",
+    "size_bytes": 104136
+  },
+  "checks": {
+    "archive_sha256": "verified",
+    "canonical_gzip_and_tar": "verified",
+    "evidence_document": "verified",
+    "manifest": "verified",
+    "member_hashes": "verified",
+    "member_paths_and_types": "verified",
+    "sanitization": {
+      "descriptor_values": {
+        "files_scanned": 133,
+        "replacement_count": 597,
+        "report_sha256": "7bd6e9341bfa21c5ae39593da1d85fc75ab1fbeac130727e7afbb5c349c33865",
+        "rules_applied": [
+          "bearer_token",
+          "cache_path",
+          "credential_url",
+          "file_uri",
+          "github_token",
+          "huggingface_token",
+          "json_secret_assignment",
+          "openai_token",
+          "python_interpreter",
+          "secret_assignment",
+          "sensitive_literal",
+          "unix_absolute_path",
+          "windows_absolute_path"
+        ]
+      },
+      "files_scanned": 133,
+      "independent_members_scanned": 136,
+      "status": "verified"
+    },
+    "sha256sums": "verified"
+  },
+  "errors": [],
+  "format_version": "validation-evidence-verification-v1",
+  "status": "verified",
+  "verified_at_utc": "2026-08-16T02:52:48Z",
+  "verifier_version": "1.0.0"
+}

@@ -32,6 +32,41 @@ evidence. It does not validate paper-scale reproduction, retrieval benchmarks,
 optimized long-context efficiency, distributed training, or any P1
 model/ecosystem capability.
 
+## HF contract hardening Stage E validated scope
+
+Stage E evidence is complete on tested source
+`0d59083ddbd78619ca29bf9af730999834272a1a`, against implementation baseline
+`bf8cc34cb6aa16ffeec1f609166db5efae79e9df`. The 53-command matrix and two
+environment records passed, with 117 focused tests in each exact Transformers
+4.57.6 and 5.14.1 lane, full P0-1/P0-2 CPU fp32 and CUDA bf16, fresh
+checkpointed P0-3 Psi=8/16, and fresh strict P0-4 Psi=8/16. Codex reviewed all
+53 lossless logs and 179 raw events.
+
+The bounded result verifies these eight contracts:
+
+1. the output head is a callable hidden-to-vocabulary projection;
+2. the normalized tied head remains parameter-free;
+3. deep copies isolate owner, mutation, gradient, and lifecycle state;
+4. gradient-checkpointed training with past state fails fast;
+5. zero valid targets produce a finite graph-connected zero loss;
+6. cached-generation suffix handling never silently drops tokens;
+7. packed-text construction fails fast when EOS identity is missing; and
+8. hardened P0-4 qualification requires microbatch one plus enabled,
+   supported non-reentrant gradient checkpointing.
+
+See the [Stage E plan](HF_CONTRACT_HARDENING_PLAN.md),
+[summary](validation_results/HF_CONTRACT_HARDENING_SUMMARY.md),
+[descriptor](validation_results/HF_CONTRACT_HARDENING_EVIDENCE_ARCHIVE.json),
+[exact/private verification](validation_results/HF_CONTRACT_HARDENING_EXACT_VERIFICATION.json),
+and [sanitized verification](validation_results/HF_CONTRACT_HARDENING_SANITIZED_VERIFICATION.json).
+The exact/private and sanitized staging archives are retained and verified
+offline but unpublished. Draft PR review and merge remain pending.
+
+This result does not establish paper-scale training, retrieval quality,
+optimized long-context efficiency, distributed training, broad generation
+compatibility, or any P1 model/ecosystem capability. It does not turn the dense
+quadratic screening path into performance evidence.
+
 ## P0-4 validated scope
 
 Both intended P0-4 model orders passed the recorded CUDA bf16 context-4096 qualification. This establishes short-run feasibility and stability under one recorded hardware/software environment only; it does not validate paper-scale training, retrieval quality, long-context efficiency, or cross-hardware reproducibility. See [validation_results/P0_4_SUMMARY.md](validation_results/P0_4_SUMMARY.md).

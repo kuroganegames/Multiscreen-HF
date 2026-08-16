@@ -1,0 +1,63 @@
+{
+  "acceptance_review": {
+    "reviewers": [
+      {
+        "identifier": "Codex",
+        "raw_events_reviewed": true,
+        "review_commit": "0d59083ddbd78619ca29bf9af730999834272a1a",
+        "review_method": "Codex read all 53 lossless logs and 179 raw events, both P0-4 summaries and completion markers, and both machine reports; checked event order, finite loss and gradients, qualification, tokenizer, cache, data bindings, and repository hygiene.",
+        "reviewed_at_utc": "2026-08-16T02:51:24Z",
+        "role": "evidence_reviewer"
+      }
+    ],
+    "status": "recorded"
+  },
+  "implementation_baseline": "bf8cc34cb6aa16ffeec1f609166db5efae79e9df",
+  "limitations": [
+    "This is an unofficial correctness-first Hugging Face implementation.",
+    "The dense quadratic screening path is not evidence of paper efficiency.",
+    "No paper-scale training, retrieval benchmark, distributed training, broad generation compatibility, or P1 ecosystem capability is validated."
+  ],
+  "review": {
+    "artifact_count": 130,
+    "command_count": 53,
+    "environment_record_count": 2,
+    "focused_tests_per_exact_lane": 117,
+    "historical_evidence": {
+      "artifact_count": 14,
+      "status": "passed",
+      "tree_material_sha256": "cf716205ce89e65ea02cc8ccc65450f94c899660c75afeebc141257c1358aecd"
+    },
+    "ordering_checks": [
+      "runtime-environments-before-commands",
+      "all-command-records-nonoverlapping-in-fixed-order",
+      "p0-4-psi8-focused-review-before-psi16"
+    ],
+    "raw_event_counts": {
+      "p0_3_stdout_step_events": 65,
+      "p0_4_jsonl_events": 114,
+      "total": 179
+    },
+    "review_material_sha256": "14bb534c4e636316bcc6e0b3fff86b755dc1fb056e47d4982d7096d4928b0870",
+    "status": "passed"
+  },
+  "schema_version": "multiscreen-hf-contract-hardening-summary-v1",
+  "tested_commit": "0d59083ddbd78619ca29bf9af730999834272a1a",
+  "validated_components": {
+    "c1_architecture_initialization_all_scale": "passed",
+    "c2_position_mipe_cache": "passed",
+    "generation_input_contract": "passed",
+    "gradient_checkpointing_api_matrix": "passed",
+    "hf_output_head_and_deepcopy_lifecycle": "passed",
+    "historical_evidence_immutability": "passed",
+    "p0_1_formula_oracle": "passed",
+    "p0_2_three_way": "passed",
+    "p0_3_checkpointed_smoke": "passed",
+    "p0_4_hardened_psi8_psi16_qualification": "passed",
+    "packed_text_eos_contract": "passed",
+    "paper_training_contract": "passed",
+    "training_edge_contracts": "passed"
+  },
+  "validation_gate": "HF Contract Hardening",
+  "validation_status": "passed"
+}
