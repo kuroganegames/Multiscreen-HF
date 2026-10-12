@@ -12,8 +12,11 @@ and accepted as merged PR #14 (merge commit
 paper-scale reproduction, retrieval, optimized long-context efficiency,
 distributed training, or any P1 model/ecosystem capability.
 
-**HF contract hardening Stage E: evidence complete locally; draft PR
-pending.** The fixed matrix passed on clean tested source
+**HF contract hardening Stage E: validation and evidence closure complete;
+PR #22 merged.** [PR #22](https://github.com/kuroganegames/Multiscreen-HF/pull/22)
+was merged on 2026-08-16 (merge commit
+`fc487d57312597d31258ea14a8a47a751708ee4d`). The fixed matrix passed on clean
+tested source
 `0d59083ddbd78619ca29bf9af730999834272a1a`, based on implementation baseline
 `bf8cc34cb6aa16ffeec1f609166db5efae79e9df`. It records 53 passed commands,
 two exact Transformers environments, 117 focused tests per lane, full
@@ -21,10 +24,11 @@ P0-1/P0-2 CPU fp32 and CUDA bf16, and fresh checkpointed P0-3 plus strict P0-4
 Psi=8/16 runs. Codex reviewed all 53 lossless logs and all 179 raw events.
 Evidence commit `4fd704f805ea634c66d2c4c26dded425c819a51d` contains the two
 summaries, partial descriptor, and two verification reports. The documentation
-closure records the complete descriptor. Exact/private and separately
-sanitized staging
-archives are retained and verified offline but unpublished. Draft PR review
-and merge remain pending. This does not validate paper-scale training,
+closure `6e8ea7120372396f562352d874c63ca7ac1d7736` records the complete
+descriptor. Exact/private and separately sanitized staging archives are
+retained and verified offline but unpublished. The validation remains bound
+to the tested source, not the merge commit or current repository HEAD.
+This does not validate paper-scale training,
 retrieval, optimized long-context efficiency, broad generation compatibility,
 distributed training, or a P1 model/ecosystem capability.
 
@@ -52,7 +56,7 @@ P0.5-C2: accepted; focused PR #10 merged; correction PR #11 merged
 P1-preflight B: accepted; focused PR #12 merged
 P0.5-C3 / Stage 4: accepted; focused PR #13 reviewed and merged
 final Level 1 requalification / Stage 5: accepted; focused PR #14 reviewed and merged
-HF contract hardening Stage E: evidence complete locally; draft PR review/merge pending
+HF contract hardening Stage E: validation/evidence closure complete; PR #22 merged on 2026-08-16
 ```
 
 Start with:
@@ -101,13 +105,14 @@ Use [CODEX_P0_4_HANDOFF.md](CODEX_P0_4_HANDOFF.md) only for an intentional P0-4 
 | P1-preflight B | Complete | Supported non-reentrant API, exact 4.57.6/5.14.1 matrix, strong P0 regressions, and checkpointed CUDA smokes were accepted by merged PR #12. |
 | P0.5-C3 | Complete | The local gate was reviewed and accepted by merged PR #13. |
 | Final Level 1 requalification | Complete | Reviewed Stage 5 validation and evidence closure passed and were accepted by merged PR #14. |
-| HF contract hardening Stage E | Evidence complete locally | Seven post-Level-1 hardening resolutions, fresh P0 regressions/training, review, and private evidence closure passed; draft PR review/merge remains pending. |
+| HF contract hardening Stage E | Complete; PR #22 merged | Seven post-Level-1 hardening resolutions, fresh P0 regressions/training, Codex evidence review, and private evidence closure passed; PR #22 merged on 2026-08-16. |
 | P1 ecosystem capabilities | None validated | PEFT/LoRA, QLoRA, Unsloth, generation matrix, compile, and serving remain future gates. |
 
 ### Baseline identity
 
 ```text
-Current local validation baseline: HF contract hardening Stage E evidence complete; draft PR pending
+Current recorded validation baseline: HF contract hardening Stage E validation/evidence closure complete
+Repository snapshot checked on 2026-10-12 (main): 2764ef02db74c2ba0ea6ed28db13a42e3b3af46f
 P0.5-C1 merge / C2 base: ec805c1ba60c55ea4beb3ad68e0a00c0d718e909
 P0.5-C2 merge: 54aa96ee914e9f8ac7b58e6d176d4e3fbeb0ae27
 C2 correction / Stage 3 base: 0c83be6b4b043f4b965df4528534f24e9d5ab4f1
@@ -124,7 +129,9 @@ Stage E tested/review source: 0d59083ddbd78619ca29bf9af730999834272a1a
 Stage E evidence commit: 4fd704f805ea634c66d2c4c26dded425c819a51d
 Stage E result: docs/validation_results/HF_CONTRACT_HARDENING_SUMMARY.{md,json}
 Stage E complete descriptor: docs/validation_results/HF_CONTRACT_HARDENING_EVIDENCE_ARCHIVE.json
-Stage E delivery state: draft PR not yet created, reviewed, or merged
+Stage E documentation closure: 6e8ea7120372396f562352d874c63ca7ac1d7736
+Stage E delivery state: PR #22 merged on 2026-08-16
+Stage E merge commit: fc487d57312597d31258ea14a8a47a751708ee4d
 Primary config: multiscreen_transformers/configuration_multiscreen.py
 Primary equation oracle: oracle/paper_math_oracle.py
 Canonical validation status: docs/VALIDATION_STATUS.md
@@ -587,20 +594,21 @@ P0.5-C2  long-position / MiPE / cache semantics — merged
 P1-preflight B  gradient-checkpointing API modernization — merged as PR #12
 P0.5-C3  paper-training-contract smoke — accepted as merged PR #13
 final P0 core requalification — accepted as merged PR #14
-HF contract hardening Stage E — evidence complete locally; draft PR pending
-P1-1  PEFT/LoRA smoke
+HF contract hardening Stage E — validation/evidence closure complete; PR #22 merged
+P1-1  PEFT/LoRA smoke — candidate only; separate scope and acceptance criteria required
 ```
 
 The final P0 core requalification is reproducible only under the separate
 Stage 5 plan. No P1 ecosystem capability is validated merely because the Level
 1 Core program passed.
 
-The immediate next workflow checkpoint is the focused Stage E draft PR. PR
-review and merge require separate user actions; no tag is implied. Only after
-that delivery is accepted should a distinct future capability gate such as
-P1-1 PEFT/LoRA be planned. The Stage E result does not itself validate PEFT,
-LoRA, QLoRA, Unsloth, serving, compile, broad generation, or another P1
-ecosystem capability.
+Stage E delivery is complete through
+[PR #22](https://github.com/kuroganegames/Multiscreen-HF/pull/22), merged on 2026-08-16;
+no new Stage E PR or tag is implied. P1-1 PEFT/LoRA is a possible next
+capability gate, not an approved implementation scope. Before starting it,
+agree its scope, supported environment, and acceptance criteria separately.
+The Stage E result does not itself validate PEFT, LoRA, QLoRA, Unsloth,
+serving, compile, broad generation, or another P1 ecosystem capability.
 
 ## 14. Final report format
 
