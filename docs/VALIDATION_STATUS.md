@@ -12,7 +12,8 @@ For the closed Stage 5 plan and reviewed result, see
 [LEVEL1_CORE_REQUALIFICATION_PLAN.md](LEVEL1_CORE_REQUALIFICATION_PLAN.md) and
 [LEVEL1_CORE_SUMMARY.md](validation_results/LEVEL1_CORE_SUMMARY.md).
 
-For the completed local Stage E run, see
+For the completed Stage E validation and evidence closure, merged in
+[PR #22](https://github.com/kuroganegames/Multiscreen-HF/pull/22) on 2026-08-16, see
 [HF_CONTRACT_HARDENING_PLAN.md](HF_CONTRACT_HARDENING_PLAN.md),
 [HF_CONTRACT_HARDENING_SUMMARY.md](validation_results/HF_CONTRACT_HARDENING_SUMMARY.md),
 and the complete
@@ -49,7 +50,7 @@ final Level 1 requalification and evidence
   Status: complete; evidence closure complete; focused PR #14 reviewed and merged
 
 HF contract hardening Stage E requalification
-  Status: evidence complete locally; draft PR review/merge pending
+  Status: validation/evidence closure complete; PR #22 merged on 2026-08-16
 ```
 
 **Level 1 — Core mathematical Hugging Face implementation: complete.** This
@@ -505,7 +506,10 @@ verification reports.
 
 ### HF contract hardening Stage E requalification
 
-Stage E passed locally on clean tested source
+Stage E validation and evidence closure are complete.
+[PR #22](https://github.com/kuroganegames/Multiscreen-HF/pull/22) was merged on
+2026-08-16 as `fc487d57312597d31258ea14a8a47a751708ee4d`.
+The recorded matrix passed locally on clean tested source
 `0d59083ddbd78619ca29bf9af730999834272a1a`, descended from implementation
 baseline `bf8cc34cb6aa16ffeec1f609166db5efae79e9df`. It requalified these eight
 bounded contracts together:
@@ -535,8 +539,10 @@ partial descriptor, and committed
 [exact/private](validation_results/HF_CONTRACT_HARDENING_EXACT_VERIFICATION.json)
 and [sanitized](validation_results/HF_CONTRACT_HARDENING_SANITIZED_VERIFICATION.json)
 verification reports. Exact evidence is retained privately outside Git. The
-documentation closure records the complete descriptor. The
-separately built sanitized staging archive was independently rescanned and
+documentation closure `6e8ea7120372396f562352d874c63ca7ac1d7736` records
+the complete descriptor. The validation remains bound to the tested source,
+not the merge commit or current repository HEAD. The separately built
+sanitized staging archive was independently rescanned and
 verified. Neither archive is published and no public asset exists.
 
 This is a P0/Level 1 correctness, compatibility, and bounded short-run
@@ -546,9 +552,11 @@ distributed training, or any P1 model/ecosystem capability.
 
 ## Next validation boundary
 
-P0-4, the staged Level 1 core program, and the local Stage E evidence closure
-are complete. Stage E draft PR creation, review, and merge remain the immediate
-delivery boundary; no tag is implied. A possible P1-1 PEFT/LoRA gate remains a
-separate future scope after that delivery is accepted. No PEFT, LoRA, QLoRA,
-Unsloth, broad generation, compile, serving, or other P1 ecosystem capability
-is validated by Stage E.
+P0-4, the staged Level 1 core program, and Stage E validation and evidence
+closure are complete. Stage E was merged in
+[PR #22](https://github.com/kuroganegames/Multiscreen-HF/pull/22) on 2026-08-16;
+no new Stage E PR or tag is implied. P1-1 PEFT/LoRA remains a possible future
+gate requiring separately agreed scope, supported environment, and acceptance
+criteria before implementation. No PEFT, LoRA, QLoRA, Unsloth, broad
+generation, compile, serving, or other P1 ecosystem capability is validated
+by Stage E.
