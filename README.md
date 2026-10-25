@@ -26,8 +26,11 @@ reviewed and accepted as merged PR #14 (merge commit
 paper-scale reproduction, retrieval benchmarks, optimized long-context
 efficiency, distributed training, or any P1 model/ecosystem capability.
 
-Stage E HF contract hardening requalification is **complete locally; draft PR
-pending**. The fixed 53-command matrix passed on clean tested source
+Stage E HF contract hardening requalification and evidence closure are
+**complete**. [PR #22](https://github.com/kuroganegames/Multiscreen-HF/pull/22) was
+merged on 2026-08-16 (merge commit
+`fc487d57312597d31258ea14a8a47a751708ee4d`). The fixed 53-command matrix
+passed on clean tested source
 `0d59083ddbd78619ca29bf9af730999834272a1a` (implementation baseline
 `bf8cc34cb6aa16ffeec1f609166db5efae79e9df`) with two exact Transformers
 environment records, 117 focused tests in each of Transformers 4.57.6 and
@@ -36,8 +39,11 @@ checkpointed CUDA bf16 P0-3 and strict P0-4 Psi=8/Psi=16 runs. Codex reviewed
 all 53 lossless logs and all 179 raw events. Exact evidence is retained and
 verified privately outside Git; the separately built sanitized archive is
 rescanned and verified but remains unpublished. Evidence commit
-`4fd704f805ea634c66d2c4c26dded425c819a51d` records the canonical result. This
-does not validate paper-scale training, retrieval, optimized long-context
+`4fd704f805ea634c66d2c4c26dded425c819a51d` records the canonical result;
+documentation closure `6e8ea7120372396f562352d874c63ca7ac1d7736` completes
+the descriptor. The validation remains bound to the tested source, not the
+merge commit or current repository HEAD. This does not validate paper-scale
+training, retrieval, optimized long-context
 efficiency, broad generation compatibility, distributed training, or a P1
 model/ecosystem capability.
 
@@ -113,8 +119,9 @@ resolutions together, including the hardened eight-condition P0-4 predicate.
 Its reviewed local result and complete evidence closure are recorded in the
 [Stage E summary](docs/validation_results/HF_CONTRACT_HARDENING_SUMMARY.md) and
 [descriptor](docs/validation_results/HF_CONTRACT_HARDENING_EVIDENCE_ARCHIVE.json).
-The result has not yet been published as a draft PR and does not broaden the
-project's P0/Level 1 claim into a P1 capability.
+The result and complete descriptor were merged in
+[PR #22](https://github.com/kuroganegames/Multiscreen-HF/pull/22) on 2026-08-16.
+This does not broaden the project's P0/Level 1 claim into a P1 capability.
 
 ## What is included
 
